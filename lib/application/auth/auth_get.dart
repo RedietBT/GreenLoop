@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:greenloop/presentaion/login_page.dart';
 import 'package:greenloop/presentaion/profile_page.dart';
+import 'package:greenloop/presentaion/register_as_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthGet extends StatelessWidget {
@@ -25,7 +25,7 @@ class AuthGet extends StatelessWidget {
         if (session != null) {
           return ProfilePage();
         } else {
-          return LoginPage();
+          return RegisterAsPage();
         }
         
   },);

@@ -3,20 +3,20 @@ import 'package:greenloop/application/auth/auth_service.dart';
 import 'package:greenloop/presentaion/login_page.dart';
 import 'package:greenloop/infrastructure/auth/supabase_auth_repository.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+class RegisterPageForRecycling extends StatefulWidget {
+  const RegisterPageForRecycling({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  State<RegisterPageForRecycling> createState() => _RegisterPageForRecycling();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterPageForRecycling extends State<RegisterPageForRecycling> {
   final _authService = AuthService(SupabaseAuthRepository());
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _firstNameController = TextEditingController();
-  final _lastNameController = TextEditingController();
+  final _centerName = TextEditingController();
+  final _contactInfo = TextEditingController();
 
   Map<String, dynamic>? _selectedRole;
   List<Map<String, dynamic>> _roles = [];
@@ -31,8 +31,13 @@ class _RegisterPageState extends State<RegisterPage> {
   Future<void> _loadRoles() async {
     try {
       final roles = await _authService.getRoles();
+
+      // Automatically select the last role (e.g., "Recycling Center")
+      final recyclingCenterRole = roles.isNotEmpty ? roles.last : null;
+
       setState(() {
         _roles = roles;
+        _selectedRole = recyclingCenterRole;
         _isLoading = false;
       });
     } catch (e) {
@@ -49,12 +54,12 @@ class _RegisterPageState extends State<RegisterPage> {
     try {
       final email = _emailController.text.trim();
       final password = _passwordController.text.trim();
-      final firstName = _firstNameController.text.trim();
-      final lastName = _lastNameController.text.trim();
+      final centerName = _centerName.text.trim();
+      final contactInfo = _contactInfo.text.trim();
 
       if (_selectedRole == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please select a role.")),
+          const SnackBar(content: Text("Role not found. Please try again later.")),
         );
         return;
       }
@@ -64,17 +69,17 @@ class _RegisterPageState extends State<RegisterPage> {
       final response = await _authService.sigUpInWithEmailAndPassword(
         email,
         password,
-        firstName,
-        lastName,
+        centerName,
+        contactInfo,
         roleId,
       );
 
       final userId = response.user?.id;
       if (userId != null) {
-        await _authService.insertUserProfile(
+        await _authService.insertIntoRecyclinTable(
           id: userId,
-          firstName: firstName,
-          lastName: lastName,
+          centerName: centerName,
+          contactInfo: contactInfo,
           email: email,
           role: roleId,
         );
@@ -96,7 +101,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Register")),
+      appBar: AppBar(title: const Text("Register Recycling Center")),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
@@ -105,12 +110,12 @@ class _RegisterPageState extends State<RegisterPage> {
                 child: Column(
                   children: [
                     TextField(
-                      controller: _firstNameController,
-                      decoration: const InputDecoration(labelText: "First Name"),
+                      controller: _centerName,
+                      decoration: const InputDecoration(labelText: "Recycling Center Name"),
                     ),
                     TextField(
-                      controller: _lastNameController,
-                      decoration: const InputDecoration(labelText: "Last Name"),
+                      controller: _contactInfo,
+                      decoration: const InputDecoration(labelText: "Contact Information"),
                     ),
                     TextField(
                       controller: _emailController,
@@ -121,27 +126,6 @@ class _RegisterPageState extends State<RegisterPage> {
                       decoration: const InputDecoration(labelText: "Password"),
                       obscureText: true,
                     ),
-                    const SizedBox(height: 20),
-                    DropdownButton<Map<String, dynamic>>(
-                      value: _selectedRole,
-                      hint: const Text("Select Role"),
-                      isExpanded: true,
-                      items: _roles.map((roleMap) {
-                        final displayName =
-                            roleMap['role'] ?? roleMap['name'] ?? 'Unnamed Role';
-                        return DropdownMenuItem<Map<String, dynamic>>(
-                          value: roleMap,
-                          child: Text(displayName),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedRole = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    Text('Selected Role: ${_selectedRole?['role'] ?? _selectedRole?['name'] ?? "None"}'),
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: _register,

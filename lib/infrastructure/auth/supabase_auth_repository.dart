@@ -14,6 +14,17 @@ class SupabaseAuthRepository implements AuthRepository {
         'role': role,
       });
   }
+// Insert into Recycling center
+@override
+  Future<void> insertIntoRecyclinTable({required String id, required String centerName, required String contactInfo, required String email, required String role}) async{await _supabase.from('recycling_center').insert({
+        'id': id,
+        'center_name': centerName,
+        'contact': contactInfo,
+        'email': email,
+        'role': role,
+      });
+  }
+
 //Get user email
   @override
   String? getCurrentUserEmail() {

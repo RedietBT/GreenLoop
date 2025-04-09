@@ -11,6 +11,13 @@ abstract class AuthRepository {
   required String email,
   required String role,
   });
+Future<void> insertIntoRecyclinTable({
+  required String id,
+  required String centerName,
+  required String contactInfo,
+  required String email,
+  required String role,
+  });
 String? getCurrentUserEmail();
 Future<List<Map<String, dynamic>>> getRoles();
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:greenloop/application/auth/auth_service.dart';
 import 'package:greenloop/presentaion/profile_page.dart';
-import 'package:greenloop/presentaion/register_page.dart';
+import 'package:greenloop/presentaion/register_as_page.dart';
 import 'package:greenloop/infrastructure/auth/supabase_auth_repository.dart';
 
 class LoginPage extends StatefulWidget {
@@ -59,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
             GestureDetector(
               onTap: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const RegisterPage()),
+                MaterialPageRoute(builder: (_) => const RegisterAsPage()),
               ),
               child: const Text("Don't have an account? Register here."),
             ),
