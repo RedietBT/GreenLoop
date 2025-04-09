@@ -1,0 +1,157 @@
+import 'package:flutter/material.dart';
+import 'package:greenloop/application/auth/auth_service.dart';
+import 'package:greenloop/presentaion/login_page.dart';
+import 'package:greenloop/infrastructure/auth/supabase_auth_repository.dart';
+
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
+
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  final _authService = AuthService(SupabaseAuthRepository());
+
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+
+  String? _selectedRole;
+
+  List<Map<String, dynamic>> _roles = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRoles();
+  }
+
+  Future<void> _loadRoles() async {
+    try {
+      final roles = await _authService.getRoles();
+      setState(() {
+        _roles = roles;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to load roles: ${e.toString()}")),
+      );
+    }
+  }
+
+  void _register() async {
+    try {
+      final email = _emailController.text.trim();
+      final password = _passwordController.text.trim(); 
+      final firstName = _firstNameController.text.trim();
+      final lastName = _lastNameController.text.trim();
+
+      if (_selectedRole == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please select a role.")),
+        );
+        return;
+      }
+
+      final response = await _authService.sigUpInWithEmailAndPassword(
+        email,
+        password,
+        firstName,
+        lastName,
+        _selectedRole,
+      );
+
+      final userId = response.user?.id;
+      if (userId != null) {
+        await _authService.insertUserProfile(
+          id: userId,
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          role: _selectedRole!,
+        );
+
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const LoginPage()),
+          );
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Registration failed: ${e.toString()}")),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Register")),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _firstNameController,
+                      decoration: const InputDecoration(labelText: "First Name"),
+                    ),
+                    TextField(
+                      controller: _lastNameController,
+                      decoration: const InputDecoration(labelText: "Last Name"),
+                    ),
+                    TextField(
+                      controller: _emailController,
+                      decoration: const InputDecoration(labelText: "Email"),
+                    ),
+                    TextField(
+                      controller: _passwordController,
+                      decoration: const InputDecoration(labelText: "Password"),
+                      obscureText: true,
+                    ),
+                    const SizedBox(height: 20),
+                    DropdownButton<String>(
+                      value: _selectedRole,
+                      hint: const Text("Select Role"),
+                      isExpanded: true,
+                      items: _roles.map((roleMap) {
+                        final role = (roleMap['role'] ??
+                                roleMap['name'] ??
+                                'unknown')
+                            .toString();
+                        return DropdownMenuItem<String>(
+                          value: role,
+                          child: Text(role),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedRole = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    Text('Selected Role: ${_selectedRole ?? "None"}'),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: _register,
+                      child: const Text("Register"),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+    );
+  }
+}

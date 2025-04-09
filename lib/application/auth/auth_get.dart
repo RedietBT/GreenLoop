@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:greenloop/application/auth/login_page.dart';
-import 'package:greenloop/application/auth/profile_page.dart';
+import 'package:greenloop/presentaion/login_page.dart';
+import 'package:greenloop/presentaion/profile_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthGet extends StatelessWidget {
