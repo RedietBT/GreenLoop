@@ -19,7 +19,6 @@ class _RegisterPageForRecycling extends State<RegisterPageForRecycling> {
   final _contactInfo = TextEditingController();
 
   Map<String, dynamic>? _selectedRole;
-  List<Map<String, dynamic>> _roles = [];
   bool _isLoading = true;
 
   @override
@@ -33,10 +32,12 @@ class _RegisterPageForRecycling extends State<RegisterPageForRecycling> {
       final roles = await _authService.getRoles();
 
       // Automatically select the last role (e.g., "Recycling Center")
-      final recyclingCenterRole = roles.isNotEmpty ? roles.last : null;
+      final recyclingCenterRole = roles.firstWhere(
+        (role) => role['id'] == 'USER102',
+        orElse: () => <String, dynamic>{},
+        );
 
       setState(() {
-        _roles = roles;
         _selectedRole = recyclingCenterRole;
         _isLoading = false;
       });
