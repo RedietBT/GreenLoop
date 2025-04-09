@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:greenloop/presentaion/home_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:greenloop/application/auth/auth_get.dart';
 
 
 void main() async{
@@ -23,11 +23,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      initialRoute: '/', // Set the initial route to the SignUpScreen
+      initialRoute: '/',
       routes: {
-        '/': (context) => const AuthGet(),
-        // '/auth/callback': (context) => const AuthCallbackScreen(),
-        // '/profile': (context) => const ProfileScreen(),
+        '/': (context) => const HomePage(),
       },
     );
   }
