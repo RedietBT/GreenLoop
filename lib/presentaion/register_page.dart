@@ -18,8 +18,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
 
-  String? _selectedRole;
-
+  Map<String, dynamic>? _selectedRole;
   List<Map<String, dynamic>> _roles = [];
   bool _isLoading = true;
 
@@ -49,7 +48,7 @@ class _RegisterPageState extends State<RegisterPage> {
   void _register() async {
     try {
       final email = _emailController.text.trim();
-      final password = _passwordController.text.trim(); 
+      final password = _passwordController.text.trim();
       final firstName = _firstNameController.text.trim();
       final lastName = _lastNameController.text.trim();
 
@@ -60,12 +59,14 @@ class _RegisterPageState extends State<RegisterPage> {
         return;
       }
 
+      final roleId = _selectedRole!['id'];
+
       final response = await _authService.sigUpInWithEmailAndPassword(
         email,
         password,
         firstName,
         lastName,
-        _selectedRole,
+        roleId,
       );
 
       final userId = response.user?.id;
@@ -75,7 +76,7 @@ class _RegisterPageState extends State<RegisterPage> {
           firstName: firstName,
           lastName: lastName,
           email: email,
-          role: _selectedRole!,
+          role: roleId,
         );
 
         if (mounted) {
@@ -121,18 +122,16 @@ class _RegisterPageState extends State<RegisterPage> {
                       obscureText: true,
                     ),
                     const SizedBox(height: 20),
-                    DropdownButton<String>(
+                    DropdownButton<Map<String, dynamic>>(
                       value: _selectedRole,
                       hint: const Text("Select Role"),
                       isExpanded: true,
                       items: _roles.map((roleMap) {
-                        final role = (roleMap['role'] ??
-                                roleMap['name'] ??
-                                'unknown')
-                            .toString();
-                        return DropdownMenuItem<String>(
-                          value: role,
-                          child: Text(role),
+                        final displayName =
+                            roleMap['role'] ?? roleMap['name'] ?? 'Unnamed Role';
+                        return DropdownMenuItem<Map<String, dynamic>>(
+                          value: roleMap,
+                          child: Text(displayName),
                         );
                       }).toList(),
                       onChanged: (value) {
@@ -142,7 +141,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       },
                     ),
                     const SizedBox(height: 16),
-                    Text('Selected Role: ${_selectedRole ?? "None"}'),
+                    Text('Selected Role: ${_selectedRole?['role'] ?? _selectedRole?['name'] ?? "None"}'),
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: _register,
