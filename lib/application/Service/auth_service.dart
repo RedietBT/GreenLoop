@@ -1,4 +1,4 @@
-import 'package:greenloop/domain/repositories/auth_repository.dart';
+import 'package:greenloop/application/Repository/auth_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthService {

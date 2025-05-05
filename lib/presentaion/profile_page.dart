@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:greenloop/application/auth/auth_service.dart';
+import 'package:greenloop/application/Service/auth_service.dart';
 import 'package:greenloop/presentaion/login_page.dart';
-import 'package:greenloop/infrastructure/auth/supabase_auth_repository.dart';
+import 'package:greenloop/application/infrastructure/auth/supabase_auth_repository.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final _authService = AuthService(SupabaseAuthRepository());
-    final email = _authService.getCurrentUserEmail();
+    final authService = AuthService(SupabaseAuthRepository());
+    final email = authService.getCurrentUserEmail();
 
-    void _logout() async {
-      await _authService.signOut();
+    void logout() async {
+      await authService.signOut();
       if (context.mounted) {
         Navigator.pushReplacement(
           context,
@@ -31,7 +31,7 @@ class ProfilePage extends StatelessWidget {
             const SizedBox(height: 10),
             Text(email ?? "No email found"),
             const SizedBox(height: 30),
-            ElevatedButton(onPressed: _logout, child: const Text("Logout")),
+            ElevatedButton(onPressed: logout, child: const Text("Logout")),
           ],
         ),
       ),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:greenloop/application/auth/auth_service.dart';
+import 'package:greenloop/application/Service/auth_service.dart';
 import 'package:greenloop/presentaion/profile_page.dart';
 import 'package:greenloop/presentaion/register_as_page.dart';
-import 'package:greenloop/infrastructure/auth/supabase_auth_repository.dart';
+import 'package:greenloop/application/infrastructure/auth/supabase_auth_repository.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
