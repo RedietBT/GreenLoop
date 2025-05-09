@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:greenloop/application/auth/auth_get.dart';
+import 'core/res/fonts.dart';
+import 'core/services/router.dart';
 
 
 void main() async{
@@ -11,7 +12,7 @@ await Supabase.initialize(
 );
 
   runApp(MyApp());
-}
+}  
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -21,14 +22,19 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Greenloop',
       theme: ThemeData(
-        primarySwatch: Colors.green,
+        useMaterial3: true,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        fontFamily: Fonts.fontFamily,
+        appBarTheme: const AppBarTheme(
+          color: Colors.transparent,
+          ),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.green,
+          primary: Colors.green,
+          secondary: Colors.greenAccent,
+        ),
       ),
-      initialRoute: '/', // Set the initial route to the SignUpScreen
-      routes: {
-        '/': (context) => const AuthGet(),
-        // '/auth/callback': (context) => const AuthCallbackScreen(),
-        // '/profile': (context) => const ProfileScreen(),
-      },
+      onGenerateRoute: generateRoute,
     );
   }
 }
