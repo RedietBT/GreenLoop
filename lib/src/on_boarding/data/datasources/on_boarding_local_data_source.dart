@@ -25,9 +25,10 @@ class OnBoardingLocalDataSourceImpl implements OnBoardingLocalDataSource {
 
   @override
   Future<bool> checkIfUserisFirstTimer() async {
-    final result = _sharedPreferences.getBool(OnBoardingLocalDataSource.kFirstTimeUserKey) ?? true;
+    final result = _sharedPreferences.getBool(OnBoardingLocalDataSource.kFirstTimeUserKey);
     if (result != null) {
-        return result;
-        }
+      return result;
+    }
+    return true; // Default to true if result is null
   }
 }

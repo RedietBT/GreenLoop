@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:greenloop/src/on_boarding/presentation/on_bording_screan.dart';
+import 'package:greenloop/src/on_boarding/presentation/views/on_bording_screan.dart';
 import 'package:greenloop/core/commen/views/page_under_constraction.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
