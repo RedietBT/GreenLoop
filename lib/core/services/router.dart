@@ -1,11 +1,17 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenloop/src/on_boarding/presentation/views/on_bording_screan.dart';
 import 'package:greenloop/core/commen/views/page_under_constraction.dart';
+import 'package:greenloop/core/services/injection_container.dart';
+import 'package:greenloop/src/on_boarding/presentation/cubit/on_boarding_cubit.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
     case OnBordingScrean.routeName:
-      return _pageBuilder((_) => const OnBordingScrean(), 
+      return _pageBuilder((_) => BlocProvider(
+        create: (_) => sl<OnBoardingCubit>(),
+        child: const OnBordingScrean()
+        ), 
       settings: settings);
     default:
       return CupertinoPageRoute(
