@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:greenloop/core/services/injection_container.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/res/fonts.dart';
 import 'core/services/router.dart';
 
 
 void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await init();
   //Supabase setup
 await Supabase.initialize(
   anonKey:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2cXN6cXFya25sa3ViamlscHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwMTEzMjAsImV4cCI6MjA1OTU4NzMyMH0.QPKtvmju4W_XGCvCIxePrCNU5dMJri6NJWzyiSLTz78" ,
