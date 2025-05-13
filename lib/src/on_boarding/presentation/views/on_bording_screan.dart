@@ -37,9 +37,9 @@ class _OnBordingScreanState extends State<OnBordingScrean> {
           listener: (context, state) {
         
             if (state is OnBoardingStaus && !state.isFirstTimeUser) {
-              Navigator.pushReplacementNamed(context, '/home');
+              Navigator.pushReplacementNamed(context, '/login');
             }else if (state is UserCashed) {
-                // TODO(User-Cached-Handler): Push to the approprate screan
+                Navigator.pushReplacementNamed(context, '/registerAs');
               } 
           },
             builder: (context, state) {
