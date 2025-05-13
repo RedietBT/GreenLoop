@@ -7,10 +7,12 @@ class RoleModel extends Role {
 
   factory RoleModel.fromJson(Map<String, dynamic> json) {
     return RoleModel(
-      id: json['id'] as int,
+      id: json['id'] as String,
       name: json['name'] as String,
     );
   }
+
+  get role => null;
 
   Map<String, dynamic> toJson() {
     return {

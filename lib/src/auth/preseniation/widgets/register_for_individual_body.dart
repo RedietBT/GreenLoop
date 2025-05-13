@@ -73,7 +73,7 @@ class _RegisterForIndividualBodyState extends State<RegisterForIndividualBody> {
                   password: password,
                 );
 
-                context.read<RegisterForIndividualCubit>().registerIndividual(user, password);
+                context.read<RegisterForIndividualCubit>().registerIndividual(email: email, password: password, firstName: firstName, lastName: lastName, userType: widget.role);
               },
               child: const Text("Register"),
             ),

@@ -1,5 +1,5 @@
 class Role {
-  final int id;
+  final String id;
   final String name;
 
  const Role({required this.id, required this.name});
