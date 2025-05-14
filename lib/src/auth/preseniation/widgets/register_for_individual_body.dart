@@ -64,6 +64,7 @@ class _RegisterForIndividualBodyState extends State<RegisterForIndividualBody> {
                   return;
                 }
 
+
                  IndividualUser(
                   id: "", // leave empty or generate later
                   first_name: firstName,
