@@ -25,9 +25,7 @@ class _LoginBodyState extends State<LoginBody> {
   Widget build(BuildContext context) {
     return BlocConsumer<LoginCubit, LoginState>(
       listener: (context, state) {
-        if (state is LoginSuccess) {
-        // TODO: Navigate to the profile page
-        } else if (state is LoginLoading) {
+        if (state is LoginLoading) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Logging in...")),
           );
@@ -36,11 +34,13 @@ class _LoginBodyState extends State<LoginBody> {
             SnackBar(content: Text("Login failed: ${state.message}")),
           );
         }
+        // No navigation — just message shown in builder below
       },
       builder: (context, state) {
         return Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextField(
                 controller: _emailController,
@@ -58,6 +58,15 @@ class _LoginBodyState extends State<LoginBody> {
                     ? const CircularProgressIndicator()
                     : const Text("Login"),
               ),
+              const SizedBox(height: 20),
+
+              // ✅ Show success message based on LoginSuccess state
+              if (state is LoginSuccess)
+                const Text(
+                  "✅ Logged in",
+                  style: TextStyle(fontSize: 18, color: Colors.green),
+                ),
+
               const SizedBox(height: 10),
               GestureDetector(
                 onTap: () => Navigator.push(
