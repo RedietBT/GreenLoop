@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenloop/src/auth/preseniation/cubit/register_for_individual_cubit.dart';
-import 'package:greenloop/src/auth/domain/entity/individual_user.dart';
+// import 'package:greenloop/src/auth/domain/entity/individual_user.dart';
 import 'package:greenloop/src/auth/preseniation/cubit/register_for_individual_state.dart';
 
 class RegisterForIndividualBody extends StatefulWidget {
@@ -22,8 +22,24 @@ class _RegisterForIndividualBodyState extends State<RegisterForIndividualBody> {
   String? error;
 
   @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<RegisterForIndividualCubit, RegisterForIndividualState>(
+Widget build(BuildContext context) {
+  return BlocListener<RegisterForIndividualCubit, RegisterForIndividualState>(
+    listener: (context, state) {
+      if (state is RegisterForIndividualSuccess) {
+        // Show a success message and wait for email verification
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Registration successful. Please verify your email."),
+          ),
+        );
+
+        // Navigate to login page after a short delay
+        Future.delayed(const Duration(seconds: 2), () {
+          Navigator.of(context).pushReplacementNamed('/login');
+        });
+      }
+    },
+    child: BlocBuilder<RegisterForIndividualCubit, RegisterForIndividualState>(
       builder: (context, state) {
         if (state is RegisterForIndividualLoading) {
           return const Center(child: CircularProgressIndicator());
@@ -57,24 +73,20 @@ class _RegisterForIndividualBodyState extends State<RegisterForIndividualBody> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                setState(() => error = null); // reset error
+                setState(() => error = null);
 
                 if (password != confirmPassword) {
                   setState(() => error = "Passwords do not match.");
                   return;
                 }
 
-
-                 IndividualUser(
-                  id: "", // leave empty or generate later
-                  first_name: firstName,
-                  last_name: lastName,
-                  email: email,
-                  role: widget.role, // or pass from parent
-                  password: password,
-                );
-
-                context.read<RegisterForIndividualCubit>().registerIndividual(email: email, password: password, firstName: firstName, lastName: lastName, userType: widget.role);
+                context.read<RegisterForIndividualCubit>().registerIndividual(
+                      email: email,
+                      password: password,
+                      firstName: firstName,
+                      lastName: lastName,
+                      userType: widget.role,
+                    );
               },
               child: const Text("Register"),
             ),
@@ -97,6 +109,7 @@ class _RegisterForIndividualBodyState extends State<RegisterForIndividualBody> {
           ],
         );
       },
-    );
-  }
+    ),
+  );
+}
 }
