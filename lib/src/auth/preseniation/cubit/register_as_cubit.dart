@@ -8,8 +8,11 @@ class RegisterAsCubit extends Cubit<RegisterAsState> {
 
   void selectRole(String role) {
     emit(RegisterAsLoading()); // Emit loading state
+
     Future.delayed(const Duration(seconds: 2), () {
-      emit(RegisterAsRoleSelected(role)); // Emit the selected role
+      if (!isClosed) {
+        emit(RegisterAsRoleSelected(role)); // Emit selected role if cubit is still active
+      }
     });
   }
 }

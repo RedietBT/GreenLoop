@@ -9,6 +9,8 @@ abstract class RegisterAsState extends Equatable {
 
 class RegisterAsInitial extends RegisterAsState {}
 
+class RegisterAsLoading extends RegisterAsState {}
+
 class RegisterAsRoleSelected extends RegisterAsState {
   final String role;
 
@@ -18,4 +20,3 @@ class RegisterAsRoleSelected extends RegisterAsState {
   List<Object> get props => [role];
 }
 
-class RegisterAsLoading extends RegisterAsState {}
