@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenloop/src/auth/preseniation/cubit/register_for_individual_cubit.dart';
-// import 'package:greenloop/src/auth/domain/entity/individual_user.dart';
 import 'package:greenloop/src/auth/preseniation/cubit/register_for_individual_state.dart';
 
 class RegisterForIndividualBody extends StatefulWidget {
