@@ -34,7 +34,10 @@ class _RegisterForRecyclingBodyState extends State<RegisterForRecyclingBody> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Registration successful!")),
           );
-          Navigator.pop(context);
+           // Navigate to login page after a short delay
+           Future.delayed(const Duration(seconds: 2), () {
+            Navigator.of(context).pushReplacementNamed('/login');
+          });
         }
       },
       builder: (context, state) {
