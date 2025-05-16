@@ -21,6 +21,7 @@ import 'package:greenloop/src/auth/domain/repos/register_new_use_repor.dart';
 import 'package:greenloop/src/auth/data/repos/register_new_user_repository_impl.dart';
 import 'package:greenloop/src/auth/data/datasources/register_new_user_remote_data_source.dart'; 
 import 'package:greenloop/src/auth/data/datasources/role_remote_data_source.dart';
+import 'package:greenloop/src/auth/preseniation/cubit/register_for_recycling_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -88,5 +89,9 @@ Future<void> init() async {
         role: sl<RoleRemoteDataSource>(),
       ));
 
-  // sl.registerFactory(() => RegisterForRecyclingCubit(registerRepo: sl<RegisterNewUserRepo>()));
+  sl.registerFactory(() => RegisterForRecyclingCubit(
+    repository: sl<RegisterNewUserRepo>(),
+    authRemoteDataSource: sl<AuthRemoteDataSource>(),
+    role: sl<RoleRemoteDataSource>(),
+    ));
 }

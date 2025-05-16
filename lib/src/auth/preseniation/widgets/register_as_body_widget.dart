@@ -31,7 +31,8 @@ class RegisterAsPageBody extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   final role = 'Recycling Center';
-                  context.read<RegisterAsCubit>().selectRole(role);Navigator.pushReplacementNamed(context, '/registerForIndividual', arguments: role);
+                  context.read<RegisterAsCubit>().selectRole(role);
+                  Navigator.pushReplacementNamed(context, '/register-recycling', arguments: role);
                   },
                 style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
                 child: const Text("Recycling Center"),
@@ -40,7 +41,8 @@ class RegisterAsPageBody extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   final role = 'Business';
-                  context.read<RegisterAsCubit>().selectRole(role);Navigator.pushReplacementNamed(context, '/registerForIndividual', arguments: role);
+                  context.read<RegisterAsCubit>().selectRole(role);
+                  Navigator.pushReplacementNamed(context, '/registerForIndividual', arguments: role);
                   },
                 style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
                 child: const Text("Business"),

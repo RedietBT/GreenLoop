@@ -51,7 +51,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
   return _pageBuilder(
     (_) => BlocProvider(
       create: (_) => sl<RegisterForRecyclingCubit>(),
-      child: const RegisterForRecyclingPage(),
+      child: const RegisterForRecyclingPage(userType: 'Recycling Company',),
     ),
     settings: settings,
   );

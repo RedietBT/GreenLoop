@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:uuid/uuid.dart';
 import 'package:greenloop/src/auth/preseniation/cubit/register_for_recycling_cubit.dart';
 
 class RegisterForRecyclingBody extends StatefulWidget {
-  const RegisterForRecyclingBody({super.key});
+  final String role;
+  const RegisterForRecyclingBody({
+    super.key,
+    required this.role
+    });
 
   @override
   State<RegisterForRecyclingBody> createState() => _RegisterForRecyclingBodyState();
@@ -12,10 +15,12 @@ class RegisterForRecyclingBody extends StatefulWidget {
 
 class _RegisterForRecyclingBodyState extends State<RegisterForRecyclingBody> {
   final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
   final _centerNameController = TextEditingController();
   final _contactController = TextEditingController();
-  final String _roleId = 'USER102';
+
+  String password = '';
+  String confirmPassword = '';
+
 
   @override
   Widget build(BuildContext context) {
@@ -51,23 +56,27 @@ class _RegisterForRecyclingBodyState extends State<RegisterForRecyclingBody> {
                   decoration: const InputDecoration(labelText: 'Email'),
                 ),
                 TextField(
-                  controller: _passwordController,
-                  obscureText: true,
                   decoration: const InputDecoration(labelText: 'Password'),
+                  obscureText: true,
+                  onChanged: (value) => setState(() => password = value),
                 ),
+                TextField(
+                  decoration: const InputDecoration(labelText: 'Confirm Password'),
+                  obscureText: true,
+                  onChanged: (value) => setState(() => confirmPassword = value),
+                ),
+                
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: state is RegisterForRecyclingLoading
                       ? null
                       : () {
-                          final id = const Uuid().v4();
-                          context.read<RegisterForRecyclingCubit>().register(
-                                id: id,
+                          context.read<RegisterForRecyclingCubit>().registerRecycling(
                                 centerName: _centerNameController.text.trim(),
                                 contactInfo: _contactController.text.trim(),
                                 email: _emailController.text.trim(),
-                                password: _passwordController.text.trim(),
-                                role: _roleId,
+                                password: password,
+                                userType: widget.role,
                               );
                         },
                   child: state is RegisterForRecyclingLoading
