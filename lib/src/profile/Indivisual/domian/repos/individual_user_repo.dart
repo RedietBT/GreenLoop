@@ -1,6 +1,6 @@
 import 'dart:ffi';
 import 'package:greenloop/core/utils/typedefs.dart';
-import 'package:greenloop/src/profile/Indivisual/domin/entity/individual_user.dart';
+import 'package:greenloop/src/profile/Indivisual/domian/entity/individual_user.dart';
 
 abstract class IndividualUserRepo {
   const IndividualUserRepo();
