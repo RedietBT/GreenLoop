@@ -4,7 +4,8 @@ import 'package:greenloop/src/profile/Indivisual/domian/repos/individual_user_re
 class UpdateUserProfile {
   final IndividualUserRepo repository;
 
-  UpdateUserProfile(this.repository);
+  const UpdateUserProfile(this.repository);
+  
   ResultFuture<void> call(String userId, String firstName, String lastname, String email, String avatarUrl, String points) {
     return repository.updateUserProfile(userId, firstName: firstName, lastName: lastname, email: email, avatarUrl: avatarUrl, points: points);
   }

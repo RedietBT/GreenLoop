@@ -4,7 +4,7 @@ import 'package:greenloop/src/profile/Indivisual/domian/entity/individual_user.d
 abstract class IndividualUserRepo {
   const IndividualUserRepo();
 
-ResultFuture<IndividualUser> fetchUserProfile(String userId);
+ResultFuture<Individual_User> fetchUserProfile(String userId);
 
 ResultFuture<void> updateUserProfile(
   String userId, {
