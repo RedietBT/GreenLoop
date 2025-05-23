@@ -11,6 +11,5 @@ class UserRewards {
     required this.redeemedAt,
   });
 
-  @override
   List<Object?> get props => [id, userId, rewardId, redeemedAt];
 }
