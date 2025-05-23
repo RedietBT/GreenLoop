@@ -1,5 +1,3 @@
-// data/repositories/auth_repository_impl.dart
-
 import 'package:dartz/dartz.dart';
 import 'package:greenloop/core/utils/typedefs.dart';
 import 'package:greenloop/src/auth/data/datasources/auth_remote_data_source.dart';
