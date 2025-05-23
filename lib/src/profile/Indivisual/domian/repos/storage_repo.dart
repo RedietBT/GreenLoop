@@ -6,7 +6,7 @@ abstract class StorageRepo {
 
   ResultFuture<String> uploadFile({
    required String bucketName, 
-    String filepath,
+    String? filepath,
     required File file,
 });
 }
