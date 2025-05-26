@@ -56,4 +56,13 @@ class AuthRepositoryImpl extends AuthRepo {
       return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
     }
   }
+@override
+  ResultFuture<String?> getCurrentUserId() async {
+    try {
+      final userId = remote.client.auth.currentUser?.id;
+      return Right(userId);
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString(), statusCode: '500'));
+    }
+  }
 }

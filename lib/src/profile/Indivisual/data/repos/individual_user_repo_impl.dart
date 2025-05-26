@@ -10,7 +10,7 @@ class IndividualUserRepoImpl implements IndividualUserRepo{
 
   final IndividualUserRemoteDataSource remoteDataSource;
 
-  IndividualUserRepoImpl(this.remoteDataSource);
+ const IndividualUserRepoImpl(this.remoteDataSource);
 
   @override
   ResultFuture<Individual_User> fetchUserProfile(String userId) async {
