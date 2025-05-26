@@ -34,7 +34,8 @@ class StorageRepoImpl implements StorageRepo {
       return Left(ServerFailure(
         message: e.toString(),
         statusCode: '500',
-      ));
+      )
+      );
     }
   }
 }

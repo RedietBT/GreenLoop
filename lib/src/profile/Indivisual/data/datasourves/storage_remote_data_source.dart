@@ -27,6 +27,16 @@ class StorageRemoteDataSourceImpl implements StorageRemoteDataSource {
     try {
       final String path = filePath ?? 'uploads/${DateTime.now().microsecondsSinceEpoch}-${file.path.split('/').last}';
 
+      await _supabaseClient.storage
+          .from(bucketName).upload(
+            path,
+            file,
+            fileOptions: const FileOptions(
+              cacheControl: '3600',
+              upsert: false,
+            ),
+          );
+
       final String fullPublicUrl = _supabaseClient.storage.from(bucketName).getPublicUrl(path);
 
       return fullPublicUrl;
