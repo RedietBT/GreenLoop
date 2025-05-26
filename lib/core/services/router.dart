@@ -11,8 +11,8 @@ import 'package:greenloop/src/auth/preseniation/cubit/register_for_individual_cu
 import 'package:greenloop/src/auth/preseniation/views/register_for_individual_page.dart';
 import 'package:greenloop/src/auth/preseniation/cubit/register_for_recycling_cubit.dart';
 import 'package:greenloop/src/auth/preseniation/views/register_for_recycling_page.dart';
-import 'package:greenloop/src/profile/Indivisual/presentation/cubits/individual_profile_cubit.dart';
-import 'package:greenloop/src/profile/Indivisual/presentation/view/individual_profile_page.dart';
+import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
+import 'package:greenloop/src/profile/Individual/presentation/view/individual_profile_page.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {

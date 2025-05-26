@@ -24,10 +24,10 @@ import 'package:greenloop/src/auth/data/datasources/role_remote_data_source.dart
 import 'package:greenloop/src/auth/preseniation/cubit/register_for_recycling_cubit.dart';
 
 // Individual Profile imports
-import 'package:greenloop/src/profile/Indivisual/data/datasourves/individual_user_remot_data_sorce.dart';
-import 'package:greenloop/src/profile/Indivisual/data/repos/individual_user_repo_impl.dart';
-import 'package:greenloop/src/profile/Indivisual/domian/repos/individual_user_repo.dart';
-import 'package:greenloop/src/profile/Indivisual/presentation/cubits/individual_profile_cubit.dart';
+import 'package:greenloop/src/profile/Individual/data/datasourves/individual_user_remot_data_sorce.dart';
+import 'package:greenloop/src/profile/Individual/data/repos/individual_user_repo_impl.dart';
+import 'package:greenloop/src/profile/Individual/domian/repos/individual_user_repo.dart';
+import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
 
 final sl = GetIt.instance;
 

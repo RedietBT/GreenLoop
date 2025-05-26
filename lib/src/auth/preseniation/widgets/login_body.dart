@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenloop/src/auth/preseniation/cubit/login_cubit.dart';
 import 'package:greenloop/src/auth/preseniation/views/register_as_page.dart';
-import 'package:greenloop/src/profile/Indivisual/presentation/view/individual_profile_page.dart';
+import 'package:greenloop/src/profile/Individual/presentation/view/individual_profile_page.dart';
 
 class LoginBody extends StatefulWidget {
   const LoginBody({super.key});
