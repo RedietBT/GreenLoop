@@ -28,6 +28,7 @@ import 'package:greenloop/src/profile/Individual/data/datasourves/individual_use
 import 'package:greenloop/src/profile/Individual/data/repos/individual_user_repo_impl.dart';
 import 'package:greenloop/src/profile/Individual/domian/repos/individual_user_repo.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
+import 'package:greenloop/src/profile/cores/domain/repos/storage_repo.dart';
 
 final sl = GetIt.instance;
 
@@ -118,5 +119,9 @@ Future<void> init() async {
 
   // Cubit
   // Assuming IndividualProfileCubit depends on IndividualUserRepo
-  sl.registerFactory(() => IndividualProfileCubit(sl<IndividualUserRepo>()));
+  sl.registerFactory(() => IndividualProfileCubit(
+    sl<IndividualUserRepo>(), 
+    sl<StorageRepo>()
+    )
+    );
 }
