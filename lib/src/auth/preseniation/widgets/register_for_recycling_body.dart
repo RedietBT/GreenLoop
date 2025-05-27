@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greenloop/core/res/colors.dart';
 import 'package:greenloop/src/auth/preseniation/cubit/register_for_recycling_cubit.dart';
+import 'package:greenloop/src/auth/preseniation/views/login_screen.dart';
 
 class RegisterForRecyclingBody extends StatefulWidget {
   final String role;
@@ -85,8 +87,27 @@ class _RegisterForRecyclingBodyState extends State<RegisterForRecyclingBody> {
                   child: state is RegisterForRecyclingLoading
                       ? const CircularProgressIndicator()
                       : const Text("Register"),
-                )
-              ],
+                ),
+              const SizedBox(height: 20),
+              GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                ),
+                child: RichText(
+                  text: TextSpan(
+                    text: 'have an account? ',
+                    style: TextStyle(color: Colors.black),
+                    children: [
+                      TextSpan(
+                        text: 'Login here.',
+                        style: TextStyle(color: AppColors.primary),
+                        ),
+                      ],
+                    ),
+                  ),
+              ),
+            ],
             ),
           ),
         );

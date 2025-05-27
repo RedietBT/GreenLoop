@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greenloop/core/res/colors.dart';
 import 'package:greenloop/src/auth/preseniation/cubit/register_for_individual_cubit.dart';
 import 'package:greenloop/src/auth/preseniation/cubit/register_for_individual_state.dart';
+import 'package:greenloop/src/auth/preseniation/views/login_screen.dart';
 
 class RegisterForIndividualBody extends StatefulWidget {
   final String role;   
@@ -104,6 +106,25 @@ Widget build(BuildContext context) {
                   state.message ?? 'An unknown error occurred',
                   style: const TextStyle(color: Colors.red),
                 ),
+              ),
+              const SizedBox(height: 20),
+              GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                ),
+                 child: RichText(
+                  text: TextSpan(
+                    text: 'have an account? ',
+                    style: TextStyle(color: Colors.black),
+                    children: [
+                      TextSpan(
+                        text: 'Login here.',
+                        style: TextStyle(color: AppColors.primary),
+                        ),
+                      ],
+                    ),
+                  ),
               ),
           ],
         );
