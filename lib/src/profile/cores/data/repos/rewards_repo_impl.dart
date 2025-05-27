@@ -3,10 +3,10 @@ import 'package:dartz/dartz.dart';
 import 'package:greenloop/core/errors/exceptions.dart';
 import 'package:greenloop/core/errors/failure.dart';
 import 'package:greenloop/core/utils/typedefs.dart';
-import 'package:greenloop/src/profile/Individual/domian/entity/rewards.dart';
-import 'package:greenloop/src/profile/Individual/domian/entity/user_rewards.dart';
-import 'package:greenloop/src/profile/Individual/domian/repos/rewards_repo.dart'; 
-import 'package:greenloop/src/profile/Individual/data/datasourves/rewards_remote_data_source.dart';
+import 'package:greenloop/src/profile/cores/domain/entity/rewards.dart';
+import 'package:greenloop/src/profile/cores/domain/entity/user_rewards.dart';
+import 'package:greenloop/src/profile/cores/domain/repos/rewards_repo.dart'; 
+import 'package:greenloop/src/profile/cores/data/dataSource/rewards_remote_data_source.dart';
 
 class RewardsRepoImpl implements RewardsRepo {
   final RewardsRemoteDataSource _remoteDataSource;

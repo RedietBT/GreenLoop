@@ -1,9 +1,9 @@
-import 'package:greenloop/src/profile/Individual/data/model/user_rewards_model.dart';
-import 'package:greenloop/src/profile/Individual/domian/entity/user_rewards.dart';
+import 'package:greenloop/src/profile/cores/data/model/user_rewards_model.dart';
+import 'package:greenloop/src/profile/cores/domain/entity/user_rewards.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:greenloop/core/errors/exceptions.dart';
-import 'package:greenloop/src/profile/Individual/domian/entity/rewards.dart';
-import 'package:greenloop/src/profile/Individual/data/model/rewards_model.dart';
+import 'package:greenloop/src/profile/cores/domain/entity/rewards.dart';
+import 'package:greenloop/src/profile/cores/data/model/rewards_model.dart';
 
 
 abstract class RewardsRemoteDataSource {

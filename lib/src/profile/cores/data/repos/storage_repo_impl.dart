@@ -3,8 +3,8 @@ import 'package:dartz/dartz.dart';
 import 'package:greenloop/core/errors/exceptions.dart';
 import 'package:greenloop/core/errors/failure.dart';
 import 'package:greenloop/core/utils/typedefs.dart';
-import 'package:greenloop/src/profile/Individual/data/datasourves/storage_remote_data_source.dart';
-import 'package:greenloop/src/profile/Individual/domian/repos/storage_repo.dart';
+import 'package:greenloop/src/profile/cores/data/dataSource/storage_remote_data_source.dart';
+import 'package:greenloop/src/profile/cores/domain/repos/storage_repo.dart';
 
 
 class StorageRepoImpl implements StorageRepo {

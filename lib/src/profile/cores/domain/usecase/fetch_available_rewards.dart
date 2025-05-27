@@ -1,6 +1,6 @@
 import 'package:greenloop/core/utils/typedefs.dart';
-import 'package:greenloop/src/profile/Individual/domian/entity/rewards.dart';
-import 'package:greenloop/src/profile/Individual/domian/repos/rewards_repo.dart';
+import 'package:greenloop/src/profile/cores/domain/entity/rewards.dart';
+import 'package:greenloop/src/profile/cores/domain/repos/rewards_repo.dart';
 
 class FetchAvailableRewards {
   final RewardsRepo repository;

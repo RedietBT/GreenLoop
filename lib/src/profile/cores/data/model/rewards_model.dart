@@ -1,4 +1,4 @@
-import 'package:greenloop/src/profile/Individual/domian/entity/rewards.dart';
+import 'package:greenloop/src/profile/cores/domain/entity/rewards.dart';
 
 class RewardsModel extends Rewards {
   const RewardsModel({

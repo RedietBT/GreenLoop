@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:greenloop/core/utils/typedefs.dart';
-import 'package:greenloop/src/profile/Individual/domian/repos/storage_repo.dart';
+import 'package:greenloop/src/profile/cores/domain/repos/storage_repo.dart';
 
 class UploadFile {
   final StorageRepo storageRepo;

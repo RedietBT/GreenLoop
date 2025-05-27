@@ -1,4 +1,4 @@
-import 'package:greenloop/src/profile/Individual/domian/entity/user_rewards.dart';
+import 'package:greenloop/src/profile/cores/domain/entity/user_rewards.dart';
 
 class UserRewardsModel extends UserRewards{
 
