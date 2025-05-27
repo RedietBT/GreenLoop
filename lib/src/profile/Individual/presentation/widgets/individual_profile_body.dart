@@ -35,7 +35,7 @@ class IndividualProfileBody extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 4),
                 const SizedBox(height: 10),
-                Text("Points: ${user.points ?? 'N/A'}"),
+                Text("Points: ${user.points}"),
               ],
             ),
           );

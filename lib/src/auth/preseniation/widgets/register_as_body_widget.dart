@@ -47,6 +47,17 @@ class RegisterAsPageBody extends StatelessWidget {
                 style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
                 child: const Text("Business"),
               ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  final role = 'Has an account Login';
+                  context.read<RegisterAsCubit>().selectRole(role);
+                  Navigator.pushReplacementNamed(context, '/login');
+                  },
+                style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
+                child: const Text("Has an account Login"),
+              ),
+              const SizedBox(height: 20),
               if (state is RegisterAsRoleSelected)
                 Padding(
                   padding: const EdgeInsets.all(20.0),
