@@ -1,7 +1,10 @@
+import 'package:greenloop/core/errors/exceptions.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class AuthRemoteDataSource {
   const AuthRemoteDataSource();
+
+  get client => null;
 
   Future<AuthResponse> signInWithEmailAndPassword(String email, String password);
 
@@ -16,6 +19,7 @@ abstract class AuthRemoteDataSource {
   Future<void> signOut();
 
   Future<String?> getCurrentUserEmail();
+   Future<String?> getCurrentUserId();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -52,7 +56,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw Exception("Failed to register user: Supabase returned null user");
     }
 
-    return user; // Return the User object for further use (inserting profile)
+    return user; 
   }
 
   @override
@@ -65,5 +69,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     final session = client.auth.currentSession;
     final user = session?.user;
     return user?.email;
+  }
+
+   @override
+  Future<String?> getCurrentUserId() async {
+    try {
+      return client.auth.currentUser?.id; // Directly return the ID string
+    } on AuthException catch (e) {
+      throw ServerException(message: e.message, statusCode: int.tryParse(e.statusCode ?? '')  ?? 500);
+    } catch (e) {
+      throw ServerException(message: e.toString(), statusCode: 500);
+    }
   }
 }

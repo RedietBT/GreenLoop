@@ -1,0 +1,15 @@
+import 'package:greenloop/core/utils/typedefs.dart';
+import 'package:greenloop/src/profile/cores/domain/entity/rewards.dart';
+import 'package:greenloop/src/profile/cores/domain/entity/user_rewards.dart';
+
+abstract class RewardsRepo {
+  const RewardsRepo();
+
+ResultFuture<void> redeemReward({
+    required String userId,
+    required String rewardId,
+  });
+
+  ResultFuture<List<Rewards>> fetchAvailableRewards();
+  ResultFuture<List<UserRewards>> fetchUserRedeemedRewards(String userId);
+}

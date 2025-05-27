@@ -23,6 +23,12 @@ import 'package:greenloop/src/auth/data/datasources/register_new_user_remote_dat
 import 'package:greenloop/src/auth/data/datasources/role_remote_data_source.dart';
 import 'package:greenloop/src/auth/preseniation/cubit/register_for_recycling_cubit.dart';
 
+// Individual Profile imports
+import 'package:greenloop/src/profile/Individual/data/datasourves/individual_user_remot_data_sorce.dart';
+import 'package:greenloop/src/profile/Individual/data/repos/individual_user_repo_impl.dart';
+import 'package:greenloop/src/profile/Individual/domian/repos/individual_user_repo.dart';
+import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
+
 final sl = GetIt.instance;
 
 Future<void> init() async {
@@ -94,4 +100,23 @@ Future<void> init() async {
     authRemoteDataSource: sl<AuthRemoteDataSource>(),
     role: sl<RoleRemoteDataSource>(),
     ));
+
+// ============================
+  // NEW: Individual Profile Feature
+  // ============================
+
+  // Data Sources
+  sl.registerLazySingleton<IndividualUserRemoteDataSource>(
+    () => IndividualUserRemoteDataSourceImpl(sl<SupabaseClient>()),
+  );
+
+  // Repositories
+  // Assuming IndividualUserRepo is your abstract interface for the repository
+  sl.registerLazySingleton<IndividualUserRepo>(
+    () => IndividualUserRepoImpl(sl<IndividualUserRemoteDataSource>()),
+  );
+
+  // Cubit
+  // Assuming IndividualProfileCubit depends on IndividualUserRepo
+  sl.registerFactory(() => IndividualProfileCubit(sl<IndividualUserRepo>()));
 }

@@ -1,5 +1,3 @@
-// data/repositories/auth_repository_impl.dart
-
 import 'package:dartz/dartz.dart';
 import 'package:greenloop/core/utils/typedefs.dart';
 import 'package:greenloop/src/auth/data/datasources/auth_remote_data_source.dart';
@@ -56,6 +54,15 @@ class AuthRepositoryImpl extends AuthRepo {
       return Right(email);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+    }
+  }
+@override
+  ResultFuture<String?> getCurrentUserId() async {
+    try {
+      final userId = remote.client.auth.currentUser?.id;
+      return Right(userId);
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString(), statusCode: '500'));
     }
   }
 }
