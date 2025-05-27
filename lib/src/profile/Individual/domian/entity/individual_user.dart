@@ -7,6 +7,8 @@ class Individual_User extends Equatable{
   final String role;
   final String? avatarUrl;
   final String? points;
+  final String? email;
+  final String? description;
 
   const Individual_User({
     required this.id,
@@ -15,8 +17,10 @@ class Individual_User extends Equatable{
     required this.role,
     required this.avatarUrl,
     required this.points,
+    required this.email,
+    required this.description,
   });
 
   @override
-  List<Object?> get props => [id, first_name, last_name, role, avatarUrl, points];
+  List<Object?> get props => [id, first_name, last_name, role, avatarUrl, points, email, description];
 }

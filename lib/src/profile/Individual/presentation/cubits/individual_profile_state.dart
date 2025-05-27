@@ -10,6 +10,7 @@ class IndividualProfileLoaded extends IndividualProfileState {
   final Individual_User user;
   IndividualProfileLoaded(this.user);
 }
+class IndividualProfileUploadingAvatar extends IndividualProfileState {}
 
 class IndividualProfileUpdating extends IndividualProfileState {}
 

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:greenloop/core/services/injection_container.dart';
+import 'package:greenloop/core/services/injection_container.dart'; 
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
 import 'package:greenloop/src/profile/Individual/presentation/widgets/individual_profile_body.dart';
+import 'package:greenloop/src/profile/Individual/presentation/widgets/individual_profile_drawer.dart';
 
 class IndividualProfilePage extends StatelessWidget {
   static const String routeName = '/individualProfile';
@@ -20,10 +21,23 @@ class IndividualProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => sl<IndividualProfileCubit>()..fetchUser(userId),
-      child: const Scaffold(
-        body: IndividualProfileBody(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('My Profile'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Settings Tapped!')),
+                );
+              },
+            ),
+          ],
+        ),
+        drawer: const IndividualProfileDrawer(),
+        body: const IndividualProfileBody(),
       ),
     );
   }
 }
-

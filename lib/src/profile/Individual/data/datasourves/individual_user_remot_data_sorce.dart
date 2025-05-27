@@ -17,7 +17,7 @@ abstract class IndividualUserRemoteDataSource {
     required String lastName,
     required String email,
     required String? avatarUrl,
-    required String? points,
+    required String? points, String? description,
   });
 }
 
@@ -54,12 +54,14 @@ class IndividualUserRemoteDataSourceImpl implements IndividualUserRemoteDataSour
     required String email,
     required String? avatarUrl,
     required String? points,
+    String? description,
   }) async {
     try {
       final Map<String, dynamic> updates = {
         'first_name': firstName,
         'last_name': lastName,
         'email': email,
+        'description': description ?? '',
       };
       if (avatarUrl != null) updates['avatar_url'] = avatarUrl;
       if (points != null) updates['points'] = points;
