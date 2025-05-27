@@ -19,9 +19,10 @@ import 'package:greenloop/src/auth/preseniation/cubit/register_as_cubit.dart';
 import 'package:greenloop/src/auth/preseniation/cubit/register_for_individual_cubit.dart';
 import 'package:greenloop/src/auth/domain/repos/register_new_use_repor.dart';
 import 'package:greenloop/src/auth/data/repos/register_new_user_repository_impl.dart';
-import 'package:greenloop/src/auth/data/datasources/register_new_user_remote_data_source.dart'; 
+import 'package:greenloop/src/auth/data/datasources/register_new_user_remote_data_source.dart';
 import 'package:greenloop/src/auth/data/datasources/role_remote_data_source.dart';
 import 'package:greenloop/src/auth/preseniation/cubit/register_for_recycling_cubit.dart';
+import 'package:greenloop/src/auth/preseniation/cubit/register_for_business_cubit.dart';
 
 // Individual Profile imports
 import 'package:greenloop/src/profile/Individual/data/datasourves/individual_user_remot_data_sorce.dart';
@@ -91,6 +92,12 @@ Future<void> init() async {
   sl.registerFactory(() => RegisterAsCubit());
 
   sl.registerFactory(() => RegisterForIndividualCubit(
+        registerRepo: sl<RegisterNewUserRepo>(),
+        authRemoteDataSource: sl<AuthRemoteDataSource>(),
+        role: sl<RoleRemoteDataSource>(),
+      ));
+
+     sl.registerFactory(() => RegisterForBusinessCubit(
         registerRepo: sl<RegisterNewUserRepo>(),
         authRemoteDataSource: sl<AuthRemoteDataSource>(),
         role: sl<RoleRemoteDataSource>(),

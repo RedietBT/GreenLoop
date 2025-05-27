@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenloop/core/res/colors.dart';
 import 'package:greenloop/src/auth/preseniation/cubit/register_for_business_cubit.dart';
-import 'package:greenloop/src/auth/preseniation/cubit/register_for_individual_cubit.dart';
-import 'package:greenloop/src/auth/preseniation/cubit/register_for_individual_state.dart';
+import 'package:greenloop/src/auth/preseniation/cubit/register_for_business_state.dart';
 import 'package:greenloop/src/auth/preseniation/views/login_screen.dart';
 
 class RegisterForBussinessPageBody extends StatefulWidget {
@@ -27,9 +26,9 @@ class _RegisterForIndividualBodyState extends State<RegisterForBussinessPageBody
 
   @override
 Widget build(BuildContext context) {
-  return BlocListener<RegisterForIndividualCubit, RegisterForIndividualState>(
+  return BlocListener<RegisterForBusinessCubit, RegisterForBusinessState>(
     listener: (context, state) {
-      if (state is RegisterForIndividualSuccess) {
+      if (state is RegisterForBusinessSuccess) {
         // Show a success message and wait for email verification
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -43,9 +42,9 @@ Widget build(BuildContext context) {
         });
       }
     },
-    child: BlocBuilder<RegisterForIndividualCubit, RegisterForIndividualState>(
+    child: BlocBuilder<RegisterForBusinessCubit, RegisterForBusinessState>(
       builder: (context, state) {
-        if (state is RegisterForIndividualLoading) {
+        if (state is RegisterForBusinessLoading) {
           return const Center(child: CircularProgressIndicator());
         }
 
@@ -69,13 +68,13 @@ Widget build(BuildContext context) {
               onChanged: (value) => setState(() => email = value),
             ),
             TextField(
+              decoration: const InputDecoration(labelText: 'Phone Number'),
+              onChanged: (value) => setState(() => phon_no = value),
+            ),
+            TextField(
               decoration: const InputDecoration(labelText: 'Password'),
               obscureText: true,
               onChanged: (value) => setState(() => password = value),
-            ),
-             TextField(
-              decoration: const InputDecoration(labelText: 'Phone Number'),
-              onChanged: (value) => setState(() => phon_no = value),
             ),
             TextField(
               decoration: const InputDecoration(labelText: 'Confirm Password'),
@@ -112,7 +111,7 @@ Widget build(BuildContext context) {
                   style: const TextStyle(color: Colors.red),
                 ),
               ),
-            if (state is RegisterForIndividualFailure)
+            if (state is RegisterForBusinessFailure)
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(

@@ -49,7 +49,7 @@ class RegisterNewUserRemoteDataSourceImpl implements RegisterNewUserRemoteDataSo
         'contact_person_first_name': contactPersonFirstName,
         'contact_person_last_name': contactPersonLastName,
         'email': email,
-        'phone_no': phoneNo,
+        'phone': phoneNo,
         'role': role,
       });
     } catch (e) {

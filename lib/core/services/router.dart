@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greenloop/src/auth/preseniation/cubit/register_for_business_cubit.dart';
+import 'package:greenloop/src/auth/preseniation/views/register_for_bussiness_page.dart';
 import 'package:greenloop/src/on_boarding/presentation/views/on_bording_screan.dart';
 import 'package:greenloop/core/commen/views/page_under_constraction.dart';
 import 'package:greenloop/core/services/injection_container.dart';
@@ -54,6 +56,14 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     (_) => BlocProvider(
       create: (_) => sl<RegisterForRecyclingCubit>(),
       child: const RegisterForRecyclingPage(userType: 'Recycling Company',),
+    ),
+    settings: settings,
+  );
+  case RegisterForBussinessPage.routeName:
+  return _pageBuilder(
+    (_) => BlocProvider(
+      create: (_) => sl<RegisterForBusinessCubit>(),
+      child: const RegisterForBussinessPage(userType: 'Business',),
     ),
     settings: settings,
   );
