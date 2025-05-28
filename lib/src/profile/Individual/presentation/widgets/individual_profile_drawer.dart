@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greenloop/core/services/injection_container.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_state.dart';
 import 'package:greenloop/src/profile/Individual/presentation/widgets/edit_profile_page.dart'; // Import your EditProfilePage
@@ -95,12 +96,14 @@ class IndividualProfileDrawer extends StatelessWidget {
               Navigator.pop(context); // Close the drawer
               // Navigate to the Edit Profile page
               Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const EditProfilePage()), // You'll create this page next
-              );
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Navigating to Edit Profile...')),
-              );
+                 context,
+                 MaterialPageRoute(
+                  builder: (context) => BlocProvider(
+                    create: (_) => sl<IndividualProfileCubit>(), // Creates a NEW instance
+                    child: const EditProfilePage(),
+                  ),
+              ),
+            );
             },
           ),
           // "Logout" List Tile
