@@ -42,7 +42,7 @@ class RegisterAsPageBody extends StatelessWidget {
                 onPressed: () {
                   final role = 'Business';
                   context.read<RegisterAsCubit>().selectRole(role);
-                  Navigator.pushReplacementNamed(context, '/registerForIndividual', arguments: role);
+                  Navigator.pushReplacementNamed(context, '/registerForBussiness', arguments: role);
                   },
                 style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
                 child: const Text("Business"),

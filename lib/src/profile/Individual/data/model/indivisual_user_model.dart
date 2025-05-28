@@ -8,6 +8,8 @@ class Individual_UserModel extends Individual_User {
     required super.role,
     required super.avatarUrl,
     required super.points,
+    required super.email,
+    required super.description,
   });
 
   factory Individual_UserModel.fromJson(Map<String, dynamic> json) {
@@ -18,6 +20,8 @@ class Individual_UserModel extends Individual_User {
       role: json['role'] as String,
       avatarUrl: json['avatarUrl'] as String?,
       points: json['points'] as String?,
+      email: json['email'] as String,
+      description: json['description'] as String?,
     );
   }
 }

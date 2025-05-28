@@ -12,6 +12,7 @@ ResultFuture<void> updateUserProfile(
     required String lastName,  
     required String email,     
     required String? avatarUrl, 
-    required String? points,    
+    required String? points,
+    required String? description,    
   });
 }

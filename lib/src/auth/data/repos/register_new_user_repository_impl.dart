@@ -33,4 +33,14 @@ class RegisterNewUserRepositoryImpl implements RegisterNewUserRepo {
       return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
     }
   }
+  @override
+  ResultFuture<void> insertIntoBusinessTable(
+      String id, String businessName, String contactPersonFirstName, String contactPersonLastName, String email, String phoneNo, String? role) async {
+    try {
+      await remoteDataSource.insertIntoBusinessTable(id, businessName, contactPersonFirstName, contactPersonLastName, email, phoneNo, role);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+    }
+  }
 }

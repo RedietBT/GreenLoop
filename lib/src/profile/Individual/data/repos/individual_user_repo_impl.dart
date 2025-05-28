@@ -38,6 +38,7 @@ class IndividualUserRepoImpl implements IndividualUserRepo{
     required String email,
     required String? avatarUrl,
     required String? points,
+    required String? description,
   }) async {
     try {
       await remoteDataSource.updateUserProfile(
@@ -47,7 +48,8 @@ class IndividualUserRepoImpl implements IndividualUserRepo{
         email: email,
         avatarUrl: avatarUrl,
         points: points,
-      );
+        description: description,
+       );
       return const Right(null); 
     } on ServerException catch (e) {
       return Left(ServerFailure(

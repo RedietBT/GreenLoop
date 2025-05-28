@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:greenloop/src/profile/cores/data/dataSource/storage_remote_data_source.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -19,15 +20,18 @@ import 'package:greenloop/src/auth/preseniation/cubit/register_as_cubit.dart';
 import 'package:greenloop/src/auth/preseniation/cubit/register_for_individual_cubit.dart';
 import 'package:greenloop/src/auth/domain/repos/register_new_use_repor.dart';
 import 'package:greenloop/src/auth/data/repos/register_new_user_repository_impl.dart';
-import 'package:greenloop/src/auth/data/datasources/register_new_user_remote_data_source.dart'; 
+import 'package:greenloop/src/auth/data/datasources/register_new_user_remote_data_source.dart';
 import 'package:greenloop/src/auth/data/datasources/role_remote_data_source.dart';
 import 'package:greenloop/src/auth/preseniation/cubit/register_for_recycling_cubit.dart';
+import 'package:greenloop/src/auth/preseniation/cubit/register_for_business_cubit.dart';
 
 // Individual Profile imports
 import 'package:greenloop/src/profile/Individual/data/datasourves/individual_user_remot_data_sorce.dart';
 import 'package:greenloop/src/profile/Individual/data/repos/individual_user_repo_impl.dart';
 import 'package:greenloop/src/profile/Individual/domian/repos/individual_user_repo.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
+import 'package:greenloop/src/profile/cores/domain/repos/storage_repo.dart';
+import 'package:greenloop/src/profile/cores/data/repos/storage_repo_impl.dart';
 
 final sl = GetIt.instance;
 
@@ -95,6 +99,12 @@ Future<void> init() async {
         role: sl<RoleRemoteDataSource>(),
       ));
 
+     sl.registerFactory(() => RegisterForBusinessCubit(
+        registerRepo: sl<RegisterNewUserRepo>(),
+        authRemoteDataSource: sl<AuthRemoteDataSource>(),
+        role: sl<RoleRemoteDataSource>(),
+      ));
+
   sl.registerFactory(() => RegisterForRecyclingCubit(
     repository: sl<RegisterNewUserRepo>(),
     authRemoteDataSource: sl<AuthRemoteDataSource>(),
@@ -110,13 +120,25 @@ Future<void> init() async {
     () => IndividualUserRemoteDataSourceImpl(sl<SupabaseClient>()),
   );
 
+ sl.registerLazySingleton<StorageRemoteDataSource>(
+  () => StorageRemoteDataSourceImpl(sl<SupabaseClient>()),
+);
+  
   // Repositories
   // Assuming IndividualUserRepo is your abstract interface for the repository
   sl.registerLazySingleton<IndividualUserRepo>(
     () => IndividualUserRepoImpl(sl<IndividualUserRemoteDataSource>()),
   );
 
+  sl.registerLazySingleton<StorageRepo>(
+  () => StorageRepoImpl(sl<StorageRemoteDataSource>()),
+);
+
   // Cubit
   // Assuming IndividualProfileCubit depends on IndividualUserRepo
-  sl.registerFactory(() => IndividualProfileCubit(sl<IndividualUserRepo>()));
+  sl.registerFactory(() => IndividualProfileCubit(
+    sl<IndividualUserRepo>(), 
+    sl<StorageRepo>()
+    )
+    );
 }
