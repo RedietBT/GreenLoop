@@ -18,8 +18,8 @@ class _RegisterForIndividualBodyState extends State<RegisterForBussinessPageBody
   String bussinessName = '';
   String ContactPersonfirstName = '';
   String ContactPersonlastName = '';
-  String phon_no = '';
   String email = '';
+  String phon_no = '';
   String password = '';
   String confirmPassword = '';
   String? error;
@@ -72,10 +72,13 @@ Widget build(BuildContext context) {
               onChanged: (value) => setState(() => phon_no = value),
             ),
             TextField(
-              decoration: const InputDecoration(labelText: 'Password'),
-              obscureText: true,
-              onChanged: (value) => setState(() => password = value),
-            ),
+              decoration: const InputDecoration(
+                labelText: 'Phone Number (e.g., +251911121314)',
+                hintText: '+<Country Code><Number>',
+                ),
+                keyboardType: TextInputType.phone,
+                onChanged: (value) => setState(() => phon_no = value),
+                ),
             TextField(
               decoration: const InputDecoration(labelText: 'Confirm Password'),
               obscureText: true,
