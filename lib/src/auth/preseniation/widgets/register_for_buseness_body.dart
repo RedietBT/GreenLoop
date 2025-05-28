@@ -68,10 +68,6 @@ Widget build(BuildContext context) {
               onChanged: (value) => setState(() => email = value),
             ),
             TextField(
-              decoration: const InputDecoration(labelText: 'Phone Number'),
-              onChanged: (value) => setState(() => phon_no = value),
-            ),
-            TextField(
               decoration: const InputDecoration(
                 labelText: 'Phone Number (e.g., +251911121314)',
                 hintText: '+<Country Code><Number>',
@@ -79,6 +75,11 @@ Widget build(BuildContext context) {
                 keyboardType: TextInputType.phone,
                 onChanged: (value) => setState(() => phon_no = value),
                 ),
+                 TextField(
+              decoration: const InputDecoration(labelText: 'Password'),
+              obscureText: true,
+              onChanged: (value) => setState(() => password = value),
+            ),
             TextField(
               decoration: const InputDecoration(labelText: 'Confirm Password'),
               obscureText: true,
