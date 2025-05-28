@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:greenloop/src/profile/cores/data/dataSource/storage_remote_data_source.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -30,6 +31,7 @@ import 'package:greenloop/src/profile/Individual/data/repos/individual_user_repo
 import 'package:greenloop/src/profile/Individual/domian/repos/individual_user_repo.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
 import 'package:greenloop/src/profile/cores/domain/repos/storage_repo.dart';
+import 'package:greenloop/src/profile/cores/data/repos/storage_repo_impl.dart';
 
 final sl = GetIt.instance;
 
@@ -118,11 +120,19 @@ Future<void> init() async {
     () => IndividualUserRemoteDataSourceImpl(sl<SupabaseClient>()),
   );
 
+ sl.registerLazySingleton<StorageRemoteDataSource>(
+  () => StorageRemoteDataSourceImpl(sl<SupabaseClient>()),
+);
+  
   // Repositories
   // Assuming IndividualUserRepo is your abstract interface for the repository
   sl.registerLazySingleton<IndividualUserRepo>(
     () => IndividualUserRepoImpl(sl<IndividualUserRemoteDataSource>()),
   );
+
+  sl.registerLazySingleton<StorageRepo>(
+  () => StorageRepoImpl(sl<StorageRemoteDataSource>()),
+);
 
   // Cubit
   // Assuming IndividualProfileCubit depends on IndividualUserRepo

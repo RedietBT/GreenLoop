@@ -14,9 +14,9 @@ abstract class StorageRemoteDataSource {
 }
 
 class StorageRemoteDataSourceImpl implements StorageRemoteDataSource {
-  final SupabaseClient _supabaseClient;
+  final SupabaseClient supabaseClient;
 
-  const StorageRemoteDataSourceImpl(this._supabaseClient);
+  const StorageRemoteDataSourceImpl(this.supabaseClient);
 
   @override
   Future<String> uploadFile({
@@ -27,7 +27,7 @@ class StorageRemoteDataSourceImpl implements StorageRemoteDataSource {
     try {
       final String path = filePath ?? 'uploads/${DateTime.now().microsecondsSinceEpoch}-${file.path.split('/').last}';
 
-      await _supabaseClient.storage
+      await supabaseClient.storage
           .from(bucketName).upload(
             path,
             file,
@@ -37,7 +37,7 @@ class StorageRemoteDataSourceImpl implements StorageRemoteDataSource {
             ),
           );
 
-      final String fullPublicUrl = _supabaseClient.storage.from(bucketName).getPublicUrl(path);
+      final String fullPublicUrl = supabaseClient.storage.from(bucketName).getPublicUrl(path);
 
       return fullPublicUrl;
     } on StorageException catch (e) {
