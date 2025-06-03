@@ -35,8 +35,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final state = context.read<IndividualProfileCubit>().state;
     if (state is IndividualProfileLoaded) {
       final user = state.user;
-      _firstNameController.text = user.first_name ?? '';
-      _lastNameController.text = user.last_name ?? '';
+      _firstNameController.text = user.first_name;
+      _lastNameController.text = user.last_name;
       _emailController.text = user.email ?? '';
       _descriptionController.text = user.description ?? '';
       _currentAvatarUrl = user.avatarUrl;
