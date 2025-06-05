@@ -31,10 +31,6 @@ class IndividualProfileCubit extends Cubit<IndividualProfileState> {
     String? description,
   }) async {
     emit(IndividualProfileUpdating());
-
-    // Call the repository with only the non-null (changed) values.
-    // The repository's implementation of updateUserProfile must be able to handle nulls
-    // by not updating those specific columns in the database.
     final result = await individualUserRepo.updateUserProfile(
       userId,
       firstName: firstName,

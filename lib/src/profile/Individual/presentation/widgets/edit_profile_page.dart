@@ -172,8 +172,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
             // Always update the text controllers and original values to reflect the latest user data
             // (either initial load or successful update).
             final user = state.user;
-            _firstNameController.text = user.first_name;
-            _lastNameController.text = user.last_name;
+            _firstNameController.text = user.first_name?? '';
+            _lastNameController.text = user.last_name?? '';
             _emailController.text = user.email ?? '';
             _descriptionController.text = user.description ?? '';
 

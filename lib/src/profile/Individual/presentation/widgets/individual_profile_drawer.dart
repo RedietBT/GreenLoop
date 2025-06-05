@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:greenloop/core/services/injection_container.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_state.dart';
 import 'package:greenloop/src/profile/Individual/presentation/widgets/edit_profile_page.dart'; // Import your EditProfilePage
@@ -88,26 +87,24 @@ class IndividualProfileDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.edit),
             title: const Text('Edit Profile'),
-            onTap: () {
-              Navigator.pop(context); // Close the drawer
-
-              // Get the userId from the currently loaded state of the existing cubit
+            onTap: () async {
+              Navigator.pop(context); 
+               final individualProfileCubit = context.read<IndividualProfileCubit>();
               final individualProfileState = context.read<IndividualProfileCubit>().state;
               if (individualProfileState is IndividualProfileLoaded) {
                 final userId = individualProfileState.user.id;
-                Navigator.push(
+                await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => BlocProvider(
-                      // Provide a NEW Cubit instance for the EditProfilePage route
-                      // This makes EditProfilePage self-contained.
-                      create: (_) => sl<IndividualProfileCubit>(),
+                    builder: (context) => BlocProvider.value(
+                      
+                     value: individualProfileCubit,
                       child: EditProfilePage(userId: userId), // Pass the userId
                     ),
                   ),
                 );
               } else {
-                // Handle case where user ID is not yet loaded (e.g., show error message)
+                
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Profile data not yet loaded. Please try again.')),
                 );

@@ -33,12 +33,12 @@ class IndividualUserRepoImpl implements IndividualUserRepo{
   @override
   ResultFuture<void> updateUserProfile(
     String userId, {
-    required String? firstName,
-    required String? lastName,
-    required String? email,
-    required String? avatarUrl,
-    required String? points,
-    required String? description,
+     String? firstName,
+     String? lastName,
+     String? email,
+     String? avatarUrl,
+     String? points,
+     String? description,
   }) async {
     try {
       await remoteDataSource.updateUserProfile(
