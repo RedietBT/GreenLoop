@@ -7,15 +7,14 @@ ResultFuture<Business> fetchUserProfile(String userId);
 
 ResultFuture<void> updateUserProfile(
   String userId, {
-    required String business_name, 
-    required String contact_person_first_name,
-    required String contact_person_last_name,
-    required String phone_number,
-    required String role,
-    required String? address,
-    required String email,     
-    required String? avatarUrl, 
-    required String? points,
-    required String? description,    
+     String? business_name, 
+     String? contact_person_first_name,
+     String? contact_person_last_name,
+     String? phone_number,
+     String? address,
+     String? email,     
+     String? avatarUrl, 
+     String? points,
+     String? description,    
   });
 }

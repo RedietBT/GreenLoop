@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-class Business extends Equatable{
+class Business extends Equatable {
   final String id;
   final String business_name;
   final String contact_person_first_name;
@@ -20,15 +20,25 @@ class Business extends Equatable{
     required this.contact_person_last_name,
     required this.phone_number,
     required this.role,
-    required this.address,
-    required this.avatarUrl,
-    required this.points,
-    required this.email,
-    required this.description,
+    this.address,
+    this.avatarUrl,
+    this.points,
+    this.email,
+    this.description,
   });
-   
 
   @override
-
-  List<Object?> get props => [id, business_name, contact_person_first_name, contact_person_last_name, phone_number, address, role, avatarUrl, points, email, description];
+  List<Object?> get props => [
+        id,
+        business_name,
+        contact_person_first_name,
+        contact_person_last_name,
+        phone_number,
+        role,
+        address,
+        avatarUrl,
+        points,
+        email,
+        description,
+      ];
 }

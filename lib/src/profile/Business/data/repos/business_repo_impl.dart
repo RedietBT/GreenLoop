@@ -27,29 +27,27 @@ class BusinessRepoImpl implements BusinessRepo {
 
   @override
   ResultFuture<void> updateUserProfile(
-    String userId, {
-    required String business_name,
-    required String contact_person_first_name,
-    required String contact_person_last_name,
-    required String phone_number,
-    required String role,
-    required String? address,
-    required String email,
-    required String? avatarUrl,
-    required String? points,
-    required String? description,
+     String userId, {
+    String? business_name,
+    String? contact_person_first_name,
+    String? contact_person_last_name,
+    String? phone_number,
+    String? address,
+    String? email,
+    String? avatarUrl,
+    String? points,
+    String? description,
   }) async {
     try {
       
       await _remoteDataSource.updateUserProfile(
         userId: userId,
-        business_name: business_name,
-        contact_person_first_name: contact_person_first_name,
-        contact_person_last_name: contact_person_last_name,
-        phone_number: phone_number,
-        role: role,
+        business_name: business_name ?? '',
+        contact_person_first_name: contact_person_first_name ?? '',
+        contact_person_last_name: contact_person_last_name ?? '',
+        phone_number: phone_number ?? '',
         address: address,
-        email: email,
+        email: email ?? '',
         avatarUrl: avatarUrl,
         points: points,
         description: description,

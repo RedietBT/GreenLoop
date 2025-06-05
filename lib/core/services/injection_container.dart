@@ -1,4 +1,8 @@
 import 'package:get_it/get_it.dart';
+import 'package:greenloop/src/profile/Business/data/datasource/business_remote_data_source.dart';
+import 'package:greenloop/src/profile/Business/data/repos/business_repo_impl.dart';
+import 'package:greenloop/src/profile/Business/domain/repo/business_repo.dart';
+import 'package:greenloop/src/profile/Business/presentation/cubits/business_profile_cubit.dart';
 import 'package:greenloop/src/profile/cores/data/dataSource/storage_remote_data_source.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -90,7 +94,11 @@ Future<void> init() async {
   );
 
   // Cubits
-  sl.registerFactory(() => LoginCubit(sl<AuthRepo>()));
+  sl.registerFactory(() => LoginCubit(
+    sl<AuthRepo>(),
+    sl<IndividualUserRepo>(),
+    sl<BusinessRepo>(),
+  ));
   sl.registerFactory(() => RegisterAsCubit());
 
   sl.registerFactory(() => RegisterForIndividualCubit(
@@ -141,4 +149,23 @@ Future<void> init() async {
     sl<StorageRepo>()
     )
     );
+
+    // ============================
+  // NEW:Business Profile Feature
+  // ============================
+  // Data Sources
+  sl.registerLazySingleton<BusinessRemoteDataSource>(
+    () => BusinessRemoteDataSourceImpl(sl<SupabaseClient>()),
+  );
+  // Repositories
+  sl.registerLazySingleton<BusinessRepo>(
+    () => BusinessRepoImpl(sl<BusinessRemoteDataSource>()),
+  );
+
+  // Cubit
+  sl.registerFactory(() => BusinessProfileCubit(
+    businessRepo: sl<BusinessRepo>(),
+    storageRepo: sl<StorageRepo>(),
+  ));
+
 }

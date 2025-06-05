@@ -6,16 +6,15 @@ class UpdateUserProfile {
   const UpdateUserProfile(this.businessRepo);
   ResultFuture<void> call(
     String userId, {
-    required String business_name,
-    required String contact_person_first_name,
-    required String contact_person_last_name, 
-    required String phone_number, 
-    required String role,
-    required String? address,
-    required String email,
-    required String? avatarUrl, 
-    required String? points,
-    required String? description,
+     String? business_name,
+     String? contact_person_first_name,
+     String? contact_person_last_name, 
+     String? phone_number, 
+     String? address,
+     String? email,
+     String? avatarUrl, 
+     String? points,
+     String? description,
   }) {
     return businessRepo.updateUserProfile(
       userId,
@@ -23,7 +22,6 @@ class UpdateUserProfile {
       contact_person_first_name: contact_person_first_name,
       contact_person_last_name: contact_person_last_name,
       phone_number: phone_number,
-      role: role,
       address: address,
       email: email,
       avatarUrl: avatarUrl,
