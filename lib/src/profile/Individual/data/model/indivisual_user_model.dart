@@ -3,13 +3,13 @@ import 'package:greenloop/src/profile/Individual/domian/entity/individual_user.d
 class Individual_UserModel extends Individual_User {
   const Individual_UserModel({
     required super.id,
-    required super.first_name,
-    required super.last_name,
-    required super.role,
-    required super.avatarUrl,
-    required super.points,
-    required super.email,
-    required super.description,
+     super.first_name,
+     super.last_name,
+     super.role,
+     super.avatarUrl,
+     super.points,
+     super.email,
+     super.description,
   });
 
   factory Individual_UserModel.fromJson(Map<String, dynamic> json) {

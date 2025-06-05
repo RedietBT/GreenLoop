@@ -13,9 +13,9 @@ abstract class IndividualUserRemoteDataSource {
 
   Future<void> updateUserProfile(
     String userId, {
-    required String firstName,
-    required String lastName,
-    required String email,
+    required String? firstName,
+    required String? lastName,
+    required String? email,
     required String? avatarUrl,
     required String? points, String? description,
   });
@@ -49,22 +49,33 @@ class IndividualUserRemoteDataSourceImpl implements IndividualUserRemoteDataSour
   @override
   Future<void> updateUserProfile(
     String userId, {
-    required String firstName,
-    required String lastName,
-    required String email,
-    required String? avatarUrl,
-    required String? points,
-    String? description,
+     String? firstName,
+     String? lastName,
+     String? email,
+     String? avatarUrl,
+     String? points,
+     String? description,
   }) async {
     try {
-      final Map<String, dynamic> updates = {
-        'first_name': firstName,
-        'last_name': lastName,
-        'email': email,
-        'description': description ?? '',
-      };
-      if (avatarUrl != null) updates['avatar_url'] = avatarUrl;
-      if (points != null) updates['points'] = points;
+      final Map<String, dynamic> updates = {};
+        if (firstName != null) {
+        updates['first_name'] = firstName;
+      }
+      if (lastName != null) {
+        updates['last_name'] = lastName;
+      }
+      if (email != null) {
+        updates['email'] = email;
+      }
+      if (avatarUrl != null) {
+        updates['avatar_url'] = avatarUrl;
+      }
+      if (points != null) {
+        updates['points'] = points;
+      }
+      if (description != null) {
+        updates['description'] = description;
+      }
 
       await _supabaseClient
           .from('profile')
