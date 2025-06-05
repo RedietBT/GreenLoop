@@ -23,4 +23,6 @@ class Business extends Equatable{
 
   @override
   List<Object?> get props => [id, business_name, contact_person_first_name, contact_person_last_name, email, phone_no, role, password];
+
+  get contactPersonFirstName => null;
 }
