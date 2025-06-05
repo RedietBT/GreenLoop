@@ -13,9 +13,9 @@ abstract class IndividualUserRemoteDataSource {
 
   Future<void> updateUserProfile(
     String userId, {
-    required String firstName,
-    required String lastName,
-    required String email,
+    required String? firstName,
+    required String? lastName,
+    required String? email,
     required String? avatarUrl,
     required String? points, String? description,
   });
@@ -49,9 +49,9 @@ class IndividualUserRemoteDataSourceImpl implements IndividualUserRemoteDataSour
   @override
   Future<void> updateUserProfile(
     String userId, {
-    required String firstName,
-    required String lastName,
-    required String email,
+    required String? firstName,
+    required String? lastName,
+    required String? email,
     required String? avatarUrl,
     required String? points,
     String? description,

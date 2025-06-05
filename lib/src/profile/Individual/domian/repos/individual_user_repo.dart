@@ -8,9 +8,9 @@ ResultFuture<Individual_User> fetchUserProfile(String userId);
 
 ResultFuture<void> updateUserProfile(
   String userId, {
-    required String firstName, 
-    required String lastName,  
-    required String email,     
+    required String? firstName, 
+    required String? lastName,  
+    required String? email,     
     required String? avatarUrl, 
     required String? points,
     required String? description,    

@@ -23,6 +23,7 @@ abstract class AuthRemoteDataSource {
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
+  @override
   final SupabaseClient client;
 
   AuthRemoteDataSourceImpl(this.client);

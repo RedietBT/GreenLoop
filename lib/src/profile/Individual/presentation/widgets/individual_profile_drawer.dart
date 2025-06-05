@@ -14,10 +14,8 @@ class IndividualProfileDrawer extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
-          // Drawer Header with user info, using BlocBuilder
           BlocBuilder<IndividualProfileCubit, IndividualProfileState>(
             builder: (context, state) {
-              // Default header content
               Widget headerContent = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -35,9 +33,9 @@ class IndividualProfileDrawer extends StatelessWidget {
                 ],
               );
 
-              // If profile is loaded, display user data
               if (state is IndividualProfileLoaded) {
                 final user = state.user;
+// Get the userId here
                 headerContent = Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -47,10 +45,10 @@ class IndividualProfileDrawer extends StatelessWidget {
                       backgroundImage: user.avatarUrl != null && user.avatarUrl!.isNotEmpty
                           ? NetworkImage(user.avatarUrl!)
                           : null,
+                      backgroundColor: Colors.white.withOpacity(0.3),
                       child: user.avatarUrl == null || user.avatarUrl!.isEmpty
                           ? const Icon(Icons.person, size: 30, color: Colors.white)
                           : null,
-                      backgroundColor: Colors.white.withOpacity(0.3),
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -65,7 +63,6 @@ class IndividualProfileDrawer extends StatelessWidget {
                   ],
                 );
               } else if (state is IndividualProfileError) {
-                // Handle error state in drawer header
                 headerContent = Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -88,37 +85,45 @@ class IndividualProfileDrawer extends StatelessWidget {
               );
             },
           ),
-          // "Edit Profile" List Tile
           ListTile(
             leading: const Icon(Icons.edit),
             title: const Text('Edit Profile'),
             onTap: () {
               Navigator.pop(context); // Close the drawer
-              // Navigate to the Edit Profile page
-              Navigator.push(
-                 context,
-                 MaterialPageRoute(
-                  builder: (context) => BlocProvider(
-                    create: (_) => sl<IndividualProfileCubit>(), // Creates a NEW instance
-                    child: const EditProfilePage(),
+
+              // Get the userId from the currently loaded state of the existing cubit
+              final individualProfileState = context.read<IndividualProfileCubit>().state;
+              if (individualProfileState is IndividualProfileLoaded) {
+                final userId = individualProfileState.user.id;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BlocProvider(
+                      // Provide a NEW Cubit instance for the EditProfilePage route
+                      // This makes EditProfilePage self-contained.
+                      create: (_) => sl<IndividualProfileCubit>(),
+                      child: EditProfilePage(userId: userId), // Pass the userId
+                    ),
                   ),
-              ),
-            );
+                );
+              } else {
+                // Handle case where user ID is not yet loaded (e.g., show error message)
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Profile data not yet loaded. Please try again.')),
+                );
+              }
             },
           ),
-          // "Logout" List Tile
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),
             onTap: () {
-              Navigator.pop(context); // Close the drawer
-              // TODO: Implement logout logic here (e.g., context.read<AuthCubit>().logout();)
+              Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Logout Tapped! (Implement Logout Logic)')),
               );
             },
           ),
-          // Add more list tiles for other drawer options as needed
         ],
       ),
     );
