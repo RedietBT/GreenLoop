@@ -1,12 +1,16 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenloop/src/auth/domain/repos/auth_repo.dart';
+import 'package:greenloop/src/profile/Business/domain/repo/business_repo.dart';
+import 'package:greenloop/src/profile/Individual/domian/repos/individual_user_repo.dart';
 
 part 'login_state.dart';
 class LoginCubit extends Cubit<LoginState> {
 
   final AuthRepo _authRepo;
+  final IndividualUserRepo _individualUserRepo;
+  final BusinessRepo _businessRepo; // Assuming you have a BusinessRepo for business profiles
 
-  LoginCubit(this._authRepo) : super(LoginInitial());
+  LoginCubit(this._authRepo, this._individualUserRepo, this._businessRepo) : super(LoginInitial());
 
  Future<void> login(String email, String password) async {
     emit(LoginLoading());
@@ -21,15 +25,16 @@ class LoginCubit extends Cubit<LoginState> {
         // Login itself was successful. Now, get the current user's ID string.
         final userIdResult = await _authRepo.getCurrentUserId(); // Call the method that returns String?
 
-        userIdResult.fold(
+       await userIdResult.fold(
           (userFailure) {
             emit(LoginFailure(
                  "Login successful but failed to retrieve user ID: ${userFailure.message}"));
           },
-          (userId) {
+          (userId) async {
             // userId is now already a String?
             if (userId != null && userId.isNotEmpty) {
-              emit(LoginSuccess(userId: userId)); // Pass the retrieved userId (String)
+              final role = await _determineUserRole(userId);
+              emit(LoginSuccess(userId: userId, role: role ?? "")); // Pass the retrieved userId (String)
             } else {
               // Handle case where ID is null or empty after successful login
               emit(LoginFailure("Logged in, but user ID is not available."));
@@ -38,5 +43,37 @@ class LoginCubit extends Cubit<LoginState> {
         );
       },
     );
+  }
+
+  Future<String?> _determineUserRole(String userId) async {
+    // Try fetching Individual profile
+    final individualResult = await _individualUserRepo.fetchUserProfile(userId);
+    String? role;
+    individualResult.fold(
+      (failure) {
+        print('Failed to fetch individual profile: ${failure.message}');
+      },
+      (user) {
+        print('Found individual profile with role: ${user.role}');
+        role = user.role;
+      },
+    );
+    if (role != null) return role;
+
+    // If not individual, try Business profile
+    final businessResult = await _businessRepo.fetchUserProfile(userId);
+    businessResult.fold(
+      (failure) {
+        print('Failed to fetch business profile: ${failure.message}');
+      },
+      (business) {
+        print('Found business profile with role: ${business.role}');
+        role = business.role;
+      },
+    );
+    if (role != null) return role;
+
+    print('No role found for user ID: $userId');
+    return null; // Role not found in any profile
   }
 }

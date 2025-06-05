@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:greenloop/core/res/colors.dart';
-import 'package:greenloop/src/auth/preseniation/cubit/login_cubit.dart';
-import 'package:greenloop/src/auth/preseniation/views/register_as_page.dart';
+import 'package:greenloop/core/res/colors.dart'; // Import your custom colors
+import 'package:greenloop/src/auth/preseniation/cubit/login_cubit.dart'; // Note: Check 'preseniation' vs 'presentation' typo
+import 'package:greenloop/src/auth/preseniation/views/register_as_page.dart'; // Import your RegisterAsPage
 import 'package:greenloop/src/profile/Individual/presentation/view/individual_profile_page.dart';
+import 'package:greenloop/src/profile/Business/presentation/view/business_profile_page.dart';
+//import 'package:greenloop/src/profile/Recycling/presentation/view/recycling_profile_page.dart'; // Import the new page
 
 class LoginBody extends StatefulWidget {
   const LoginBody({super.key});
@@ -13,8 +15,8 @@ class LoginBody extends StatefulWidget {
 }
 
 class _LoginBodyState extends State<LoginBody> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   void dispose() {
@@ -32,43 +34,65 @@ class _LoginBodyState extends State<LoginBody> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<LoginCubit, LoginState>(
-      listener: (context, state) {
-        if (state is LoginLoading) {
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Logging in...")),
-          );
-        } else if (state is LoginSuccess) {
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          Navigator.of(context).pushNamedAndRemoveUntil( 
-            IndividualProfilePage.routeName,
-            (route) => false, 
-            arguments: {
-              'userId': state.userId,
-              'userType': 'Individual User Page',
-            },
-          );
-        } else if (state is LoginFailure) {
-          ScaffoldMessenger.of(context).hideCurrentSnackBar(); 
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Login failed: ${state.message}"),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      },
-      builder: (context, state) {
-        return Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
+    return Padding(
+      padding: const EdgeInsets.all(20.0), // Updated padding
+      child: BlocConsumer<LoginCubit, LoginState>(
+        listener: (context, state) {
+          if (state is LoginLoading) {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Hide any previous snackbars
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Logging in...")),
+            );
+          } else if (state is LoginSuccess) {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Hide "Logging in..." snackbar
+            String userId = state.userId;
+            String userRole = state.role; // Get user role from the state
+
+            // Perform role-based navigation
+            if (userRole == 'USER101') {
+              Navigator.pushReplacementNamed(
+                context,
+                IndividualProfilePage.routeName,
+                arguments: {'userId': userId, 'userType': userRole},
+              );
+            } else if (userRole == 'USER103') {
+              Navigator.pushReplacementNamed(
+                context,
+                BusinessProfilePage.routeName,
+                arguments: {'userId': userId, 'userType': userRole},
+              );
+            // } else if (userRole == 'USER102') {
+            //   Navigator.pushReplacementNamed(
+            //     context,
+            //     RecyclingProfilePage.routeName,
+            //     arguments: {'userId': userId, 'userType': userRole},
+            //   );
+            } else {
+              // Fallback for unknown roles
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Unknown user role: $userRole')),
+              );
+            }
+          } else if (state is LoginFailure) {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Hide any previous snackbars
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Login failed: ${state.message}"),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        },
+        builder: (context, state) {
+          return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextField(
                 controller: _emailController,
                 decoration: const InputDecoration(labelText: "Email"),
+                keyboardType: TextInputType.emailAddress,
               ),
+              const SizedBox(height: 12),
               TextField(
                 controller: _passwordController,
                 decoration: const InputDecoration(labelText: "Password"),
@@ -81,7 +105,7 @@ class _LoginBodyState extends State<LoginBody> {
                     ? const CircularProgressIndicator()
                     : const Text("Login"),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 20), // Added spacing
               GestureDetector(
                 onTap: () => Navigator.push(
                   context,
@@ -90,20 +114,20 @@ class _LoginBodyState extends State<LoginBody> {
                 child: RichText(
                   text: TextSpan(
                     text: "Don't have an account? ",
-                    style: TextStyle(color: Colors.black),
+                    style: const TextStyle(color: Colors.black),
                     children: [
                       TextSpan(
                         text: 'Register here.',
-                        style: TextStyle(color: AppColors.primary),
-                        ),
-                      ],
-                    ),
+                        style: TextStyle(color: AppColors.primary), // Using AppColors.primary
+                      ),
+                    ],
                   ),
+                ),
               ),
             ],
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

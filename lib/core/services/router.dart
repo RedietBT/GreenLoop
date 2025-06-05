@@ -13,6 +13,8 @@ import 'package:greenloop/src/auth/preseniation/cubit/register_for_individual_cu
 import 'package:greenloop/src/auth/preseniation/views/register_for_individual_page.dart';
 import 'package:greenloop/src/auth/preseniation/cubit/register_for_recycling_cubit.dart';
 import 'package:greenloop/src/auth/preseniation/views/register_for_recycling_page.dart';
+import 'package:greenloop/src/profile/Business/presentation/cubits/business_profile_cubit.dart';
+import 'package:greenloop/src/profile/Business/presentation/view/business_profile_page.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
 import 'package:greenloop/src/profile/Individual/presentation/view/individual_profile_page.dart';
 
@@ -79,6 +81,25 @@ case IndividualProfilePage.routeName:
     (_) => BlocProvider(
       create: (_) => sl<IndividualProfileCubit>()..fetchUser(userId),
       child: IndividualProfilePage(
+        userId: userId,
+        userType: userType,
+      ),
+    ),
+    settings: settings,
+  );
+
+  case BusinessProfilePage.routeName:
+  final Map<String, dynamic>? arguments = settings.arguments as Map<String, dynamic>?;
+  if (arguments == null || !arguments.containsKey('userId')) {
+    throw ArgumentError('BusinessProfilePage requires a "userId" argument in settings.arguments.');
+  }
+
+  final String userId = arguments['userId'] as String;
+  final String userType = arguments['userType'] as String? ?? 'Business User Page';
+  return _pageBuilder(
+    (_) => BlocProvider(
+      create: (_) => sl<BusinessProfileCubit>()..fetchUserProfile(userId),
+      child: BusinessProfilePage(
         userId: userId,
         userType: userType,
       ),
