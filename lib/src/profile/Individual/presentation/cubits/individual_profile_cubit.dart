@@ -34,9 +34,11 @@ Future<void> updateProfile({
   );
 
   result.fold(
-    (failure) => emit(IndividualProfileError(failure.errorMassage)),
-    (_) => fetchUser(userId), // Re-fetch user to reflect changes
-  );
+      (failure) => emit(IndividualProfileError(failure.errorMassage)),
+      (updatedUser) { // CRITICAL FIX: Receive the updated user directly
+        emit(IndividualProfileLoaded(updatedUser)); // Emit loaded with the updated user
+      },
+    );
 }
 
   Future<String> uploadFile({

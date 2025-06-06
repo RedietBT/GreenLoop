@@ -67,17 +67,35 @@ class IndividualUserRemoteDataSourceImpl implements IndividualUserRemoteDataSour
   }
 
   @override
-  Future<void> updateUserProfile(
+  Future<Individual_User> updateUserProfile(
     String userId, {
     required Map<String, dynamic> data, // Corrected signature here too
   }) async {
     try {
       // Directly use the 'data' map passed in, no need for manual construction
-      await _supabaseClient
+      final dynamic responseData = await _supabaseClient
           .from('profile') // Assuming your user data is in a 'profile' table
           .update(data)    // Pass the map directly to Supabase update
           .eq('id', userId)
-          .single(); // Use .single() if you expect only one row for a given userId
+          .select()
+          .single(); 
+
+          if (responseData == null) {
+         // This might happen if the ID doesn't exist to update
+         throw ServerException(
+          message: 'User profile not found for update with ID: $userId',
+          statusCode: 404,
+        );
+      }
+
+      if (responseData is! Map<String, dynamic>) {
+        throw const ServerException(
+          message: 'Invalid data format received after update. Expected Map<String, dynamic>.',
+          statusCode: 500,
+        );
+      }
+
+      return Individual_UserModel.fromJson(responseData);
     } on PostgrestException catch (e) {
       throw ServerException(
         message: e.message,
