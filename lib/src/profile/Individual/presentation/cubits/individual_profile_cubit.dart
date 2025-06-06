@@ -21,31 +21,23 @@ class IndividualProfileCubit extends Cubit<IndividualProfileState> {
     );
   }
 
-  Future<void> updateProfile({
-    required String userId,
-    String? firstName, // <--- Made nullable
-    String? lastName,  // <--- Made nullable
-    String? email,     // <--- Made nullable
-    String? avatarUrl,
-    String? points,
-    String? description,
-  }) async {
-    emit(IndividualProfileUpdating());
-    final result = await individualUserRepo.updateUserProfile(
-      userId,
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
-      avatarUrl: avatarUrl,
-      points: points, // Assuming points might be updated separately or kept null
-      description: description,
-    );
+Future<void> updateProfile({
+  required String userId,
+  required Map<String, dynamic> data, // <--- Corrected: now accepts a map
+}) async {
+  emit(IndividualProfileUpdating());
+  
+  // Call the repository's updateUserProfile with the data map
+  final result = await individualUserRepo.updateUserProfile(
+    userId,
+    data: data, // <--- Pass the entire map here
+  );
 
-    result.fold(
-      (failure) => emit(IndividualProfileError(failure.errorMassage)),
-      (_) => fetchUser(userId), // Re-fetch user to reflect changes
-    );
-  }
+  result.fold(
+    (failure) => emit(IndividualProfileError(failure.errorMassage)),
+    (_) => fetchUser(userId), // Re-fetch user to reflect changes
+  );
+}
 
   Future<String> uploadFile({
     required String bucketName,

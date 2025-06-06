@@ -31,36 +31,26 @@ class IndividualUserRepoImpl implements IndividualUserRepo{
   }
 
   @override
-  ResultFuture<void> updateUserProfile(
-    String userId, {
-     String? firstName,
-     String? lastName,
-     String? email,
-     String? avatarUrl,
-     String? points,
-     String? description,
-  }) async {
-    try {
-      await remoteDataSource.updateUserProfile(
-        userId,
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        avatarUrl: avatarUrl,
-        points: points,
-        description: description,
-       );
-      return const Right(null); 
-    } on ServerException catch (e) {
-      return Left(ServerFailure(
-        message: e.message,
-        statusCode: e.statusCode,
-      ));
-    } catch (e) {
-      return Left(ServerFailure(
-        message: e.toString(),
-        statusCode: '500',
-      ));
-    }
+ResultFuture<void> updateUserProfile(
+  String userId, {
+  required Map<String, dynamic> data, // Now expecting a map
+}) async {
+  try {
+    await remoteDataSource.updateUserProfile(
+      userId,
+      data: data, // Pass the entire map directly
+    );
+    return const Right(null);
+  } on ServerException catch (e) {
+    return Left(ServerFailure(
+      message: e.message,
+      statusCode: e.statusCode,
+    ));
+  } catch (e) {
+    return Left(ServerFailure(
+      message: e.toString(),
+      statusCode: '500',
+    ));
   }
+}
 }

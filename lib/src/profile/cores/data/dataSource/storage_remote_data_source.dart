@@ -25,19 +25,27 @@ class StorageRemoteDataSourceImpl implements StorageRemoteDataSource {
     required File file,
   }) async {
     try {
-      final String path = filePath ?? 'uploads/${DateTime.now().microsecondsSinceEpoch}-${file.path.split('/').last}';
+      final String userId = filePath!; // filePath now contains widget.userId
+    if (userId.isEmpty) {
+      throw ServerException(message: 'User ID is required for file upload path', statusCode: 400);
+    }
+    final String fileExtension = file.path.split('.').last;
+    final String uniqueFileName = '${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
+    // This is the CRUCIAL part: Constructing the path as 'avatars/userId/uniqueFileName'
+    final String storagePath = 'avatars/$userId/$uniqueFileName';
 
-      await supabaseClient.storage
-          .from(bucketName).upload(
-            path,
-            file,
-            fileOptions: const FileOptions(
-              cacheControl: '3600',
-              upsert: false,
-            ),
-          );
+       await supabaseClient.storage
+        .from(bucketName)
+        .upload(
+          storagePath, // Use the structured path
+          file,
+          fileOptions: const FileOptions(
+            cacheControl: '3600',
+            upsert: false,
+          ),
+        );
 
-      final String fullPublicUrl = supabaseClient.storage.from(bucketName).getPublicUrl(path);
+      final String fullPublicUrl = supabaseClient.storage.from(bucketName).getPublicUrl(storagePath);
 
       return fullPublicUrl;
     } on StorageException catch (e) {

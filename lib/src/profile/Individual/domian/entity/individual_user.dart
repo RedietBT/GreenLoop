@@ -6,7 +6,7 @@ class Individual_User extends Equatable{
   final String? last_name;
   final String? role;
   final String? avatarUrl;
-  final String? points;
+  final int? points;
   final String? email;
   final String? description;
 
