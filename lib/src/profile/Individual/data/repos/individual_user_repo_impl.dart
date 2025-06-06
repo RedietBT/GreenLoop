@@ -30,27 +30,19 @@ class IndividualUserRepoImpl implements IndividualUserRepo{
     }
   }
 
-  @override
-  ResultFuture<void> updateUserProfile(
+@override
+  // CRITICAL FIX: Now expects to receive Individual_User from remoteDataSource
+  ResultFuture<Individual_User> updateUserProfile(
     String userId, {
-     String? firstName,
-     String? lastName,
-     String? email,
-     String? avatarUrl,
-     String? points,
-     String? description,
+    required Map<String, dynamic> data,
   }) async {
     try {
       await remoteDataSource.updateUserProfile(
         userId,
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        avatarUrl: avatarUrl,
-        points: points,
-        description: description,
-       );
-      return const Right(null); 
+        data: data,
+      );
+      final updatedUser = await remoteDataSource.fetchUserProfile(userId);
+      return Right(updatedUser); // Return the updated user
     } on ServerException catch (e) {
       return Left(ServerFailure(
         message: e.message,

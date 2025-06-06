@@ -6,13 +6,8 @@ abstract class IndividualUserRepo {
 
 ResultFuture<Individual_User> fetchUserProfile(String userId);
 
-ResultFuture<void> updateUserProfile(
-  String userId, {
-     String? firstName, 
-     String? lastName,  
-     String? email,     
-     String? avatarUrl, 
-     String? points,
-     String? description,    
+ ResultFuture<Individual_User> updateUserProfile(
+    String userId, {
+    required Map<String, dynamic> data,
   });
 }

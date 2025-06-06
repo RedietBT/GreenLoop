@@ -1,3 +1,4 @@
+// src/profile/Individual/presentation/widgets/individual_profile_drawer.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
@@ -9,6 +10,9 @@ class IndividualProfileDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get the existing cubit reference
+    final individualProfileCubit = context.read<IndividualProfileCubit>();
+
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -34,7 +38,6 @@ class IndividualProfileDrawer extends StatelessWidget {
 
               if (state is IndividualProfileLoaded) {
                 final user = state.user;
-// Get the userId here
                 headerContent = Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -51,7 +54,7 @@ class IndividualProfileDrawer extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      "${user.first_name} ${user.last_name}",
+                      "${user.first_name ?? ''} ${user.last_name ?? ''}", // Handle nulls gracefully
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -88,25 +91,33 @@ class IndividualProfileDrawer extends StatelessWidget {
             leading: const Icon(Icons.edit),
             title: const Text('Edit Profile'),
             onTap: () async {
-              Navigator.pop(context); 
-               final individualProfileCubit = context.read<IndividualProfileCubit>();
-              final individualProfileState = context.read<IndividualProfileCubit>().state;
+              Navigator.pop(context); // Close the drawer first
+
+              final individualProfileState = individualProfileCubit.state; // Use the cubit obtained outside builder
+
               if (individualProfileState is IndividualProfileLoaded) {
                 final userId = individualProfileState.user.id;
-                await Navigator.push(
+                // Await the result from EditProfilePage
+                final bool? profileUpdated = await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => BlocProvider.value(
-                      
-                     value: individualProfileCubit,
+                      value: individualProfileCubit, // Pass the SAME cubit instance
                       child: EditProfilePage(userId: userId), // Pass the userId
                     ),
                   ),
                 );
+
+                // If EditProfilePage popped with `true`, trigger re-fetch on the main page
+                if (profileUpdated == true) {
+                  individualProfileCubit.fetchUser(userId); // Re-fetch the user data
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Profile refreshed from drawer!')),
+                  );
+                }
               } else {
-                
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Profile data not yet loaded. Please try again.')),
+                  const SnackBar(content: Text('Profile data not yet loaded. Please wait and try again.')),
                 );
               }
             },

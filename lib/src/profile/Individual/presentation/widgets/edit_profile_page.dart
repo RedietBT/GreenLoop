@@ -1,14 +1,15 @@
+// src/profile/Individual/presentation/pages/edit_profile_page.dart
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_state.dart';
-import 'package:image_picker/image_picker.dart'; 
+import 'package:image_picker/image_picker.dart';
 
 class EditProfilePage extends StatefulWidget {
-  final String userId; // Add this parameter
+  final String userId;
 
-  const EditProfilePage({super.key, required this.userId}); // Update constructor
+  const EditProfilePage({super.key, required this.userId});
 
   @override
   State<EditProfilePage> createState() => _EditProfilePageState();
@@ -22,15 +23,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late TextEditingController _descriptionController;
 
   File? _pickedImage;
-  String? _currentAvatarUrl; // This will hold the URL currently displayed or fetched
+  String? _currentAvatarUrl;
 
-  // Store original values for comparison
   String? _originalFirstName;
   String? _originalLastName;
   String? _originalEmail;
   String? _originalDescription;
 
-  // IMPORTANT: Flag to track if an update operation was initiated by the user
   bool _updateInProgress = false;
 
   @override
@@ -42,7 +41,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _descriptionController = TextEditingController();
 
     // Fetch initial user data to populate the fields when the page loads
-    // The cubit was created in the BlocProvider before this page, so it's available.
+    // This uses the SAME cubit instance passed via BlocProvider.value
     context.read<IndividualProfileCubit>().fetchUser(widget.userId);
   }
 
@@ -67,15 +66,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _updateProfile() async {
-    if (widget.userId.isEmpty) { // Use widget.userId from the widget property
+    if (widget.userId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('User ID not found. Cannot update profile.')),
       );
       return;
     }
 
-    // Set the flag to true at the beginning of an update attempt
-    // This will disable the button and tell the listener this is an update.
     setState(() {
       _updateInProgress = true;
     });
@@ -83,18 +80,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
     String? newAvatarUrl = _currentAvatarUrl;
     bool imageUploaded = false;
 
-    // --- 1. Handle Image Upload First
     if (_pickedImage != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Uploading image...')),
       );
       try {
-        final fileName = 'avatar_${widget.userId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+        // Ensure your uploadFile method accepts `filepath` which includes a filename.
+        // For example: '${widget.userId}/avatar.jpg'
         newAvatarUrl = await context.read<IndividualProfileCubit>().uploadFile(
-              bucketName: 'profile',
-              filepath: fileName,
-              file: _pickedImage!,
-            );
+          bucketName: 'profile',
+          filepath: '${widget.userId}/avatar.jpg', // Ensure this is a proper path + filename
+          file: _pickedImage!,
+        );
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Image uploaded successfully!')),
         );
@@ -103,15 +100,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to upload image: $e')),
         );
-        setState(() { _updateInProgress = false; }); // Reset flag on error
-        return; // Stop if image upload fails
+        setState(() { _updateInProgress = false; });
+        return;
       }
     }
 
-    // --- 2. Validate text fields
     bool formIsValid = _formKey.currentState!.validate();
 
-    // Determine which text fields have actually changed
     String? firstNameToUpdate = _firstNameController.text != _originalFirstName ? _firstNameController.text : null;
     String? lastNameToUpdate = _lastNameController.text != _originalLastName ? _lastNameController.text : null;
     String? emailToUpdate = _emailController.text != _originalEmail ? _emailController.text : null;
@@ -119,7 +114,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ? (_descriptionController.text.isEmpty ? null : _descriptionController.text)
         : null;
 
-    // Check if any actual update is needed (image or text fields)
     if (!imageUploaded &&
         firstNameToUpdate == null &&
         lastNameToUpdate == null &&
@@ -128,29 +122,40 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No changes to save.')),
       );
-      setState(() { _updateInProgress = false; }); // Reset flag if no changes
-      return; // No changes, so no update necessary
-    }
-
-    // If there are text field changes, ensure the form is valid.
-    if (!formIsValid && (firstNameToUpdate != null || lastNameToUpdate != null || emailToUpdate != null || descriptionToUpdate != null)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please correct invalid fields.')),
-      );
-      setState(() { _updateInProgress = false; }); // Reset flag on validation failure
+      setState(() { _updateInProgress = false; });
       return;
     }
 
-    // --- 3. Call updateProfile with only the changed values
+    if ((firstNameToUpdate != null || lastNameToUpdate != null || emailToUpdate != null || descriptionToUpdate != null) && !formIsValid) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please correct invalid fields.')),
+      );
+      setState(() { _updateInProgress = false; });
+      return;
+    }
+
+    final Map<String, dynamic> updateData = {};
+
+    if (firstNameToUpdate != null) {
+      updateData['first_name'] = firstNameToUpdate;
+    }
+    if (lastNameToUpdate != null) {
+      updateData['last_name'] = lastNameToUpdate;
+    }
+    if (emailToUpdate != null) {
+      updateData['email'] = emailToUpdate;
+    }
+    if (descriptionToUpdate != null) {
+      updateData['description'] = descriptionToUpdate;
+    }
+    if (imageUploaded && newAvatarUrl != null) {
+      updateData['avatar_url'] = newAvatarUrl;
+    }
+
     context.read<IndividualProfileCubit>().updateProfile(
-          userId: widget.userId, // Use widget.userId here
-          firstName: firstNameToUpdate,
-          lastName: lastNameToUpdate,
-          email: emailToUpdate,
-          avatarUrl: imageUploaded ? newAvatarUrl : null, // Only send avatarUrl if it was just uploaded
-          points: null, // Keep existing points, or handle as needed
-          description: descriptionToUpdate,
-        );
+      userId: widget.userId,
+      data: updateData,
+    );
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Profile update initiated...')),
@@ -166,11 +171,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
       body: BlocListener<IndividualProfileCubit, IndividualProfileState>(
         listener: (context, state) {
           if (state is IndividualProfileLoaded) {
-            // This listener will be called for initial load AND after a successful update.
-            // We need to differentiate based on our _updateInProgress flag.
-
-            // Always update the text controllers and original values to reflect the latest user data
-            // (either initial load or successful update).
             final user = state.user;
             _firstNameController.text = user.first_name?? '';
             _lastNameController.text = user.last_name?? '';
@@ -182,48 +182,40 @@ class _EditProfilePageState extends State<EditProfilePage> {
             _originalEmail = user.email;
             _originalDescription = user.description;
             _currentAvatarUrl = user.avatarUrl;
-            _pickedImage = null; // Clear picked image if update includes image
+            _pickedImage = null;
 
-            // ONLY pop and show "updated successfully" if an update was in progress
             if (_updateInProgress) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Profile updated successfully!')),
               );
-              Navigator.pop(context); // Go back after successful update
-              // Reset the flag after handling the successful update
+              // Pop with `true` to signal success to the previous page
+              Navigator.pop(context, true);
               setState(() {
                 _updateInProgress = false;
               });
             }
-            // If _updateInProgress is false, it means this IndividualProfileLoaded
-            // state came from the initial fetch, so we just populate the fields.
           } else if (state is IndividualProfileError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Profile update failed: ${state.message}')),
             );
-            // Reset the flag if an error occurred during an initiated update
             setState(() {
               _updateInProgress = false;
             });
           }
-          // No specific action for IndividualProfileUpdating in listener,
-          // the initial "Profile update initiated..." snackbar already gives feedback.
         },
         child: BlocBuilder<IndividualProfileCubit, IndividualProfileState>(
           builder: (context, state) {
-            if (state is IndividualProfileLoading || state is IndividualProfileInitial) {
+            if (state is IndividualProfileLoading || state is IndividualProfileInitial || state is IndividualProfileUpdating) {
+              // Show loading for initial load and during update
               return const Center(child: CircularProgressIndicator());
             }
 
             if (state is IndividualProfileError && !_updateInProgress) {
-              // Show error on initial load failure, but don't prevent showing the form if
-              // the error happened during an update (which is handled by the listener).
+              // Only show error message if it's not during an update (which is handled by listener)
               return Center(child: Text('Error loading profile: ${state.message}'));
             }
 
-            // The controller values are primarily set in initState (initial load) and BlocListener (updates).
-            // No need for redundant setting in the builder, but keep the `CircleAvatar` logic based on `_currentAvatarUrl`.
-
+            // Render the form only when data is loaded (or error, but form still useful)
             return Form(
               key: _formKey,
               child: SingleChildScrollView(
@@ -239,8 +231,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         backgroundImage: _pickedImage != null
                             ? FileImage(_pickedImage!)
                             : (_currentAvatarUrl != null && _currentAvatarUrl!.isNotEmpty
-                                ? NetworkImage(_currentAvatarUrl!)
-                                : null) as ImageProvider<Object>?,
+                                  ? NetworkImage(_currentAvatarUrl!)
+                                  : null) as ImageProvider<Object>?,
                         child: _pickedImage == null &&
                                 (_currentAvatarUrl == null || _currentAvatarUrl!.isEmpty)
                             ? const Icon(Icons.camera_alt, size: 70, color: Colors.white)
@@ -292,7 +284,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                     const SizedBox(height: 32),
                     ElevatedButton(
-                      // Disable button while update is in progress to prevent multiple submissions
                       onPressed: _updateInProgress ? null : _updateProfile,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),

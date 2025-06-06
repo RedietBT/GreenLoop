@@ -13,11 +13,7 @@ abstract class IndividualUserRemoteDataSource {
 
   Future<void> updateUserProfile(
     String userId, {
-    required String? firstName,
-    required String? lastName,
-    required String? email,
-    required String? avatarUrl,
-    required String? points, String? description,
+    required Map<String, dynamic> data, 
   });
 }
 
@@ -26,61 +22,80 @@ class IndividualUserRemoteDataSourceImpl implements IndividualUserRemoteDataSour
 
   const IndividualUserRemoteDataSourceImpl(this._supabaseClient);
 
-  @override
+@override
   Future<Individual_User> fetchUserProfile(String userId) async {
     try {
-      final response = await _supabaseClient
-          .from('profile')
+      final dynamic responseData = await _supabaseClient
+          .from('profile') // Your table name
           .select()
           .eq('id', userId)
-          .single();
+          .single(); // Supabase .single() returns dynamic, which can be Map<String, dynamic> or null
 
-      return Individual_UserModel.fromJson(response);
+      // Handle null response (user not found)
+      if (responseData == null) {
+        throw ServerException(
+          message: 'User profile data not found for ID: $userId',
+          statusCode: 404, // HTTP 404 Not Found
+        );
+      }
+
+      // CRITICAL FIX: Explicitly cast the dynamic responseData to Map<String, dynamic>
+      // This directly addresses the "Map<dynamic, dynamic>" error.
+      if (responseData is! Map<String, dynamic>) {
+        throw const ServerException(
+          message: 'Invalid data format received from server. Expected Map<String, dynamic>.',
+          statusCode: 500, // Internal Server Error, or appropriate error code
+        );
+      }
+
+      // Now responseData is guaranteed to be Map<String, dynamic> and non-null
+      return Individual_UserModel.fromJson(responseData);
+
     } on PostgrestException catch (e) {
+      // Catch Supabase-specific errors
       throw ServerException(
         message: e.message,
-        statusCode: int.tryParse(e.code ?? '') ?? 500,
+        statusCode: int.tryParse(e.code ?? '') ?? 500, // Supabase error codes
       );
     } catch (e) {
-      throw ServerException(message: e.toString(), statusCode: 500);
+      // Catch any other unexpected errors
+      throw ServerException(
+        message: e.toString(), // Convert other exceptions to string message
+        statusCode: 500,
+      );
     }
   }
 
   @override
-  Future<void> updateUserProfile(
+  Future<Individual_User> updateUserProfile(
     String userId, {
-     String? firstName,
-     String? lastName,
-     String? email,
-     String? avatarUrl,
-     String? points,
-     String? description,
+    required Map<String, dynamic> data, // Corrected signature here too
   }) async {
     try {
-      final Map<String, dynamic> updates = {};
-        if (firstName != null) {
-        updates['first_name'] = firstName;
-      }
-      if (lastName != null) {
-        updates['last_name'] = lastName;
-      }
-      if (email != null) {
-        updates['email'] = email;
-      }
-      if (avatarUrl != null) {
-        updates['avatar_url'] = avatarUrl;
-      }
-      if (points != null) {
-        updates['points'] = points;
-      }
-      if (description != null) {
-        updates['description'] = description;
+      // Directly use the 'data' map passed in, no need for manual construction
+      final dynamic responseData = await _supabaseClient
+          .from('profile') // Assuming your user data is in a 'profile' table
+          .update(data)    // Pass the map directly to Supabase update
+          .eq('id', userId)
+          .select()
+          .single(); 
+
+          if (responseData == null) {
+         // This might happen if the ID doesn't exist to update
+         throw ServerException(
+          message: 'User profile not found for update with ID: $userId',
+          statusCode: 404,
+        );
       }
 
-      await _supabaseClient
-          .from('profile')
-          .update(updates)
-          .eq('id', userId);
+      if (responseData is! Map<String, dynamic>) {
+        throw const ServerException(
+          message: 'Invalid data format received after update. Expected Map<String, dynamic>.',
+          statusCode: 500,
+        );
+      }
+
+      return Individual_UserModel.fromJson(responseData);
     } on PostgrestException catch (e) {
       throw ServerException(
         message: e.message,
