@@ -29,38 +29,31 @@ class IndividualUserRemoteDataSourceImpl implements IndividualUserRemoteDataSour
           .from('profile') // Your table name
           .select()
           .eq('id', userId)
-          .single(); // Supabase .single() returns dynamic, which can be Map<String, dynamic> or null
-
-      // Handle null response (user not found)
+          .single(); 
       if (responseData == null) {
         throw ServerException(
           message: 'User profile data not found for ID: $userId',
-          statusCode: 404, // HTTP 404 Not Found
+          statusCode: 404,
         );
       }
 
-      // CRITICAL FIX: Explicitly cast the dynamic responseData to Map<String, dynamic>
-      // This directly addresses the "Map<dynamic, dynamic>" error.
       if (responseData is! Map<String, dynamic>) {
         throw const ServerException(
           message: 'Invalid data format received from server. Expected Map<String, dynamic>.',
-          statusCode: 500, // Internal Server Error, or appropriate error code
+          statusCode: 500, 
         );
       }
 
-      // Now responseData is guaranteed to be Map<String, dynamic> and non-null
       return Individual_UserModel.fromJson(responseData);
 
     } on PostgrestException catch (e) {
-      // Catch Supabase-specific errors
       throw ServerException(
         message: e.message,
-        statusCode: int.tryParse(e.code ?? '') ?? 500, // Supabase error codes
+        statusCode: int.tryParse(e.code ?? '') ?? 500,
       );
     } catch (e) {
-      // Catch any other unexpected errors
       throw ServerException(
-        message: e.toString(), // Convert other exceptions to string message
+        message: e.toString(), 
         statusCode: 500,
       );
     }
@@ -69,19 +62,17 @@ class IndividualUserRemoteDataSourceImpl implements IndividualUserRemoteDataSour
   @override
   Future<Individual_User> updateUserProfile(
     String userId, {
-    required Map<String, dynamic> data, // Corrected signature here too
+    required Map<String, dynamic> data,
   }) async {
     try {
-      // Directly use the 'data' map passed in, no need for manual construction
       final dynamic responseData = await _supabaseClient
-          .from('profile') // Assuming your user data is in a 'profile' table
-          .update(data)    // Pass the map directly to Supabase update
+          .from('profile')
+          .update(data)  
           .eq('id', userId)
           .select()
           .single(); 
 
           if (responseData == null) {
-         // This might happen if the ID doesn't exist to update
          throw ServerException(
           message: 'User profile not found for update with ID: $userId',
           statusCode: 404,

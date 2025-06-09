@@ -1,22 +1,16 @@
-import 'package:supabase_flutter/supabase_flutter.dart'; // Import Supabase
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:greenloop/core/errors/exceptions.dart';
-import 'package:greenloop/src/profile/Business/data/model/business_model.dart'; // Corrected import path for model
+import 'package:greenloop/src/profile/Business/data/model/business_model.dart';
+import 'package:greenloop/src/profile/Business/domain/entity/business_user.dart';
 
 abstract class BusinessRemoteDataSource {
   const BusinessRemoteDataSource();
 
   Future<BusinessModel> fetchUserProfile(String userId);
-  Future<void> updateUserProfile({
-    required String userId,
-    required String business_name,
-    required String contact_person_first_name,
-    required String contact_person_last_name,
-    required String phone_number,
-    required String? address,
-    required String email,
-    required String? avatarUrl,
-    required String? points,
-    required String? description,
+
+  Future<void> updateUserProfile(
+    String userId, {
+    required Map<String, dynamic> data, 
   });
 }
 
@@ -50,45 +44,40 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
     }
   }
 
-  @override
-  Future<void> updateUserProfile({
-     required String userId,
-     String? business_name,
-     String? contact_person_first_name,
-     String? contact_person_last_name,
-     String? phone_number,
-     String? address,
-     String? email,
-     String? avatarUrl,
-     String? points,
-     String? description,
+   @override
+  Future<Business> updateUserProfile(
+    String userId, {
+    required Map<String, dynamic> data,
   }) async {
     try {
-      // Prepare a map of updates. The keys here should match your Supabase column names.
-      final Map<String, dynamic> updates = {
-        'business_name': business_name,
-        'contact_person_first_name': contact_person_first_name,
-        'contact_person_last_name': contact_person_last_name,
-        'phone': phone_number,
-        'email': email,
-        'description': description ?? '',
-        'address': address ?? '', // Assuming address can be an empty string
-      };
+      final dynamic responseData = await _supabaseClient
+          .from('business')
+          .update(data)  
+          .eq('id', userId)
+          .select()
+          .single(); 
 
-      if (avatarUrl != null) updates['avatar_url'] = avatarUrl;
-      if (points != null) updates['points'] = points;
-      await _supabaseClient
-          .from('business') 
-          .update(updates)
-          .eq('id', userId);
+          if (responseData == null) {
+         throw ServerException(
+          message: 'User profile not found for update with ID: $userId',
+          statusCode: 404,
+        );
+      }
+
+      if (responseData is! Map<String, dynamic>) {
+        throw const ServerException(
+          message: 'Invalid data format received after update. Expected Map<String, dynamic>.',
+          statusCode: 500,
+        );
+      }
+
+      return BusinessModel.fromJson(responseData);
     } on PostgrestException catch (e) {
-      
       throw ServerException(
         message: e.message,
         statusCode: int.tryParse(e.code ?? '') ?? 500,
       );
     } catch (e) {
-      
       throw ServerException(message: e.toString(), statusCode: 500);
     }
   }

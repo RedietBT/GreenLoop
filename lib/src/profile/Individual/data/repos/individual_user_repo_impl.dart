@@ -31,7 +31,6 @@ class IndividualUserRepoImpl implements IndividualUserRepo{
   }
 
 @override
-  // CRITICAL FIX: Now expects to receive Individual_User from remoteDataSource
   ResultFuture<Individual_User> updateUserProfile(
     String userId, {
     required Map<String, dynamic> data,
@@ -42,7 +41,7 @@ class IndividualUserRepoImpl implements IndividualUserRepo{
         data: data,
       );
       final updatedUser = await remoteDataSource.fetchUserProfile(userId);
-      return Right(updatedUser); // Return the updated user
+      return Right(updatedUser);
     } on ServerException catch (e) {
       return Left(ServerFailure(
         message: e.message,

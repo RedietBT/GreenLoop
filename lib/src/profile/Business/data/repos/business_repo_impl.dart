@@ -25,41 +25,28 @@ class BusinessRepoImpl implements BusinessRepo {
     }
   }
 
-  @override
-  ResultFuture<void> updateUserProfile(
-     String userId, {
-    String? business_name,
-    String? contact_person_first_name,
-    String? contact_person_last_name,
-    String? phone_number,
-    String? address,
-    String? email,
-    String? avatarUrl,
-    String? points,
-    String? description,
+ @override
+  ResultFuture<Business> updateUserProfile(
+    String userId, {
+    required Map<String, dynamic> data,
   }) async {
     try {
-      
-      await _remoteDataSource.updateUserProfile(
-        userId: userId,
-        business_name: business_name ?? '',
-        contact_person_first_name: contact_person_first_name ?? '',
-        contact_person_last_name: contact_person_last_name ?? '',
-        phone_number: phone_number ?? '',
-        address: address,
-        email: email ?? '',
-        avatarUrl: avatarUrl,
-        points: points,
-        description: description,
+      await  _remoteDataSource.updateUserProfile(
+        userId,
+        data: data,
       );
-      return const Right(null);
+      final updatedUser = await  _remoteDataSource.fetchUserProfile(userId);
+      return Right(updatedUser); 
     } on ServerException catch (e) {
       return Left(ServerFailure(
         message: e.message,
         statusCode: e.statusCode,
       ));
     } catch (e) {
-      return Left(ServerFailure(message: e.toString(), statusCode: 500));
+      return Left(ServerFailure(
+        message: e.toString(),
+        statusCode: '500',
+      ));
     }
   }
 }
