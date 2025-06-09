@@ -19,10 +19,12 @@ class RegisterForRecyclingCubit extends Cubit<RegisterForRecyclingState> {
 
   Future<void> registerRecycling({
     required String centerName,
-    required String contactInfo,
+    required String contactPersonFirstName,
+    required String contactPersonLastName,
     required String email,
     required String userType,
     required String password,
+    required String phoneNo,
   }) async {
     emit(RegisterForRecyclingLoading());
     
@@ -48,8 +50,8 @@ class RegisterForRecyclingCubit extends Cubit<RegisterForRecyclingState> {
           email,
           password,
           centerName,
-          contactInfo,
-          roleId,
+          contactPersonFirstName,
+          contactPersonLastName,
         );
         
         if (supabaseUser == null) {
@@ -61,8 +63,10 @@ class RegisterForRecyclingCubit extends Cubit<RegisterForRecyclingState> {
         final result = await repository.insertIntoRecyclinTable(
           supabaseUser.id,
           centerName,
-          contactInfo,
+          contactPersonFirstName,
+          contactPersonLastName,
           email,
+          phoneNo,
           roleId,
           );
           

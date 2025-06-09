@@ -18,11 +18,23 @@ class RegisterForRecyclingBody extends StatefulWidget {
 class _RegisterForRecyclingBodyState extends State<RegisterForRecyclingBody> {
   final _emailController = TextEditingController();
   final _centerNameController = TextEditingController();
-  final _contactController = TextEditingController();
+  final _contactPersonFirstNameController = TextEditingController();
+  final _contactPersonLastNameController = TextEditingController();
+  final _phoneNoController = TextEditingController();
 
   String password = '';
   String confirmPassword = '';
 
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _centerNameController.dispose();
+    _contactPersonFirstNameController.dispose();
+    _contactPersonLastNameController.dispose();
+    _phoneNoController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,12 +65,21 @@ class _RegisterForRecyclingBodyState extends State<RegisterForRecyclingBody> {
                   decoration: const InputDecoration(labelText: 'Center Name'),
                 ),
                 TextField(
-                  controller: _contactController,
-                  decoration: const InputDecoration(labelText: 'Contact Info'),
+                  controller: _contactPersonFirstNameController,
+                  decoration: const InputDecoration(labelText: 'Contact Person First Name'),
+                ),
+                TextField(
+                  controller: _contactPersonLastNameController,
+                  decoration: const InputDecoration(labelText: 'Contact Person Last Name'),
                 ),
                 TextField(
                   controller: _emailController,
                   decoration: const InputDecoration(labelText: 'Email'),
+                ),
+                TextField(
+                  controller: _phoneNoController,
+                  decoration: const InputDecoration(labelText: 'Phone Number'),
+                  keyboardType: TextInputType.phone,
                 ),
                 TextField(
                   decoration: const InputDecoration(labelText: 'Password'),
@@ -78,10 +99,12 @@ class _RegisterForRecyclingBodyState extends State<RegisterForRecyclingBody> {
                       : () {
                           context.read<RegisterForRecyclingCubit>().registerRecycling(
                                 centerName: _centerNameController.text.trim(),
-                                contactInfo: _contactController.text.trim(),
+                                contactPersonFirstName: _contactPersonFirstNameController.text.trim(),
+                                contactPersonLastName: _contactPersonLastNameController.text.trim(),
                                 email: _emailController.text.trim(),
                                 password: password,
                                 userType: widget.role,
+                                phoneNo: _phoneNoController.text.trim().isEmpty ? '' : _phoneNoController.text.trim(),
                               );
                         },
                   child: state is RegisterForRecyclingLoading

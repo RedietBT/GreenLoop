@@ -6,7 +6,7 @@ class InsertIntoRecyclinTable {
 
   InsertIntoRecyclinTable (this.repository);
 
-  ResultFuture<void> call(String id, String centerName, String contactInfo, String email, String role) {
-    return repository.insertIntoRecyclinTable(id, centerName, contactInfo, email, role);
+  ResultFuture<void> call(String id, String centerName, String contactPersonFirstName, String contactPersonLastName, String email, String? phoneNo, String? role) {
+    return repository.insertIntoRecyclinTable(id, centerName, contactPersonFirstName, contactPersonLastName, email, phoneNo, role);
   }
 }

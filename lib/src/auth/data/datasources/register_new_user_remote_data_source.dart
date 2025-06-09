@@ -2,7 +2,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class RegisterNewUserRemoteDataSource {
   Future<void> insertUserProfile(String id, String firstName, String lastName, String email, String? role);
-  Future<void> insertIntoRecyclingTable(String id, String centerName, String contactInfo, String email, String? role);
+  Future<void> insertIntoRecyclingTable(String id, String centerName, String contactPersonFirstName, String contactPersonLastName, String email, String? phoneNo, String? role);
   Future<void> insertIntoBusinessTable(String id, String businessName, String contactPersonFirstName, String contactPersonLastName, String email, String phoneNo, String? role);
 }
 
@@ -27,13 +27,15 @@ class RegisterNewUserRemoteDataSourceImpl implements RegisterNewUserRemoteDataSo
   }
 
   @override
-  Future<void> insertIntoRecyclingTable(String id, String centerName, String contactInfo, String email, String? role) async {
+  Future<void> insertIntoRecyclingTable(String id, String centerName, String contactPersonFirstName, String contactPersonLastName, String email, String? phoneNo, String? role) async {
     try {
       await client.from('recycling_center').insert({
         'id': id,
         'center_name': centerName,
-        'contact': contactInfo,
+        'contact_person_first_name': contactPersonFirstName,
+        'contact_person_last_name': contactPersonLastName,
         'email': email,
+        'phone': phoneNo,
         'role': role,
       });
     } catch (e) {

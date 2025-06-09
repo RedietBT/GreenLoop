@@ -25,9 +25,9 @@ class RegisterNewUserRepositoryImpl implements RegisterNewUserRepo {
 
   @override
   ResultFuture<void> insertIntoRecyclinTable(
-      String id, String centerName, String contactInfo, String email, String? role) async {
+      String id, String centerName, String contactPersonFirstName, String contactPersonLastName, String email, String? phoneNo, String? role) async {
     try {
-      await remoteDataSource.insertIntoRecyclingTable(id, centerName, contactInfo, email, role);
+      await remoteDataSource.insertIntoRecyclingTable(id, centerName, contactPersonFirstName, contactPersonLastName, email, phoneNo, role);
       return const Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
