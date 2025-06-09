@@ -5,16 +5,8 @@ abstract class BusinessRepo {
 
 ResultFuture<Business> fetchUserProfile(String userId);
 
-ResultFuture<void> updateUserProfile(
-  String userId, {
-     String? business_name, 
-     String? contact_person_first_name,
-     String? contact_person_last_name,
-     String? phone_number,
-     String? address,
-     String? email,     
-     String? avatarUrl, 
-     String? points,
-     String? description,    
+ ResultFuture<Business> updateUserProfile(
+    String userId, {
+    required Map<String, dynamic> data,
   });
 }

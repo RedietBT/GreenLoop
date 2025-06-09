@@ -2,24 +2,24 @@ import 'package:equatable/equatable.dart';
 
 class Business extends Equatable {
   final String id;
-  final String business_name;
-  final String contact_person_first_name;
-  final String contact_person_last_name;
-  final String phone_number;
-  final String role;
+  final String? business_name;
+  final String? contact_person_first_name;
+  final String? contact_person_last_name;
+  final String? phone_number;
+  final String? role;
   final String? address;
   final String? avatarUrl;
-  final String? points;
+  final int? points;
   final String? email;
   final String? description;
 
   const Business({
     required this.id,
-    required this.business_name,
-    required this.contact_person_first_name,
-    required this.contact_person_last_name,
-    required this.phone_number,
-    required this.role,
+    this.business_name,
+    this.contact_person_first_name,
+    this.contact_person_last_name,
+    this.phone_number,
+    this.role,
     this.address,
     this.avatarUrl,
     this.points,

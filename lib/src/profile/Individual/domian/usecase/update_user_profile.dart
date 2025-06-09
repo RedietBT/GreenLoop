@@ -7,7 +7,6 @@ class UpdateUserProfile {
 
   const UpdateUserProfile(this.repository);
 
-  // The 'call' method now accepts a Map<String, dynamic> for the update data
   ResultFuture<Individual_User> call(String userId, Map<String, dynamic> data) {
     return repository.updateUserProfile(userId, data: data);
   }
