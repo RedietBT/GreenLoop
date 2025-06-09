@@ -23,4 +23,12 @@ class Individual_User extends Equatable{
 
   @override
   List<Object?> get props => [id, first_name, last_name, role, avatarUrl, points, email, description];
+
+  get eventsJoined => null;
+
+  get badgesEarned => null;
+
+  get treesPlanted => null;
+
+  get achievements => null;
 }
