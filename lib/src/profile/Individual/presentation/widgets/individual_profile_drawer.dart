@@ -1,4 +1,4 @@
-// src/profile/Individual/presentation/widgets/individual_profile_drawer.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
@@ -10,7 +10,6 @@ class IndividualProfileDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get the existing cubit reference
     final individualProfileCubit = context.read<IndividualProfileCubit>();
 
     return Drawer(
@@ -91,13 +90,12 @@ class IndividualProfileDrawer extends StatelessWidget {
             leading: const Icon(Icons.edit),
             title: const Text('Edit Profile'),
             onTap: () async {
-              Navigator.pop(context); // Close the drawer first
+              Navigator.pop(context); 
 
-              final individualProfileState = individualProfileCubit.state; // Use the cubit obtained outside builder
+              final individualProfileState = individualProfileCubit.state; 
 
               if (individualProfileState is IndividualProfileLoaded) {
                 final userId = individualProfileState.user.id;
-                // Await the result from EditProfilePage
                 final bool? profileUpdated = await Navigator.push(
                   context,
                   MaterialPageRoute(

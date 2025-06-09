@@ -39,7 +39,7 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
         title: const Text('Business Profile')
       ),
       drawer: const BusinessProfileDrawer(), 
-      body: const BusinessProfileBody(), 
+      body: const BusinessProfileBody(userId: '',), 
     );
   }
 }

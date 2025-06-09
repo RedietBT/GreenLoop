@@ -1,13 +1,11 @@
-// src/profile/Individual/presentation/widgets/individual_profile_body.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_state.dart';
-// Ensure your Individual_User entity is imported if needed for direct access to its properties
-// import 'package:greenloop/src/profile/Individual/domian/entity/individual_user.dart';
+
 
 class IndividualProfileBody extends StatefulWidget {
-  final String userId; // Crucially, this receives the userId from IndividualProfilePage
+  final String userId; 
 
   const IndividualProfileBody({super.key, required this.userId});
 
@@ -19,8 +17,7 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> {
   @override
   void initState() {
     super.initState();
-    // This fetches the user data when IndividualProfileBody is first initialized.
-    // It uses the userId passed from IndividualProfilePage.
+    
     context.read<IndividualProfileCubit>().fetchUser(widget.userId);
   }
 
@@ -134,8 +131,6 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> {
             ),
           );
         }
-        // Fallback for states like IndividualProfileInitial (which might already be handled above)
-        // or any other unhandled states. SizedBox.shrink() is a safe default.
         return const SizedBox.shrink();
       },
     );

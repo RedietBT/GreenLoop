@@ -9,6 +9,8 @@ class BusinessProfileDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final businessProfileCubit = context.read<BusinessProfileCubit>();
+
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -46,11 +48,10 @@ class BusinessProfileDrawer extends StatelessWidget {
                       child: business.avatarUrl == null || business.avatarUrl!.isEmpty
                           ? const Icon(Icons.business, size: 30, color: Colors.white)
                           : null,
-                      backgroundColor: Colors.white.withOpacity(0.3),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      business.business_name,
+                      business.business_name ?? '',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -93,16 +94,33 @@ class BusinessProfileDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.edit),
             title: const Text('Edit Profile'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const EditBusinessProfilePage()),
-              );
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Navigating to Edit Business Profile...')),
-              );
-            },
+            onTap: () async {
+
+              final businessProfileState = businessProfileCubit.state;
+              if (businessProfileState is BusinessProfileLoaded) {
+                final business = businessProfileState.business.id;
+                final bool? profileUpdated = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BlocProvider.value(
+                      value: businessProfileCubit,
+                      child: EditBusinessProfilePage(userId: business),
+                    ),
+                  ),
+                );
+
+                if (profileUpdated == true) {
+                  businessProfileCubit.fetchUserProfile(business);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Profile refreshed from drawer!')),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Profile data not yet loaded. Please wait and try again.')),
+                  );
+                }
+              }
+            }  
           ),
           ListTile(
             leading: const Icon(Icons.logout),

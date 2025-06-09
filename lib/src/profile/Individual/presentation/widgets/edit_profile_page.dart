@@ -40,8 +40,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _emailController = TextEditingController();
     _descriptionController = TextEditingController();
 
-    // Fetch initial user data to populate the fields when the page loads
-    // This uses the SAME cubit instance passed via BlocProvider.value
     context.read<IndividualProfileCubit>().fetchUser(widget.userId);
   }
 
@@ -85,8 +83,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         const SnackBar(content: Text('Uploading image...')),
       );
       try {
-        // Ensure your uploadFile method accepts `filepath` which includes a filename.
-        // For example: '${widget.userId}/avatar.jpg'
+       
         newAvatarUrl = await context.read<IndividualProfileCubit>().uploadFile(
           bucketName: 'profile',
           filepath: '${widget.userId}/avatar.jpg', // Ensure this is a proper path + filename
@@ -206,16 +203,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
         child: BlocBuilder<IndividualProfileCubit, IndividualProfileState>(
           builder: (context, state) {
             if (state is IndividualProfileLoading || state is IndividualProfileInitial || state is IndividualProfileUpdating) {
-              // Show loading for initial load and during update
               return const Center(child: CircularProgressIndicator());
             }
 
             if (state is IndividualProfileError && !_updateInProgress) {
-              // Only show error message if it's not during an update (which is handled by listener)
               return Center(child: Text('Error loading profile: ${state.message}'));
             }
 
-            // Render the form only when data is loaded (or error, but form still useful)
             return Form(
               key: _formKey,
               child: SingleChildScrollView(
