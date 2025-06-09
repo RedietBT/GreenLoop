@@ -26,8 +26,24 @@ class BusinessModel extends Business {
       address: json['address'] as String?,
       email: json['email'] as String? ?? '',
       avatarUrl: json['avater_url'] as String?,
-      points: json['points']?.toString() ?? '0',
+      points: json['points'] as int?,
       description: json['description'] as String?,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'business_name': business_name,
+      'contact_person_first_name': contact_person_first_name,
+      'contact_person_last_name': contact_person_last_name,
+      'phone': phone_number,
+      'role': role,
+      'address': address,
+      'email': email,
+      'avater_url': avatarUrl,
+      'points': points,
+      'description': description,
+    };
   }
 }
