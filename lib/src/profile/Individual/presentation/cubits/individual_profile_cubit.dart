@@ -23,20 +23,19 @@ class IndividualProfileCubit extends Cubit<IndividualProfileState> {
 
 Future<void> updateProfile({
   required String userId,
-  required Map<String, dynamic> data, // <--- Corrected: now accepts a map
+  required Map<String, dynamic> data, 
 }) async {
   emit(IndividualProfileUpdating());
   
-  // Call the repository's updateUserProfile with the data map
   final result = await individualUserRepo.updateUserProfile(
     userId,
-    data: data, // <--- Pass the entire map here
+    data: data,
   );
 
   result.fold(
       (failure) => emit(IndividualProfileError(failure.errorMassage)),
-      (updatedUser) { // CRITICAL FIX: Receive the updated user directly
-        emit(IndividualProfileLoaded(updatedUser)); // Emit loaded with the updated user
+      (updatedUser) { 
+        emit(IndividualProfileLoaded(updatedUser)); 
       },
     );
 }

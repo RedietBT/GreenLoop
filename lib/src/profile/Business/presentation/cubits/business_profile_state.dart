@@ -18,11 +18,7 @@ class BusinessProfileLoading extends BusinessProfileState {
 
 class BusinessProfileLoaded extends BusinessProfileState {
   final Business business;
-
-  const BusinessProfileLoaded({required this.business});
-
-  @override
-  List<Object> get props => [business];
+  BusinessProfileLoaded(this.business);
 }
 
 class BusinessProfileUpdating extends BusinessProfileState {
