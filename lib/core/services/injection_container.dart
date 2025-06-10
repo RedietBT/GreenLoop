@@ -165,7 +165,7 @@ Future<void> init() async {
   // Cubit
   sl.registerFactory(() => BusinessProfileCubit(
     businessRepo: sl<BusinessRepo>(),
-    storageRepo: sl<StorageRepo>(),
+    storageRepo: sl<StorageRepo>()
   ));
 
 }

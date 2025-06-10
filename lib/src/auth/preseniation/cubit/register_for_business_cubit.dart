@@ -64,11 +64,11 @@ final roleId = matchedRole.id;
       // 4. Insert user profile
       final result = await registerRepo.insertIntoBusinessTable(
         supabaseUser.id,
+        businessName,
         contactPersonFirstName,
         contactPersonLastName,
-        phoneNo,
         email,
-        businessName,
+        phoneNo,
         roleId,
       );
 

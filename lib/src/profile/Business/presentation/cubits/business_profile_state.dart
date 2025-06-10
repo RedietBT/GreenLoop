@@ -18,7 +18,7 @@ class BusinessProfileLoading extends BusinessProfileState {
 
 class BusinessProfileLoaded extends BusinessProfileState {
   final Business business;
-  BusinessProfileLoaded(this.business);
+  const BusinessProfileLoaded(this.business);
 }
 
 class BusinessProfileUpdating extends BusinessProfileState {

@@ -98,19 +98,20 @@ class BusinessProfileDrawer extends StatelessWidget {
 
               final businessProfileState = businessProfileCubit.state;
               if (businessProfileState is BusinessProfileLoaded) {
-                final business = businessProfileState.business.id;
+                final userId = businessProfileState.business.id;
+
                 final bool? profileUpdated = await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => BlocProvider.value(
                       value: businessProfileCubit,
-                      child: EditBusinessProfilePage(userId: business),
+                      child: EditBusinessProfilePage(userId: userId),
                     ),
                   ),
                 );
 
                 if (profileUpdated == true) {
-                  businessProfileCubit.fetchUserProfile(business);
+                  businessProfileCubit.fetchUserProfile(userId);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Profile refreshed from drawer!')),
                   );

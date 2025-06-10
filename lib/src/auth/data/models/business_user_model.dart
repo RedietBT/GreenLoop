@@ -21,7 +21,7 @@ class BusinessUserModel extends Business{
       contact_person_last_name: json['contact_person_last_name'] as String,
       email: json['email'] as String,
       phone_no: json['phone_no'] as String,
-      role: json['role'] as String? ?? 'business',
+      role: json['role'] as String? ?? 'USER103',
       password: json['password'] as String,
     );
   }

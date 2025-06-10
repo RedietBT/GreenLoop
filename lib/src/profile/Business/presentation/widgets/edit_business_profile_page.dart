@@ -92,9 +92,10 @@ Future<void>  _updateProfile() async{
     try {
       newAvatarUrl = await context.read<BusinessProfileCubit>().uploadFile(
           bucketName: 'profile',
-          filepath: '${widget.userId}/avatar.jpg', // Ensure this is a proper path + filename
+          filepath: '${widget.userId}/avatar.jpg',
           file: _pickedImage!,
         );
+        isImageUpdated = true;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Image uploaded successfully!')),
         );
@@ -233,7 +234,7 @@ Future<void>  _updateProfile() async{
                                 ? NetworkImage(_currentavatarUrl!) 
                                 : null) as ImageProvider<Object>?,
                                 child: _pickedImage == null &&
-                                (_currentavatarUrl== null && _currentavatarUrl!.isEmpty)
+                                (_currentavatarUrl == null || _currentavatarUrl!.isEmpty)
                                 ? const Icon(Icons.business, size: 70, color: Colors.white)
                                 : null,                            
                       ),
