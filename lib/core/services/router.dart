@@ -17,6 +17,8 @@ import 'package:greenloop/src/profile/Business/presentation/cubits/business_prof
 import 'package:greenloop/src/profile/Business/presentation/view/business_profile_page.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
 import 'package:greenloop/src/profile/Individual/presentation/view/individual_profile_page.dart';
+import 'package:greenloop/src/profile/recycling/presentation/cubits/recycling_profile_cubit.dart';
+import 'package:greenloop/src/profile/recycling/presentation/view/recycling_profile_page.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
@@ -100,6 +102,25 @@ case IndividualProfilePage.routeName:
     (_) => BlocProvider(
       create: (_) => sl<BusinessProfileCubit>()..fetchUserProfile(userId),
       child: BusinessProfilePage(
+        userId: userId,
+        userType: userType,
+      ),
+    ),
+    settings: settings,
+  );
+
+   case RecyclingProfilePage.routeName:
+  final Map<String, dynamic>? arguments = settings.arguments as Map<String, dynamic>?;
+  if (arguments == null || !arguments.containsKey('userId')) {
+    throw ArgumentError('RecyclingProfilePage requires a "userId" argument in settings.arguments.');
+  }
+
+  final String userId = arguments['userId'] as String;
+  final String userType = arguments['userType'] as String? ?? 'Recycling User Page';
+  return _pageBuilder(
+    (_) => BlocProvider(
+      create: (_) => sl<RecyclingProfileCubit>()..fetchUser(userId),
+      child: RecyclingProfilePage(
         userId: userId,
         userType: userType,
       ),

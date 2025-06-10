@@ -5,6 +5,7 @@ import 'package:greenloop/src/auth/preseniation/cubit/login_cubit.dart'; // Note
 import 'package:greenloop/src/auth/preseniation/views/register_as_page.dart'; // Import your RegisterAsPage
 import 'package:greenloop/src/profile/Individual/presentation/view/individual_profile_page.dart';
 import 'package:greenloop/src/profile/Business/presentation/view/business_profile_page.dart';
+import 'package:greenloop/src/profile/recycling/presentation/view/recycling_profile_page.dart';
 //import 'package:greenloop/src/profile/Recycling/presentation/view/recycling_profile_page.dart'; // Import the new page
 
 class LoginBody extends StatefulWidget {
@@ -61,12 +62,12 @@ class _LoginBodyState extends State<LoginBody> {
                 BusinessProfilePage.routeName,
                 arguments: {'userId': userId, 'userType': userRole},
               );
-            // } else if (userRole == 'USER102') {
-            //   Navigator.pushReplacementNamed(
-            //     context,
-            //     RecyclingProfilePage.routeName,
-            //     arguments: {'userId': userId, 'userType': userRole},
-            //   );
+            } else if (userRole == 'USER102') {
+              Navigator.pushReplacementNamed(
+                context,
+                RecyclingProfilePage.routeName,
+                arguments: {'userId': userId, 'userType': userRole},
+              );
             } else {
               // Fallback for unknown roles
               ScaffoldMessenger.of(context).showSnackBar(

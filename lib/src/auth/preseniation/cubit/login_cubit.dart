@@ -2,15 +2,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenloop/src/auth/domain/repos/auth_repo.dart';
 import 'package:greenloop/src/profile/Business/domain/repo/business_repo.dart';
 import 'package:greenloop/src/profile/Individual/domian/repos/individual_user_repo.dart';
+import 'package:greenloop/src/profile/recycling/domain/repos/recycling_user_repo.dart';
 
 part 'login_state.dart';
 class LoginCubit extends Cubit<LoginState> {
 
   final AuthRepo _authRepo;
   final IndividualUserRepo _individualUserRepo;
-  final BusinessRepo _businessRepo; // Assuming you have a BusinessRepo for business profiles
+  final BusinessRepo _businessRepo;
+  final RecyclingUserRepo _recyclingUserRepo; // Assuming you have a BusinessRepo for business profiles
 
-  LoginCubit(this._authRepo, this._individualUserRepo, this._businessRepo) : super(LoginInitial());
+  LoginCubit(this._authRepo, this._individualUserRepo, this._businessRepo, this._recyclingUserRepo) : super(LoginInitial());
 
  Future<void> login(String email, String password) async {
     emit(LoginLoading());
@@ -72,7 +74,17 @@ class LoginCubit extends Cubit<LoginState> {
       },
     );
     if (role != null) return role;
-
+    final recyclingResult = await _recyclingUserRepo.fetchUserProfile(userId);
+    recyclingResult.fold(
+      (failure) {
+        print('Failed to fetch recycling profile: ${failure.message}');
+      },
+      (recycling) {
+        print('Found recycling profile with role: ${recycling.role}');
+        role = recycling.role;
+      },
+    );
+    if (role != null) return role;
     print('No role found for user ID: $userId');
     return null; // Role not found in any profile
   }

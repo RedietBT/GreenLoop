@@ -1,8 +1,5 @@
 import 'package:get_it/get_it.dart';
-import 'package:greenloop/src/profile/Business/data/datasource/business_remote_data_source.dart';
-import 'package:greenloop/src/profile/Business/data/repos/business_repo_impl.dart';
-import 'package:greenloop/src/profile/Business/domain/repo/business_repo.dart';
-import 'package:greenloop/src/profile/Business/presentation/cubits/business_profile_cubit.dart';
+
 import 'package:greenloop/src/profile/cores/data/dataSource/storage_remote_data_source.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -36,6 +33,19 @@ import 'package:greenloop/src/profile/Individual/domian/repos/individual_user_re
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
 import 'package:greenloop/src/profile/cores/domain/repos/storage_repo.dart';
 import 'package:greenloop/src/profile/cores/data/repos/storage_repo_impl.dart';
+
+
+// Recycling Profile imports
+import 'package:greenloop/src/profile/recycling/data/datasource/recycling_remote_data_source.dart';
+import 'package:greenloop/src/profile/recycling/presentation/cubits/recycling_profile_cubit.dart';
+import 'package:greenloop/src/profile/recycling/data/repos/recycling_repo_impl.dart';
+import 'package:greenloop/src/profile/recycling/domain/repos/recycling_user_repo.dart';
+
+//Business Profile imports
+import 'package:greenloop/src/profile/Business/data/datasource/business_remote_data_source.dart';
+import 'package:greenloop/src/profile/Business/data/repos/business_repo_impl.dart';
+import 'package:greenloop/src/profile/Business/domain/repo/business_repo.dart';
+import 'package:greenloop/src/profile/Business/presentation/cubits/business_profile_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -98,6 +108,7 @@ Future<void> init() async {
     sl<AuthRepo>(),
     sl<IndividualUserRepo>(),
     sl<BusinessRepo>(),
+    sl<RecyclingUserRepo>(),
   ));
   sl.registerFactory(() => RegisterAsCubit());
 
@@ -167,5 +178,23 @@ Future<void> init() async {
     businessRepo: sl<BusinessRepo>(),
     storageRepo: sl<StorageRepo>(),
   ));
+
+  // ============================
+  // NEW:Recycling Profile Feature
+  // ============================
+  // Data Sources
+  sl.registerLazySingleton<RecyclingRemoteDataSource>(
+    () => RecyclingRemoteDataSourceImpl(sl<SupabaseClient>()),
+  );
+  // Repositories
+  sl.registerLazySingleton<RecyclingUserRepo>(
+    () => RecyclingUserRepoImpl(sl<RecyclingRemoteDataSource>()),
+  );
+  // Cubit
+  sl.registerFactory(() => RecyclingProfileCubit(
+    sl<RecyclingUserRepo>(),
+    sl<StorageRepo>(),
+  ));
+  // ============================
 
 }
