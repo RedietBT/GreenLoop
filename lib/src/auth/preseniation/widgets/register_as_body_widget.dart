@@ -2,70 +2,111 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenloop/src/auth/preseniation/cubit/register_as_cubit.dart';
 import 'package:greenloop/core/commen/views/loading_view.dart';
+import 'package:greenloop/core/res/colors.dart';
 
 class RegisterAsPageBody extends StatelessWidget {
   const RegisterAsPageBody({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: BlocBuilder<RegisterAsCubit, RegisterAsState>(
-        builder: (context, state) {
-          if (state is RegisterAsLoading) {
-            return const LoadingView(); // Show loading view
-          }
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  final role = 'Individual / Household';
-                  context.read<RegisterAsCubit>().selectRole(role);
-                  Navigator.pushReplacementNamed(context, '/registerForIndividual', arguments: role);
+    return Container(
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/images/background.jpg'), // Ensure you have this image
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: BlocBuilder<RegisterAsCubit, RegisterAsState>(
+          builder: (context, state) {
+            if (state is RegisterAsLoading) {
+              return const LoadingView();
+            }
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    final role = 'Individual / Household';
+                    context.read<RegisterAsCubit>().selectRole(role);
+                    Navigator.pushReplacementNamed(context, '/registerForIndividual', arguments: role);
                   },
-                style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
-                child: const Text("Individual / Household"),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  final role = 'Recycling Center';
-                  context.read<RegisterAsCubit>().selectRole(role);
-                  Navigator.pushReplacementNamed(context, '/register-recycling', arguments: role);
-                  },
-                style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
-                child: const Text("Recycling Center"),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  final role = 'Business';
-                  context.read<RegisterAsCubit>().selectRole(role);
-                  Navigator.pushReplacementNamed(context, '/registerForBussiness', arguments: role);
-                  },
-                style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
-                child: const Text("Business"),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  final role = 'Has an account Login';
-                  context.read<RegisterAsCubit>().selectRole(role);
-                  Navigator.pushReplacementNamed(context, '/login');
-                  },
-                style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
-                child: const Text("Has an account Login"),
-              ),
-              const SizedBox(height: 20),
-              if (state is RegisterAsRoleSelected)
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Text('Selected Role: ${state.role}'),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(50),
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.textTertiary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    elevation: 5,
+                  ),
+                  child: const Text("Individual / Household"),
                 ),
-            ],
-          );
-        },
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    final role = 'Recycling Center';
+                    context.read<RegisterAsCubit>().selectRole(role);
+                    Navigator.pushReplacementNamed(context, '/register-recycling', arguments: role);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(50),
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.textTertiary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    elevation: 5,
+                  ),
+                  child: const Text("Recycling Center"),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    final role = 'Business';
+                    context.read<RegisterAsCubit>().selectRole(role);
+                    Navigator.pushReplacementNamed(context, '/registerForBussiness', arguments: role);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(50),
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.textTertiary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    elevation: 5,
+                  ),
+                  child: const Text("Business"),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    final role = 'Has an account Login';
+                    context.read<RegisterAsCubit>().selectRole(role);
+                    Navigator.pushReplacementNamed(context, '/login');
+                  },
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(50),
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.textTertiary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    elevation: 5,
+                  ),
+                  child: const Text("Has an account Login"),
+                ),
+                const SizedBox(height: 20),
+                if (state is RegisterAsRoleSelected)
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Text('Selected Role: ${state.role}'),
+                  ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
