@@ -9,7 +9,7 @@ class RegisterForRecyclingBody extends StatefulWidget {
   const RegisterForRecyclingBody({
     super.key,
     required this.role
-    });
+  });
 
   @override
   State<RegisterForRecyclingBody> createState() => _RegisterForRecyclingBodyState();
@@ -24,7 +24,6 @@ class _RegisterForRecyclingBodyState extends State<RegisterForRecyclingBody> {
 
   String password = '';
   String confirmPassword = '';
-
 
   @override
   void dispose() {
@@ -48,92 +47,166 @@ class _RegisterForRecyclingBodyState extends State<RegisterForRecyclingBody> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Registration successful!")),
           );
-           // Navigate to login page after a short delay
-           Future.delayed(const Duration(seconds: 2), () {
+          Future.delayed(const Duration(seconds: 2), () {
             Navigator.of(context).pushReplacementNamed('/login');
           });
         }
       },
       builder: (context, state) {
-        return Padding(
-          padding: const EdgeInsets.all(16),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextField(
-                  controller: _centerNameController,
-                  decoration: const InputDecoration(labelText: 'Center Name'),
-                ),
-                TextField(
-                  controller: _contactPersonFirstNameController,
-                  decoration: const InputDecoration(labelText: 'Contact Person First Name'),
-                ),
-                TextField(
-                  controller: _contactPersonLastNameController,
-                  decoration: const InputDecoration(labelText: 'Contact Person Last Name'),
-                ),
-                TextField(
-                  controller: _emailController,
-                  decoration: const InputDecoration(labelText: 'Email'),
-                ),
-                TextField(
-                  controller: _phoneNoController,
-                  decoration: const InputDecoration(labelText: 'Phone Number'),
-                  keyboardType: TextInputType.phone,
-                ),
-                TextField(
-                  decoration: const InputDecoration(labelText: 'Password'),
-                  obscureText: true,
-                  onChanged: (value) => setState(() => password = value),
-                ),
-                TextField(
-                  decoration: const InputDecoration(labelText: 'Confirm Password'),
-                  obscureText: true,
-                  onChanged: (value) => setState(() => confirmPassword = value),
-                ),
-                
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: state is RegisterForRecyclingLoading
-                      ? null
-                      : () {
-                          context.read<RegisterForRecyclingCubit>().registerRecycling(
-                                centerName: _centerNameController.text.trim(),
-                                contactPersonFirstName: _contactPersonFirstNameController.text.trim(),
-                                contactPersonLastName: _contactPersonLastNameController.text.trim(),
-                                email: _emailController.text.trim(),
-                                password: password,
-                                userType: widget.role,
-                                phoneNo: _phoneNoController.text.trim().isEmpty ? '' : _phoneNoController.text.trim(),
-                              );
-                        },
-                  child: state is RegisterForRecyclingLoading
-                      ? const CircularProgressIndicator()
-                      : const Text("Register"),
-                ),
-              const SizedBox(height: 20),
-              GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                ),
-                child: RichText(
-                  text: TextSpan(
-                    text: 'have an account? ',
-                    style: TextStyle(color: Colors.black),
-                    children: [
-                      TextSpan(
-                        text: 'Login here.',
-                        style: TextStyle(color: AppColors.primary),
-                        ),
-                      ],
+        Widget content = Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/images/background.jpg'),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  TextField(
+                    controller: _centerNameController,
+                    decoration: InputDecoration(
+                      labelText: 'Center Name',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
                     ),
                   ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: _contactPersonFirstNameController,
+                    decoration: InputDecoration(
+                      labelText: 'Contact Person First Name',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: _contactPersonLastNameController,
+                    decoration: InputDecoration(
+                      labelText: 'Contact Person Last Name',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: _phoneNoController,
+                    decoration: InputDecoration(
+                      labelText: 'Phone Number',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                    keyboardType: TextInputType.phone,
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                    obscureText: true,
+                    onChanged: (value) => setState(() => password = value),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    decoration: InputDecoration(
+                      labelText: 'Confirm Password',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                    obscureText: true,
+                    onChanged: (value) => setState(() => confirmPassword = value),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: state is RegisterForRecyclingLoading
+                        ? null
+                        : () {
+                            context.read<RegisterForRecyclingCubit>().registerRecycling(
+                                  centerName: _centerNameController.text.trim(),
+                                  contactPersonFirstName: _contactPersonFirstNameController.text.trim(),
+                                  contactPersonLastName: _contactPersonLastNameController.text.trim(),
+                                  email: _emailController.text.trim(),
+                                  password: password,
+                                  userType: widget.role,
+                                  phoneNo: _phoneNoController.text.trim().isEmpty ? '' : _phoneNoController.text.trim(),
+                                );
+                          },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.textTertiary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 50,
+                        vertical: 17,
+                      ),
+                      elevation: 5,
+                    ),
+                    child: state is RegisterForRecyclingLoading
+                        ? const CircularProgressIndicator()
+                        : const Text("Register"),
+                  ),
+                  const SizedBox(height: 20),
+                  GestureDetector(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    ),
+                    child: RichText(
+                      text: TextSpan(
+                        text: 'have an account? ',
+                        style: TextStyle(color: Colors.black),
+                        children: [
+                          TextSpan(
+                            text: 'Login here.',
+                            style: TextStyle(color: AppColors.primary),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
             ),
           ),
         );
+        return content;
       },
     );
   }

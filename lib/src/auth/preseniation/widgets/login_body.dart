@@ -36,20 +36,19 @@ class _LoginBodyState extends State<LoginBody> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(20.0), // Updated padding
+      padding: const EdgeInsets.all(20.0),
       child: BlocConsumer<LoginCubit, LoginState>(
         listener: (context, state) {
           if (state is LoginLoading) {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Hide any previous snackbars
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text("Logging in...")),
             );
           } else if (state is LoginSuccess) {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Hide "Logging in..." snackbar
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
             String userId = state.userId;
-            String userRole = state.role; // Get user role from the state
+            String userRole = state.role;
 
-            // Perform role-based navigation
             if (userRole == 'USER101') {
               Navigator.pushReplacementNamed(
                 context,
@@ -69,13 +68,12 @@ class _LoginBodyState extends State<LoginBody> {
                 arguments: {'userId': userId, 'userType': userRole},
               );
             } else {
-              // Fallback for unknown roles
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Unknown user role: $userRole')),
               );
             }
           } else if (state is LoginFailure) {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Hide any previous snackbars
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text("Login failed: ${state.message}"),
@@ -90,23 +88,49 @@ class _LoginBodyState extends State<LoginBody> {
             children: [
               TextField(
                 controller: _emailController,
-                decoration: const InputDecoration(labelText: "Email"),
+                decoration: InputDecoration(
+                  labelText: "Email",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: _passwordController,
-                decoration: const InputDecoration(labelText: "Password"),
+                decoration: InputDecoration(
+                  labelText: "Password",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
                 obscureText: true,
               ),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: state is LoginLoading ? null : _login,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: AppColors.textTertiary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 50,
+                    vertical: 17,
+                  ),
+                  elevation: 5,
+                ),
                 child: state is LoginLoading
                     ? const CircularProgressIndicator()
                     : const Text("Login"),
               ),
-              const SizedBox(height: 20), // Added spacing
+              const SizedBox(height: 20),
               GestureDetector(
                 onTap: () => Navigator.push(
                   context,
@@ -119,7 +143,7 @@ class _LoginBodyState extends State<LoginBody> {
                     children: [
                       TextSpan(
                         text: 'Register here.',
-                        style: TextStyle(color: AppColors.primary), // Using AppColors.primary
+                        style: TextStyle(color: AppColors.primary),
                       ),
                     ],
                   ),

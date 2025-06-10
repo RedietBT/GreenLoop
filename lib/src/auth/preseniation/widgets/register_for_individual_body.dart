@@ -46,87 +46,161 @@ Widget build(BuildContext context) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              decoration: const InputDecoration(labelText: 'First Name'),
-              onChanged: (value) => setState(() => firstName = value),
+        return Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/images/background.jpg'), // Ensure you have this image
+              fit: BoxFit.cover,
             ),
-            TextField(
-              decoration: const InputDecoration(labelText: 'Last Name'),
-              onChanged: (value) => setState(() => lastName = value),
-            ),
-            TextField(
-              decoration: const InputDecoration(labelText: 'Email'),
-              onChanged: (value) => setState(() => email = value),
-            ),
-            TextField(
-              decoration: const InputDecoration(labelText: 'Password'),
-              obscureText: true,
-              onChanged: (value) => setState(() => password = value),
-            ),
-            TextField(
-              decoration: const InputDecoration(labelText: 'Confirm Password'),
-              obscureText: true,
-              onChanged: (value) => setState(() => confirmPassword = value),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                setState(() => error = null);
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: 'First Name',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
+                  onChanged: (value) => setState(() => firstName = value),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Last Name',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
+                  onChanged: (value) => setState(() => lastName = value),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
+                  onChanged: (value) => setState(() => email = value),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Phone Number',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
+                  keyboardType: TextInputType.phone,
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
+                  obscureText: true,
+                  onChanged: (value) => setState(() => password = value),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Confirm Password',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
+                  obscureText: true,
+                  onChanged: (value) => setState(() => confirmPassword = value),
+                ),
+                const SizedBox(height: 30),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() => error = null);
 
-                if (password != confirmPassword) {
-                  setState(() => error = "Passwords do not match.");
-                  return;
-                }
+                    if (password != confirmPassword) {
+                      setState(() => error = "Passwords do not match.");
+                      return;
+                    }
 
-                context.read<RegisterForIndividualCubit>().registerIndividual(
-                      email: email,
-                      password: password,
-                      firstName: firstName,
-                      lastName: lastName,
-                      userType: widget.role,
-                    );
-              },
-              child: const Text("Register"),
-            ),
-            if (error != null)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  error!,
-                  style: const TextStyle(color: Colors.red),
+                    context.read<RegisterForIndividualCubit>().registerIndividual(
+                          email: email,
+                          password: password,
+                          firstName: firstName,
+                          lastName: lastName,
+                          userType: widget.role,
+                        );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.textTertiary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 50,
+                      vertical: 17,
+                    ),
+                    elevation: 5,
+                  ),
+                  child: const Text("Register"),
                 ),
-              ),
-            if (state is RegisterForIndividualFailure)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  state.message ?? 'An unknown error occurred',
-                  style: const TextStyle(color: Colors.red),
-                ),
-              ),
-              const SizedBox(height: 20),
-              GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                ),
-                 child: RichText(
-                  text: TextSpan(
-                    text: 'have an account? ',
-                    style: TextStyle(color: Colors.black),
-                    children: [
-                      TextSpan(
-                        text: 'Login here.',
-                        style: TextStyle(color: AppColors.primary),
-                        ),
-                      ],
+                if (error != null)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      error!,
+                      style: const TextStyle(color: Colors.red),
                     ),
                   ),
-              ),
-          ],
+                if (state is RegisterForIndividualFailure)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      state.message ?? 'An unknown error occurred',
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  GestureDetector(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    ),
+                     child: RichText(
+                      text: TextSpan(
+                        text: 'have an account? ',
+                        style: TextStyle(color: Colors.black),
+                        children: [
+                          TextSpan(
+                            text: 'Login here.',
+                            style: TextStyle(color: AppColors.primary),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ),
+              ],
+            ),
+          ),
         );
       },
     ),

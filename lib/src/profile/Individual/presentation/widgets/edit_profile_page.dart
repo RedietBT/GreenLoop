@@ -1,4 +1,3 @@
-// src/profile/Individual/presentation/pages/edit_profile_page.dart
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -40,6 +39,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _emailController = TextEditingController();
     _descriptionController = TextEditingController();
 
+    // Fetch initial user data to populate the fields when the page loads
     context.read<IndividualProfileCubit>().fetchUser(widget.userId);
   }
 
@@ -65,9 +65,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Future<void> _updateProfile() async {
     if (widget.userId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User ID not found. Cannot update profile.')),
-      );
+      _showSnackBar('User ID not found. Cannot update profile.', isError: true);
+      return;
+    }
+
+    if (!_formKey.currentState!.validate()) {
+      _showSnackBar('Please correct invalid fields.', isError: true);
       return;
     }
 
@@ -79,55 +82,51 @@ class _EditProfilePageState extends State<EditProfilePage> {
     bool imageUploaded = false;
 
     if (_pickedImage != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Uploading image...')),
-      );
+      _showSnackBar('Uploading image...');
       try {
-       
         newAvatarUrl = await context.read<IndividualProfileCubit>().uploadFile(
-          bucketName: 'profile',
-          filepath: '${widget.userId}/avatar.jpg', // Ensure this is a proper path + filename
-          file: _pickedImage!,
-        );
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Image uploaded successfully!')),
-        );
+              bucketName: 'profile',
+              filepath: '${widget.userId}/avatar.jpg',
+              file: _pickedImage!,
+            );
+        _showSnackBar('Image uploaded successfully!');
         imageUploaded = true;
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to upload image: $e')),
-        );
-        setState(() { _updateInProgress = false; });
+        _showSnackBar('Failed to upload image: $e', isError: true);
+        setState(() {
+          _updateInProgress = false;
+        });
         return;
       }
     }
 
-    bool formIsValid = _formKey.currentState!.validate();
-
-    String? firstNameToUpdate = _firstNameController.text != _originalFirstName ? _firstNameController.text : null;
-    String? lastNameToUpdate = _lastNameController.text != _originalLastName ? _lastNameController.text : null;
-    String? emailToUpdate = _emailController.text != _originalEmail ? _emailController.text : null;
-    String? descriptionToUpdate = _descriptionController.text != _originalDescription
-        ? (_descriptionController.text.isEmpty ? null : _descriptionController.text)
+    String? firstNameToUpdate =
+        _firstNameController.text.trim() != _originalFirstName
+            ? _firstNameController.text.trim()
+            : null;
+    String? lastNameToUpdate =
+        _lastNameController.text.trim() != _originalLastName
+            ? _lastNameController.text.trim()
+            : null;
+    String? emailToUpdate = _emailController.text.trim() != _originalEmail
+        ? _emailController.text.trim()
         : null;
+    String? descriptionToUpdate =
+        _descriptionController.text.trim() != _originalDescription
+            ? (_descriptionController.text.trim().isEmpty
+                ? null
+                : _descriptionController.text.trim())
+            : null;
 
     if (!imageUploaded &&
         firstNameToUpdate == null &&
         lastNameToUpdate == null &&
         emailToUpdate == null &&
         descriptionToUpdate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No changes to save.')),
-      );
-      setState(() { _updateInProgress = false; });
-      return;
-    }
-
-    if ((firstNameToUpdate != null || lastNameToUpdate != null || emailToUpdate != null || descriptionToUpdate != null) && !formIsValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please correct invalid fields.')),
-      );
-      setState(() { _updateInProgress = false; });
+      _showSnackBar('No changes to save.');
+      setState(() {
+        _updateInProgress = false;
+      });
       return;
     }
 
@@ -150,12 +149,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
 
     context.read<IndividualProfileCubit>().updateProfile(
-      userId: widget.userId,
-      data: updateData,
-    );
+          userId: widget.userId,
+          data: updateData,
+        );
 
+    _showSnackBar('Profile update initiated...');
+  }
+
+  void _showSnackBar(String message, {bool isError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Profile update initiated...')),
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? Colors.red : Colors.green,
+      ),
     );
   }
 
@@ -164,13 +170,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Profile'),
+        elevation: 0, // Flat app bar
       ),
       body: BlocListener<IndividualProfileCubit, IndividualProfileState>(
         listener: (context, state) {
           if (state is IndividualProfileLoaded) {
             final user = state.user;
-            _firstNameController.text = user.first_name?? '';
-            _lastNameController.text = user.last_name?? '';
+            _firstNameController.text = user.first_name ?? '';
+            _lastNameController.text = user.last_name ?? '';
             _emailController.text = user.email ?? '';
             _descriptionController.text = user.description ?? '';
 
@@ -179,22 +186,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
             _originalEmail = user.email;
             _originalDescription = user.description;
             _currentAvatarUrl = user.avatarUrl;
-            _pickedImage = null;
+            _pickedImage = null; // Clear picked image after successful update
 
             if (_updateInProgress) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Profile updated successfully!')),
-              );
-              // Pop with `true` to signal success to the previous page
-              Navigator.pop(context, true);
+              _showSnackBar('Profile updated successfully!', isError: false);
+              Navigator.pop(context, true); // Pop with `true` to signal success
               setState(() {
                 _updateInProgress = false;
               });
             }
           } else if (state is IndividualProfileError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Profile update failed: ${state.message}')),
-            );
+            _showSnackBar('Profile update failed: ${state.message}',
+                isError: true);
             setState(() {
               _updateInProgress = false;
             });
@@ -202,7 +205,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
         },
         child: BlocBuilder<IndividualProfileCubit, IndividualProfileState>(
           builder: (context, state) {
-            if (state is IndividualProfileLoading || state is IndividualProfileInitial || state is IndividualProfileUpdating) {
+            if (state is IndividualProfileLoading ||
+                state is IndividualProfileInitial ||
+                state is IndividualProfileUpdating) {
               return const Center(child: CircularProgressIndicator());
             }
 
@@ -219,26 +224,54 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   children: [
                     GestureDetector(
                       onTap: _pickImage,
-                      child: CircleAvatar(
-                        radius: 70,
-                        backgroundColor: Theme.of(context).primaryColor.withOpacity(0.7),
-                        backgroundImage: _pickedImage != null
-                            ? FileImage(_pickedImage!)
-                            : (_currentAvatarUrl != null && _currentAvatarUrl!.isNotEmpty
-                                  ? NetworkImage(_currentAvatarUrl!)
-                                  : null) as ImageProvider<Object>?,
-                        child: _pickedImage == null &&
-                                (_currentAvatarUrl == null || _currentAvatarUrl!.isEmpty)
-                            ? const Icon(Icons.camera_alt, size: 70, color: Colors.white)
-                            : null,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          CircleAvatar(
+                            radius: 70,
+                            backgroundColor:
+                                Theme.of(context).primaryColor.withOpacity(0.7),
+                            backgroundImage: _pickedImage != null
+                                ? FileImage(_pickedImage!)
+                                : (_currentAvatarUrl != null &&
+                                        _currentAvatarUrl!.isNotEmpty
+                                    ? NetworkImage(_currentAvatarUrl!)
+                                    : null) as ImageProvider<Object>?,
+                            child: _pickedImage == null &&
+                                    (_currentAvatarUrl == null ||
+                                        _currentAvatarUrl!.isEmpty)
+                                ? const Icon(Icons.person,
+                                    size: 70, color: Colors.white)
+                                : null,
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: CircleAvatar(
+                              backgroundColor: Theme.of(context).cardColor,
+                              radius: 20,
+                              child: Icon(
+                                Icons.camera_alt,
+                                size: 20,
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 30),
                     TextFormField(
                       controller: _firstNameController,
-                      decoration: const InputDecoration(labelText: 'First Name'),
+                      decoration: InputDecoration(
+                        labelText: 'First Name',
+                        prefixIcon: const Icon(Icons.person_outline),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
+                        if (value == null || value.trim().isEmpty) {
                           return 'Please enter your first name';
                         }
                         return null;
@@ -247,9 +280,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _lastNameController,
-                      decoration: const InputDecoration(labelText: 'Last Name'),
+                      decoration: InputDecoration(
+                        labelText: 'Last Name',
+                        prefixIcon: const Icon(Icons.person_outline),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
+                        if (value == null || value.trim().isEmpty) {
                           return 'Please enter your last name';
                         }
                         return null;
@@ -258,10 +297,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _emailController,
-                      decoration: const InputDecoration(labelText: 'Email'),
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        prefixIcon: const Icon(Icons.email_outlined),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
+                        if (value == null || value.trim().isEmpty) {
                           return 'Please enter your email';
                         }
                         if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
@@ -273,31 +318,46 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _descriptionController,
-                      decoration: const InputDecoration(labelText: 'Description (Optional)'),
-                      maxLines: 3,
-                    ),
-                    const SizedBox(height: 32),
-                    ElevatedButton(
-                      onPressed: _updateInProgress ? null : _updateProfile,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                        shape: RoundedRectangleBorder(
+                      decoration: InputDecoration(
+                        labelText: 'Description (Optional)',
+                        prefixIcon: const Icon(Icons.description_outlined),
+                        alignLabelWithHint: true,
+                        border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: _updateInProgress
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                strokeWidth: 2,
+                      maxLines: 4,
+                      minLines: 1,
+                    ),
+                    const SizedBox(height: 32),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _updateInProgress ? null : _updateProfile,
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          backgroundColor: Theme.of(context).primaryColor,
+                          foregroundColor: Colors.white,
+                          elevation: 3,
+                        ),
+                        child: _updateInProgress
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  valueColor:
+                                      AlwaysStoppedAnimation<Color>(Colors.white),
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text(
+                                'Save Changes',
+                                style: TextStyle(fontSize: 18),
                               ),
-                            )
-                          : const Text(
-                              'Save Changes',
-                              style: TextStyle(fontSize: 18),
-                            ),
+                      ),
                     ),
                   ],
                 ),
