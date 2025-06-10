@@ -73,7 +73,19 @@ class _BusinessProfileBodyState extends State<BusinessProfileBody> {
                   user.description ?? 'No description available.', // Use user.description and handle null
                   style: const TextStyle(fontSize: 16, color: Colors.grey),
                 ),
-
+                 const SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Address",
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  user.address ?? 'No Address available.', // Use user.description and handle null
+                  style: const TextStyle(fontSize: 16, color: Colors.grey),
+                ),
                 const SizedBox(height: 20), 
 
                 // Achievements Section
