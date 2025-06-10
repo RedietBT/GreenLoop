@@ -135,7 +135,7 @@ Future<void>  _updateProfile() async{
 
     if((businessNameToUpdate != null || contactPersonLastNameToUpdate != null ||
         contactPersonFirstNameToUpdate != null || phoneNumberToUpdate != null ||
-        emailToUpdate != null || descriptionToUpdate != null) && formIsValid) {
+        emailToUpdate != null || descriptionToUpdate != null) && !formIsValid) {
           ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please correct invalid fields.')),
       );
@@ -143,13 +143,13 @@ Future<void>  _updateProfile() async{
       return;
     }
     final Map<String, dynamic> updatedData = {
-      if (businessNameToUpdate != null) 'businessName': businessNameToUpdate,
-      if (contactPersonFirstNameToUpdate != null) 'contactPersonFirstName': contactPersonFirstNameToUpdate,
-      if (contactPersonLastNameToUpdate != null) 'contactPersonLastName': contactPersonLastNameToUpdate,
-      if (phoneNumberToUpdate != null) 'phoneNumber': phoneNumberToUpdate,
+      if (businessNameToUpdate != null) 'business_name': businessNameToUpdate,
+      if (contactPersonFirstNameToUpdate != null) 'contact_person_first_name': contactPersonFirstNameToUpdate,
+      if (contactPersonLastNameToUpdate != null) 'contact_person_last_name': contactPersonLastNameToUpdate,
+      if (phoneNumberToUpdate != null) 'phone': phoneNumberToUpdate,
       if (emailToUpdate != null) 'email': emailToUpdate,
       if (descriptionToUpdate != null) 'description': descriptionToUpdate,
-      if (newAvatarUrl != null) 'avatarUrl': newAvatarUrl,
+      if (newAvatarUrl != null) 'avater_url': newAvatarUrl,
     };
 
     context.read<BusinessProfileCubit>().updateProfile(

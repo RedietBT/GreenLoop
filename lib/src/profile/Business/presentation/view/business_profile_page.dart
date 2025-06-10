@@ -23,13 +23,13 @@ class BusinessProfilePage extends StatefulWidget {
 }
 
 class _BusinessProfilePageState extends State<BusinessProfilePage> {
-  late BusinessProfileCubit businessProfileCubit;
+  late BusinessProfileCubit _businessProfileCubit;
 
   @override
   void initState() {
     super.initState();
-    businessProfileCubit = context.read<BusinessProfileCubit>();
-    businessProfileCubit.fetchUserProfile(widget.userId);
+    _businessProfileCubit = context.read<BusinessProfileCubit>();
+    _businessProfileCubit.fetchUserProfile(widget.userId);
 }
 
   @override
@@ -39,7 +39,7 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
         title: const Text('Business Profile')
       ),
       drawer: const BusinessProfileDrawer(), 
-      body: const BusinessProfileBody(userId: '',), 
+      body:  BusinessProfileBody(userId: widget.userId), 
     );
   }
 }
