@@ -23,6 +23,7 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
   late TextEditingController _phoneNumberController;
   late TextEditingController _emailController;
   late TextEditingController _descriptionController;
+  late TextEditingController _addressController;
 
   File? _pickedImage;
   String? _currentavatarUrl;
@@ -33,6 +34,7 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
   String? _originalphoneNumber;
   String? _originalemail;
   String? _originaldescription;
+  String? _originaladdress;
 
   bool _updateInProgress = false;
 
@@ -45,6 +47,7 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
     _phoneNumberController = TextEditingController();
     _emailController = TextEditingController();
     _descriptionController = TextEditingController();
+    _addressController = TextEditingController();
 
     context.read<BusinessProfileCubit>().fetchUserProfile(widget.userId);
   }
@@ -57,6 +60,7 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
     _phoneNumberController.dispose();
     _emailController.dispose();
     _descriptionController.dispose();
+    _addressController.dispose();
     super.dispose();
   }
 
@@ -116,6 +120,7 @@ Future<void>  _updateProfile() async{
     String? phoneNumberToUpdate = _phoneNumberController.text != _originalphoneNumber ? _phoneNumberController.text: null;
     String? emailToUpdate = _emailController.text != _originalemail ? _emailController.text: null;
     String? descriptionToUpdate = _descriptionController.text != _originaldescription ? _descriptionController.text: null;
+    String? addressToUpdate = _addressController.text != _originaladdress ? _addressController.text: null;
 
     if(!isImageUpdated &&
         businessNameToUpdate == null &&
@@ -123,7 +128,8 @@ Future<void>  _updateProfile() async{
         contactPersonLastNameToUpdate == null &&
         phoneNumberToUpdate == null &&
         emailToUpdate == null &&
-        descriptionToUpdate == null) {
+        descriptionToUpdate == null &&
+        addressToUpdate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No changes made to the profile.')),
       );
@@ -135,7 +141,8 @@ Future<void>  _updateProfile() async{
 
     if((businessNameToUpdate != null || contactPersonLastNameToUpdate != null ||
         contactPersonFirstNameToUpdate != null || phoneNumberToUpdate != null ||
-        emailToUpdate != null || descriptionToUpdate != null) && !formIsValid) {
+        emailToUpdate != null || descriptionToUpdate != null || addressToUpdate != null) 
+        && !formIsValid) {
           ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please correct invalid fields.')),
       );
@@ -150,6 +157,7 @@ Future<void>  _updateProfile() async{
       if (emailToUpdate != null) 'email': emailToUpdate,
       if (descriptionToUpdate != null) 'description': descriptionToUpdate,
       if (newAvatarUrl != null) 'avater_url': newAvatarUrl,
+      if (addressToUpdate != null) 'address': addressToUpdate,
     };
 
     context.read<BusinessProfileCubit>().updateProfile(
@@ -178,6 +186,7 @@ Future<void>  _updateProfile() async{
             _phoneNumberController.text = business.phone_number ?? '';
             _emailController.text = business.email ?? '';
             _descriptionController.text = business.description ?? '';
+            _addressController.text = business.address ?? '';
 
             _originalbusinessName = business.business_name;
             _originalcontactPersonFirstName = business.contact_person_first_name;
@@ -185,6 +194,7 @@ Future<void>  _updateProfile() async{
             _originalphoneNumber = business.phone_number;
             _originalemail = business.email;
             _originaldescription = business.description;
+            _originaladdress = business.address;
             _currentavatarUrl = business.avatarUrl;
             _pickedImage = null;
 
@@ -292,6 +302,16 @@ Future<void>  _updateProfile() async{
                         }
                         if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
                           return 'Please enter a valid email address';
+                        }
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      controller: _addressController,
+                      decoration: const InputDecoration(labelText: 'Address'),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your address';
                         }
                         return null;
                       },
