@@ -49,7 +49,7 @@ class _BusinessProfileBodyState extends State<BusinessProfileBody> {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  "${user.business_name ?? ''}",
+                  user.business_name ?? '',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
