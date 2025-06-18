@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greenloop/core/commen/widgets/location_map_preview.dart';
 import 'package:greenloop/src/profile/recycling/presentation/cubits/recycling_profile_cubit.dart';
 import 'package:greenloop/src/profile/recycling/presentation/cubits/recycling_profile_state.dart';
+import 'package:latlong2/latlong.dart';
+
 
 class RecyclingProfileBody extends StatefulWidget {
   final String userId;
@@ -29,6 +32,22 @@ class _RecyclingProfileBodyState extends State<RecyclingProfileBody> {
           return Center(child: Text('Error: ${state.message}'));
         } else if (state is RecyclingProfileLoaded) {
           final user = state.user;
+          // Defensive: parse location from WKT if needed
+          LatLng? location = user.location;
+          if (location == null && user.location is String) {
+            final locationString = user.location as String?;
+            if (locationString != null && locationString.isNotEmpty) {
+              final regex = RegExp(r'POINT\(([^ ]+) ([^ ]+)\)');
+              final match = regex.firstMatch(locationString);
+              if (match != null && match.groupCount == 2) {
+                final longitude = double.tryParse(match.group(1)!);
+                final latitude = double.tryParse(match.group(2)!);
+                if (latitude != null && longitude != null) {
+                  location = LatLng(latitude, longitude);
+                }
+              }
+            }
+          }
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
@@ -87,6 +106,14 @@ class _RecyclingProfileBodyState extends State<RecyclingProfileBody> {
                       ],
                     ),
                   ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Location Coordinates Card
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12.0),
+                  child: LocationMapPreview(location: location),
                 ),
 
                 const SizedBox(height: 30),

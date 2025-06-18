@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:greenloop/src/profile/recycling/presentation/cubits/recycling_profile_cubit.dart';
 import 'package:greenloop/src/profile/recycling/presentation/cubits/recycling_profile_state.dart';
+import 'package:greenloop/src/profile/recycling/presentation/widgets/location_picker_screen.dart';
 import 'package:image_picker/image_picker.dart';
 
 class EditRecyclingProfilePage extends StatefulWidget {
@@ -23,6 +25,8 @@ class _EditRecyclingProfilePageState extends State<EditRecyclingProfilePage> {
   late TextEditingController _phoneController;
   late TextEditingController _addressController;
   late TextEditingController _descriptionController;
+  late TextEditingController _latitudeDisplayController;
+  late TextEditingController _longitudeDisplayController;
 
   File? _pickedImage;
   String? _currentAvatarUrl;
@@ -34,6 +38,8 @@ class _EditRecyclingProfilePageState extends State<EditRecyclingProfilePage> {
   String? _originalPhone;
   String? _originalAddress;
   String? _originalDescription;
+  LatLng? _originalLocation;
+  LatLng? _selectedLocationFromMap;
 
   bool _updateInProgress = false;
 
@@ -47,6 +53,8 @@ class _EditRecyclingProfilePageState extends State<EditRecyclingProfilePage> {
     _phoneController = TextEditingController();
     _addressController = TextEditingController();
     _descriptionController = TextEditingController();
+    _latitudeDisplayController = TextEditingController();
+    _longitudeDisplayController = TextEditingController();
 
     context.read<RecyclingProfileCubit>().fetchUser(widget.userId);
   }
@@ -60,6 +68,8 @@ class _EditRecyclingProfilePageState extends State<EditRecyclingProfilePage> {
     _phoneController.dispose();
     _addressController.dispose();
     _descriptionController.dispose();
+    _latitudeDisplayController.dispose();
+    _longitudeDisplayController.dispose();
     super.dispose();
   }
 
@@ -70,6 +80,25 @@ class _EditRecyclingProfilePageState extends State<EditRecyclingProfilePage> {
     if (pickedFile != null) {
       setState(() {
         _pickedImage = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<void> _openLocationPicker() async {
+    final LatLng? pickedLocation = await Navigator.push<LatLng>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RecyclingLocationPickerScreen(
+          initialLocation: _selectedLocationFromMap ?? _originalLocation,
+        ),
+      ),
+    );
+
+    if (pickedLocation != null) {
+      setState(() {
+        _selectedLocationFromMap = pickedLocation;
+        _latitudeDisplayController.text = pickedLocation.latitude.toString();
+        _longitudeDisplayController.text = pickedLocation.longitude.toString();
       });
     }
   }
@@ -124,6 +153,22 @@ class _EditRecyclingProfilePageState extends State<EditRecyclingProfilePage> {
         ? (_descriptionController.text.isEmpty ? null : _descriptionController.text)
         : null;
 
+    bool isLocationUpdated = false;
+    // Check if location was picked or changed
+    if (_selectedLocationFromMap != null) {
+      // Location was selected via map
+      if (_originalLocation == null ||
+          _selectedLocationFromMap!.latitude != _originalLocation!.latitude ||
+          _selectedLocationFromMap!.longitude != _originalLocation!.longitude) {
+        isLocationUpdated = true;
+      }
+    } else if (_originalLocation != null &&
+               (_latitudeDisplayController.text.isEmpty && _longitudeDisplayController.text.isEmpty)) {
+      // Location was cleared
+      isLocationUpdated = true;
+      _selectedLocationFromMap = null;
+    }
+
     if (!imageUploaded &&
         centerNameToUpdate == null &&
         contactPersonFirstNameToUpdate == null &&
@@ -131,7 +176,8 @@ class _EditRecyclingProfilePageState extends State<EditRecyclingProfilePage> {
         emailToUpdate == null &&
         phoneToUpdate == null &&
         addressToUpdate == null &&
-        descriptionToUpdate == null) {
+        descriptionToUpdate == null &&
+        !isLocationUpdated) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No changes to save.')),
       );
@@ -179,6 +225,11 @@ class _EditRecyclingProfilePageState extends State<EditRecyclingProfilePage> {
     if (imageUploaded && newAvatarUrl != null) {
       updateData['avater_url'] = newAvatarUrl;
     }
+    if (isLocationUpdated) {
+      updateData['location'] = _selectedLocationFromMap != null
+          ? 'SRID=4326;POINT(${_selectedLocationFromMap!.longitude} ${_selectedLocationFromMap!.latitude})'
+          : null;
+    }
 
     context.read<RecyclingProfileCubit>().updateProfile(
       userId: widget.userId,
@@ -207,6 +258,8 @@ class _EditRecyclingProfilePageState extends State<EditRecyclingProfilePage> {
             _phoneController.text = user.phone ?? '';
             _addressController.text = user.address ?? '';
             _descriptionController.text = user.description ?? '';
+            _latitudeDisplayController.text = user.location?.latitude.toString() ?? '';
+            _longitudeDisplayController.text = user.location?.longitude.toString() ?? '';
 
             _originalCenterName = user.center_name;
             _originalContactPersonFirstName = user.contact_person_first_name;
@@ -216,6 +269,8 @@ class _EditRecyclingProfilePageState extends State<EditRecyclingProfilePage> {
             _originalAddress = user.address;
             _originalDescription = user.description;
             _currentAvatarUrl = user.avatar_url;
+            _originalLocation = user.location;
+            _selectedLocationFromMap = user.location;
             _pickedImage = null;
 
             if (_updateInProgress) {
@@ -330,6 +385,51 @@ class _EditRecyclingProfilePageState extends State<EditRecyclingProfilePage> {
                       maxLines: 3,
                     ),
                     const SizedBox(height: 16),
+                    
+                    // Location Display Fields (Read-only)
+                    TextFormField(
+                      controller: _latitudeDisplayController,
+                      decoration: InputDecoration(
+                        labelText: 'Latitude',
+                        enabled: false,
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        prefixIcon: const Icon(Icons.location_on_outlined),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _longitudeDisplayController,
+                      decoration: InputDecoration(
+                        labelText: 'Longitude',
+                        enabled: false,
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        prefixIcon: const Icon(Icons.location_on_outlined),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    
+                    // Location Picker Button
+                    ElevatedButton.icon(
+                      onPressed: _openLocationPicker,
+                      icon: const Icon(Icons.map),
+                      label: const Text('Pick Location on Map'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    
                     TextFormField(
                       controller: _descriptionController,
                       decoration: const InputDecoration(labelText: 'Description'),

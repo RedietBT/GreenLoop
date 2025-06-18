@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greenloop/core/commen/widgets/location_map_preview.dart';
 import 'package:greenloop/core/res/colors.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_state.dart';
+
 // Ensure your Individual_User entity is imported if needed for direct access to its properties
 // import 'package:greenloop/src/profile/Individual/domian/entity/individual_user.dart';
 
@@ -370,6 +372,81 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
                         ),
                       ),
                     ),
+                  
+                  // 6.1 Address Section
+                  if (state is IndividualProfileLoaded)
+                    FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: SlideTransition(
+                        position: _slideAnimation,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: AppColors.textTertiary,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primary.withOpacity(0.1),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primary.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Icon(Icons.location_on, color: AppColors.primary),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    const Text(
+                                      'Address',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  'No address available.',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: AppColors.textSecondary,
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  
+                  // 6.2 Location Section
+                  if (state is IndividualProfileLoaded)
+                    FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: SlideTransition(
+                        position: _slideAnimation,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: LocationMapPreview(location: state.user.location),
+                        ),
+                      ),
+                    ),
+                  
                   // 7. Recent Activity
                   FadeTransition(
                     opacity: _fadeAnimation,
