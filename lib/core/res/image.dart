@@ -1,6 +1,6 @@
 class MediaRes {
   const MediaRes._();
-  static const String _baseImage = 'images';
+  static const String _baseImage = 'assets/images';
   // static const String _baseIcon = 'assets/icons/';
 
 // Images
