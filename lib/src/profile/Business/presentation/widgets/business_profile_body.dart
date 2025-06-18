@@ -87,7 +87,13 @@ class _BusinessProfileBodyState extends State<BusinessProfileBody> {
                   style: const TextStyle(fontSize: 16, color: Colors.grey),
                 ),
                 const SizedBox(height: 20), 
-
+                Text(
+                  user.location != null
+                  ? 'Latitude: ${user.location!.latitude.toStringAsFixed(4)}, Longitude: ${user.location!.longitude.toStringAsFixed(4)}'
+                  : 'No location available.',
+                  style: const TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 20),
                 // Achievements Section
                 Align(
                   alignment: Alignment.centerLeft,
