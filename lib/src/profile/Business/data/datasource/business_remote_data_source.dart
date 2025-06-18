@@ -1,21 +1,20 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:greenloop/core/errors/exceptions.dart';
 import 'package:greenloop/src/profile/Business/data/model/business_model.dart';
-import 'package:greenloop/src/profile/Business/domain/entity/business_user.dart';
+
 
 abstract class BusinessRemoteDataSource {
   const BusinessRemoteDataSource();
 
   Future<BusinessModel> fetchUserProfile(String userId);
 
-  Future<void> updateUserProfile(
+  Future<BusinessModel> updateUserProfile(
     String userId, {
-    required Map<String, dynamic> data, 
+    required Map<String, dynamic> data,
   });
 }
 
 class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
-
   final SupabaseClient _supabaseClient;
 
   const BusinessRemoteDataSourceImpl(this._supabaseClient);
@@ -25,7 +24,7 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
     try {
       print('Fetching business profile for user ID: $userId');
       final response = await _supabaseClient
-          .from('business') 
+          .from('business')
           .select()
           .eq('id', userId)
           .single(); // Expecting a single record
@@ -35,30 +34,31 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
       print('Postgrest error fetching business profile: ${e.message}');
       throw ServerException(
         message: e.message,
-        statusCode: int.tryParse(e.code ?? '') ?? 500, 
+        statusCode: int.tryParse(e.code ?? '') ?? 500,
       );
     } catch (e) {
       print('Unexpected error fetching business profile: $e');
-      // Catch any other unexpected errors during the process.
       throw ServerException(message: e.toString(), statusCode: 500);
     }
   }
 
-   @override
-  Future<Business> updateUserProfile(
+  @override
+  Future<BusinessModel> updateUserProfile( 
     String userId, {
     required Map<String, dynamic> data,
   }) async {
     try {
+      final Map<String, dynamic> dataToSend = Map.from(data);
+
       final dynamic responseData = await _supabaseClient
           .from('business')
-          .update(data)  
+          .update(dataToSend) 
           .eq('id', userId)
           .select()
-          .single(); 
+          .single();
 
-          if (responseData == null) {
-         throw ServerException(
+      if (responseData == null) {
+        throw ServerException(
           message: 'User profile not found for update with ID: $userId',
           statusCode: 404,
         );
@@ -70,14 +70,15 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
           statusCode: 500,
         );
       }
-
       return BusinessModel.fromJson(responseData);
     } on PostgrestException catch (e) {
+      print('Postgrest error updating business profile: ${e.message}, Code: ${e.code}'); // Log more details
       throw ServerException(
         message: e.message,
         statusCode: int.tryParse(e.code ?? '') ?? 500,
       );
     } catch (e) {
+      print('Unexpected error updating business profile: $e'); // Log unexpected errors
       throw ServerException(message: e.toString(), statusCode: 500);
     }
   }

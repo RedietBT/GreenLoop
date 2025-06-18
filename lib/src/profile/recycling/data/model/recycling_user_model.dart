@@ -1,4 +1,5 @@
 import 'package:greenloop/src/profile/recycling/domain/entity/recycling_user.dart';
+import 'package:latlong2/latlong.dart';
 
 class Recycling_UserModel extends Recycling_User {
   const Recycling_UserModel({
@@ -12,11 +13,27 @@ class Recycling_UserModel extends Recycling_User {
     super.address,
     super.avatar_url,
     super.phone,
+    super.location,
   });
 
   factory Recycling_UserModel.fromJson(Map<String, dynamic>? json) {
     if (json == null) {
       throw const FormatException('Recycling_UserModel.fromJson: Input map is null. Cannot create model from null data.');
+    }
+
+    LatLng? parsedLocation;
+    final locationString = json['location'] as String?;
+
+    if (locationString != null && locationString.isNotEmpty) {
+      final regex = RegExp(r'POINT\(([^ ]+) ([^ ]+)\)');
+      final match = regex.firstMatch(locationString);
+      if (match != null && match.groupCount == 2) {
+        final longitude = double.tryParse(match.group(1)!);
+        final latitude = double.tryParse(match.group(2)!);
+        if (latitude != null && longitude != null) {
+          parsedLocation = LatLng(latitude, longitude);
+        }
+      }
     }
 
     return Recycling_UserModel(
@@ -30,6 +47,7 @@ class Recycling_UserModel extends Recycling_User {
       address: json['address'] as String?,
       avatar_url: json['avater_url'] as String?,
       phone: json['phone'] as String?,
+      location: parsedLocation,
     );
   }
 
@@ -45,6 +63,9 @@ class Recycling_UserModel extends Recycling_User {
       'address': address,
       'avater_url': avatar_url,
       'phone': phone,
+      'location': location != null
+          ? 'SRID=4326;POINT(${location!.longitude} ${location!.latitude})'
+          : null,
     };
   }
 } 

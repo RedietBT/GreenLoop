@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenloop/src/profile/Business/presentation/cubits/business_profile_cubit.dart';
 import 'package:greenloop/src/profile/Business/presentation/cubits/business_profile_state.dart';
+import 'package:greenloop/src/profile/Business/presentation/widgets/location_picker_screen.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:flutter_map/flutter_map.dart';
 
 class EditBusinessProfilePage extends StatefulWidget {
   final String userId;
@@ -24,17 +27,22 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
   late TextEditingController _emailController;
   late TextEditingController _descriptionController;
   late TextEditingController _addressController;
+  // Latitude and Longitude controllers are now for display only
+  late TextEditingController _latitudeDisplayController;
+  late TextEditingController _longitudeDisplayController;
 
   File? _pickedImage;
-  String? _currentavatarUrl;
+  String? _currentAvatarUrl;
 
-  String? _originalbusinessName;
-  String? _originalcontactPersonFirstName;
-  String? _originalcontactPersonLastName;
-  String? _originalphoneNumber;
-  String? _originalemail;
-  String? _originaldescription;
-  String? _originaladdress;
+  String? _originalBusinessName;
+  String? _originalContactPersonFirstName;
+  String? _originalContactPersonLastName;
+  String? _originalPhoneNumber;
+  String? _originalEmail;
+  String? _originalDescription;
+  String? _originalAddress;
+  LatLng? _originalLocation; 
+  LatLng? _selectedLocationFromMap; 
 
   bool _updateInProgress = false;
 
@@ -48,6 +56,8 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
     _emailController = TextEditingController();
     _descriptionController = TextEditingController();
     _addressController = TextEditingController();
+    _latitudeDisplayController = TextEditingController();
+    _longitudeDisplayController = TextEditingController();
 
     context.read<BusinessProfileCubit>().fetchUserProfile(widget.userId);
   }
@@ -61,11 +71,13 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
     _emailController.dispose();
     _descriptionController.dispose();
     _addressController.dispose();
+    _latitudeDisplayController.dispose();
+    _longitudeDisplayController.dispose();
     super.dispose();
   }
 
   Future<void> _pickImage() async {
-  final picker = ImagePicker();
+    final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
@@ -75,61 +87,107 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
     }
   }
 
-Future<void>  _updateProfile() async{
-  if (widget.userId.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('User ID is empty. Cannot update profile.')),
+  Future<void> _openLocationPicker() async {
+    final LatLng? pickedLocation = await Navigator.push<LatLng>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LocationPickerScreen(
+          initialLocation: _selectedLocationFromMap ?? _originalLocation,
+        ),
+      ),
     );
-    return;
+
+    if (pickedLocation != null) {
+      setState(() {
+        _selectedLocationFromMap = pickedLocation;
+        _latitudeDisplayController.text = pickedLocation.latitude.toString();
+        _longitudeDisplayController.text = pickedLocation.longitude.toString();
+      });
+    }
   }
-  setState(() {
-    _updateInProgress = true;
-  });
 
-  String? newAvatarUrl = _currentavatarUrl;
-  bool isImageUpdated = false;
+  Future<void> _updateProfile() async {
+    if (widget.userId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User ID is empty. Cannot update profile.')),
+      );
+      return;
+    }
+    setState(() {
+      _updateInProgress = true;
+    });
 
-  if (_pickedImage != null) {
-    ScaffoldMessenger.of(context).showSnackBar(
+    String? newAvatarUrl = _currentAvatarUrl;
+    bool isImageUpdated = false;
+
+    if (_pickedImage != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Uploading image...')),
       );
-    try {
-      newAvatarUrl = await context.read<BusinessProfileCubit>().uploadFile(
-          bucketName: 'profile',
-          filepath: '${widget.userId}/avatar.jpg',
-          file: _pickedImage!,
-        );
+      try {
+        newAvatarUrl = await context.read<BusinessProfileCubit>().uploadFile(
+              bucketName: 'profile',
+              filepath: '${widget.userId}/avatar.jpg',
+              file: _pickedImage!,
+            );
         isImageUpdated = true;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Image uploaded successfully!')),
         );
-    }catch (e) {
+      } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to upload image: $e')),
         );
-        setState(() { _updateInProgress = false; });
+        setState(() {
+          _updateInProgress = false;
+        });
         return;
       }
     }
+
     bool formIsValid = _formKey.currentState!.validate();
 
-    String? businessNameToUpdate = _businessNameController.text != _originalbusinessName
-        ? _businessNameController.text: null;
-    String? contactPersonFirstNameToUpdate = _contactPersonFirstNameController.text != _originalcontactPersonFirstName ? _contactPersonFirstNameController.text: null;
-    String? contactPersonLastNameToUpdate = _contactPersonLastNameController.text != _originalcontactPersonLastName ? _contactPersonLastNameController.text: null;
-    String? phoneNumberToUpdate = _phoneNumberController.text != _originalphoneNumber ? _phoneNumberController.text: null;
-    String? emailToUpdate = _emailController.text != _originalemail ? _emailController.text: null;
-    String? descriptionToUpdate = _descriptionController.text != _originaldescription ? _descriptionController.text: null;
-    String? addressToUpdate = _addressController.text != _originaladdress ? _addressController.text: null;
+    String? businessNameToUpdate =
+        _businessNameController.text != _originalBusinessName ? _businessNameController.text : null;
+    String? contactPersonFirstNameToUpdate = _contactPersonFirstNameController.text != _originalContactPersonFirstName
+        ? _contactPersonFirstNameController.text
+        : null;
+    String? contactPersonLastNameToUpdate = _contactPersonLastNameController.text != _originalContactPersonLastName
+        ? _contactPersonLastNameController.text
+        : null;
+    String? phoneNumberToUpdate = _phoneNumberController.text != _originalPhoneNumber ? _phoneNumberController.text : null;
+    String? emailToUpdate = _emailController.text != _originalEmail ? _emailController.text : null;
+    String? descriptionToUpdate = _descriptionController.text != _originalDescription ? _descriptionController.text : null;
+    String? addressToUpdate = _addressController.text != _originalAddress ? _addressController.text : null;
 
-    if(!isImageUpdated &&
+    bool isLocationUpdated = false;
+    // Check if location was picked or changed
+    if (_selectedLocationFromMap != null) {
+      // Location was selected via map
+      if (_originalLocation == null ||
+          _selectedLocationFromMap!.latitude != _originalLocation!.latitude ||
+          _selectedLocationFromMap!.longitude != _originalLocation!.longitude) {
+        isLocationUpdated = true;
+      }
+    } else if (_originalLocation != null &&
+               (_latitudeDisplayController.text.isEmpty && _longitudeDisplayController.text.isEmpty)) {
+      // Location was cleared (if it existed before and now text fields are empty)
+      // This case handles if original location was there, but user cleared the display text field manually
+      // which means they want to set location to null.
+      isLocationUpdated = true;
+      _selectedLocationFromMap = null; // Explicitly set to null for update
+    }
+
+
+    if (!isImageUpdated &&
         businessNameToUpdate == null &&
         contactPersonFirstNameToUpdate == null &&
         contactPersonLastNameToUpdate == null &&
         phoneNumberToUpdate == null &&
         emailToUpdate == null &&
         descriptionToUpdate == null &&
-        addressToUpdate == null) {
+        addressToUpdate == null &&
+        !isLocationUpdated) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No changes made to the profile.')),
       );
@@ -139,38 +197,50 @@ Future<void>  _updateProfile() async{
       return;
     }
 
-    if((businessNameToUpdate != null || contactPersonLastNameToUpdate != null ||
-        contactPersonFirstNameToUpdate != null || phoneNumberToUpdate != null ||
-        emailToUpdate != null || descriptionToUpdate != null || addressToUpdate != null) 
-        && !formIsValid) {
-          ScaffoldMessenger.of(context).showSnackBar(
+    if ((businessNameToUpdate != null ||
+            contactPersonLastNameToUpdate != null ||
+            contactPersonFirstNameToUpdate != null ||
+            phoneNumberToUpdate != null ||
+            emailToUpdate != null ||
+            descriptionToUpdate != null ||
+            addressToUpdate != null) &&
+        !formIsValid) {
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please correct invalid fields.')),
       );
-      setState(() { _updateInProgress = false; });
+      setState(() {
+        _updateInProgress = false;
+      });
       return;
     }
+
     final Map<String, dynamic> updatedData = {
       if (businessNameToUpdate != null) 'business_name': businessNameToUpdate,
       if (contactPersonFirstNameToUpdate != null) 'contact_person_first_name': contactPersonFirstNameToUpdate,
       if (contactPersonLastNameToUpdate != null) 'contact_person_last_name': contactPersonLastNameToUpdate,
-      if (phoneNumberToUpdate != null) 'phone': phoneNumberToUpdate,
+      if (phoneNumberToUpdate != null) 'phone_number': phoneNumberToUpdate, // Corrected key to phone_number
       if (emailToUpdate != null) 'email': emailToUpdate,
       if (descriptionToUpdate != null) 'description': descriptionToUpdate,
-      if (newAvatarUrl != null) 'avater_url': newAvatarUrl,
+      if (newAvatarUrl != null) 'avatarUrl': newAvatarUrl, // Corrected key to avatarUrl
       if (addressToUpdate != null) 'address': addressToUpdate,
+
+      // Format location properly for Supabase geometry column
+      if (isLocationUpdated) 'location': _selectedLocationFromMap != null
+          ? 'SRID=4326;POINT(${_selectedLocationFromMap!.longitude} ${_selectedLocationFromMap!.latitude})'
+          : null,
     };
 
     context.read<BusinessProfileCubit>().updateProfile(
-      userId: widget.userId,
-      data: updatedData, 
-      );
+          userId: widget.userId,
+          data: updatedData,
+        );
 
-      ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Profile update initiated...')),
     );
-    }
+  }
 
-    @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -178,7 +248,7 @@ Future<void>  _updateProfile() async{
       ),
       body: BlocListener<BusinessProfileCubit, BusinessProfileState>(
         listener: (context, state) {
-          if (state is BusinessProfileLoaded){
+          if (state is BusinessProfileLoaded) {
             final business = state.business;
             _businessNameController.text = business.business_name ?? '';
             _contactPersonFirstNameController.text = business.contact_person_first_name ?? '';
@@ -187,16 +257,21 @@ Future<void>  _updateProfile() async{
             _emailController.text = business.email ?? '';
             _descriptionController.text = business.description ?? '';
             _addressController.text = business.address ?? '';
+            _latitudeDisplayController.text = business.location?.latitude.toString() ?? '';
+            _longitudeDisplayController.text = business.location?.longitude.toString() ?? '';
 
-            _originalbusinessName = business.business_name;
-            _originalcontactPersonFirstName = business.contact_person_first_name;
-            _originalcontactPersonLastName = business.contact_person_last_name;
-            _originalphoneNumber = business.phone_number;
-            _originalemail = business.email;
-            _originaldescription = business.description;
-            _originaladdress = business.address;
-            _currentavatarUrl = business.avatarUrl;
-            _pickedImage = null;
+            _originalBusinessName = business.business_name;
+            _originalContactPersonFirstName = business.contact_person_first_name;
+            _originalContactPersonLastName = business.contact_person_last_name;
+            _originalPhoneNumber = business.phone_number;
+            _originalEmail = business.email;
+            _originalDescription = business.description;
+            _originalAddress = business.address;
+            _currentAvatarUrl = business.avatarUrl;
+            _originalLocation = business.location; 
+            _selectedLocationFromMap = business.location;
+
+            _pickedImage = null; 
 
             if (_updateInProgress) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -240,13 +315,12 @@ Future<void>  _updateProfile() async{
                         backgroundColor: Theme.of(context).primaryColor.withOpacity(0.7),
                         backgroundImage: _pickedImage != null
                             ? FileImage(_pickedImage!)
-                            : (_currentavatarUrl != null && _currentavatarUrl!.isNotEmpty
-                                ? NetworkImage(_currentavatarUrl!) 
+                            : (_currentAvatarUrl != null && _currentAvatarUrl!.isNotEmpty
+                                ? NetworkImage(_currentAvatarUrl!)
                                 : null) as ImageProvider<Object>?,
-                                child: _pickedImage == null &&
-                                (_currentavatarUrl == null || _currentavatarUrl!.isEmpty)
-                                ? const Icon(Icons.business, size: 70, color: Colors.white)
-                                : null,                            
+                        child: _pickedImage == null && (_currentAvatarUrl == null || _currentAvatarUrl!.isEmpty)
+                            ? const Icon(Icons.business, size: 70, color: Colors.white)
+                            : null,
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -260,7 +334,7 @@ Future<void>  _updateProfile() async{
                         return null;
                       },
                     ),
-                     const SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     TextFormField(
                       controller: _contactPersonFirstNameController,
                       decoration: const InputDecoration(labelText: 'Contact Person First Name'),
@@ -269,7 +343,7 @@ Future<void>  _updateProfile() async{
                           return 'Please enter first name';
                         }
                         return null;
-                      }
+                      },
                     ),
                     TextFormField(
                       controller: _contactPersonLastNameController,
@@ -279,7 +353,7 @@ Future<void>  _updateProfile() async{
                           return 'Please enter last name';
                         }
                         return null;
-                      }
+                      },
                     ),
                     TextFormField(
                       controller: _phoneNumberController,
@@ -290,7 +364,7 @@ Future<void>  _updateProfile() async{
                           return 'Please enter phone number';
                         }
                         return null;
-                      }
+                      },
                     ),
                     TextFormField(
                       controller: _emailController,
@@ -316,6 +390,45 @@ Future<void>  _updateProfile() async{
                         return null;
                       },
                     ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Location Coordinates',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    // Display Latitude
+                    TextFormField(
+                      controller: _latitudeDisplayController,
+                      decoration: InputDecoration(
+                        labelText: 'Latitude',
+                        enabled: false, // Make it read-only
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                      ),
+                    ),
+                    // Display Longitude
+                    TextFormField(
+                      controller: _longitudeDisplayController,
+                      decoration: InputDecoration(
+                        labelText: 'Longitude',
+                        enabled: false, // Make it read-only
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      onPressed: _openLocationPicker,
+                      icon: const Icon(Icons.map),
+                      label: const Text('Pick Location on Map'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
                     TextFormField(
                       controller: _descriptionController,
                       decoration: const InputDecoration(labelText: 'Description (Optional)'),
@@ -323,24 +436,22 @@ Future<void>  _updateProfile() async{
                     ),
                     const SizedBox(height: 32),
                     ElevatedButton(
-                      onPressed:
-                          _updateInProgress ? null : () => _updateProfile(),
-                        style: ElevatedButton.styleFrom(
+                      onPressed: _updateInProgress ? null : () => _updateProfile(),
+                      style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child:
-                          _updateInProgress 
+                      child: _updateInProgress
                           ? const SizedBox(
-                            width: 20,
+                              width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
                                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                 strokeWidth: 2,
                               ),
-                          ) 
+                            )
                           : const Text(
                               'Save Changes',
                               style: TextStyle(fontSize: 18),
@@ -354,5 +465,61 @@ Future<void>  _updateProfile() async{
         ),
       ),
     );
+  }
+}
+
+class LocationMapPreview extends StatelessWidget {
+  final LatLng? location;
+  final double height;
+  final double zoom;
+
+  const LocationMapPreview({
+    Key? key,
+    required this.location,
+    this.height = 180,
+    this.zoom = 15,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    if (location == null) {
+      return Container(
+        height: height,
+        color: Colors.grey[200],
+        alignment: Alignment.center,
+        child: const Text('No location set.'),
+      );
     }
+    return SizedBox(
+      height: height,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: FlutterMap(
+          options: MapOptions(
+            initialCenter: location!,
+            initialZoom: zoom,
+            interactionOptions: const InteractionOptions(
+              flags: InteractiveFlag.none, // disables all gestures
+            ),
+          ),
+          children: [
+            TileLayer(
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              userAgentPackageName: 'com.example.greenloop',
+            ),
+            MarkerLayer(
+              markers: [
+                Marker(
+                  point: location!,
+                  width: 40,
+                  height: 40,
+                  child: const Icon(Icons.location_on, color: Colors.red, size: 36),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

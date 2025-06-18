@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_state.dart';
+import 'package:greenloop/src/profile/Individual/presentation/widgets/location_picker_screen.dart';
 import 'package:image_picker/image_picker.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -20,6 +22,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late TextEditingController _lastNameController;
   late TextEditingController _emailController;
   late TextEditingController _descriptionController;
+  late TextEditingController _latitudeDisplayController;
+  late TextEditingController _longitudeDisplayController;
 
   File? _pickedImage;
   String? _currentAvatarUrl;
@@ -28,6 +32,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   String? _originalLastName;
   String? _originalEmail;
   String? _originalDescription;
+  LatLng? _originalLocation;
+  LatLng? _selectedLocationFromMap;
 
   bool _updateInProgress = false;
 
@@ -38,6 +44,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _lastNameController = TextEditingController();
     _emailController = TextEditingController();
     _descriptionController = TextEditingController();
+    _latitudeDisplayController = TextEditingController();
+    _longitudeDisplayController = TextEditingController();
 
     // Fetch initial user data to populate the fields when the page loads
     context.read<IndividualProfileCubit>().fetchUser(widget.userId);
@@ -49,6 +57,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _lastNameController.dispose();
     _emailController.dispose();
     _descriptionController.dispose();
+    _latitudeDisplayController.dispose();
+    _longitudeDisplayController.dispose();
     super.dispose();
   }
 
@@ -59,6 +69,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
     if (pickedFile != null) {
       setState(() {
         _pickedImage = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<void> _openLocationPicker() async {
+    final LatLng? pickedLocation = await Navigator.push<LatLng>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => IndividualLocationPickerScreen(
+          initialLocation: _selectedLocationFromMap ?? _originalLocation,
+        ),
+      ),
+    );
+
+    if (pickedLocation != null) {
+      setState(() {
+        _selectedLocationFromMap = pickedLocation;
+        _latitudeDisplayController.text = pickedLocation.latitude.toString();
+        _longitudeDisplayController.text = pickedLocation.longitude.toString();
       });
     }
   }
@@ -118,11 +147,28 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 : _descriptionController.text.trim())
             : null;
 
+    bool isLocationUpdated = false;
+    // Check if location was picked or changed
+    if (_selectedLocationFromMap != null) {
+      // Location was selected via map
+      if (_originalLocation == null ||
+          _selectedLocationFromMap!.latitude != _originalLocation!.latitude ||
+          _selectedLocationFromMap!.longitude != _originalLocation!.longitude) {
+        isLocationUpdated = true;
+      }
+    } else if (_originalLocation != null &&
+               (_latitudeDisplayController.text.isEmpty && _longitudeDisplayController.text.isEmpty)) {
+      // Location was cleared
+      isLocationUpdated = true;
+      _selectedLocationFromMap = null;
+    }
+
     if (!imageUploaded &&
         firstNameToUpdate == null &&
         lastNameToUpdate == null &&
         emailToUpdate == null &&
-        descriptionToUpdate == null) {
+        descriptionToUpdate == null &&
+        !isLocationUpdated) {
       _showSnackBar('No changes to save.');
       setState(() {
         _updateInProgress = false;
@@ -146,6 +192,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
     if (imageUploaded && newAvatarUrl != null) {
       updateData['avatar_url'] = newAvatarUrl;
+    }
+    if (isLocationUpdated) {
+      updateData['location'] = _selectedLocationFromMap != null
+          ? 'SRID=4326;POINT(${_selectedLocationFromMap!.longitude} ${_selectedLocationFromMap!.latitude})'
+          : null;
     }
 
     context.read<IndividualProfileCubit>().updateProfile(
@@ -180,12 +231,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
             _lastNameController.text = user.last_name ?? '';
             _emailController.text = user.email ?? '';
             _descriptionController.text = user.description ?? '';
+            _latitudeDisplayController.text = user.location?.latitude.toString() ?? '';
+            _longitudeDisplayController.text = user.location?.longitude.toString() ?? '';
 
             _originalFirstName = user.first_name;
             _originalLastName = user.last_name;
             _originalEmail = user.email;
             _originalDescription = user.description;
             _currentAvatarUrl = user.avatarUrl;
+            _originalLocation = user.location;
+            _selectedLocationFromMap = user.location;
             _pickedImage = null; // Clear picked image after successful update
 
             if (_updateInProgress) {
@@ -309,11 +364,51 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         if (value == null || value.trim().isEmpty) {
                           return 'Please enter your email';
                         }
-                        if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
                           return 'Please enter a valid email address';
                         }
                         return null;
                       },
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _latitudeDisplayController,
+                      decoration: InputDecoration(
+                        labelText: 'Latitude',
+                        enabled: false,
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        prefixIcon: const Icon(Icons.location_on_outlined),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _longitudeDisplayController,
+                      decoration: InputDecoration(
+                        labelText: 'Longitude',
+                        enabled: false,
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        prefixIcon: const Icon(Icons.location_on_outlined),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      onPressed: _openLocationPicker,
+                      icon: const Icon(Icons.map),
+                      label: const Text('Pick Location on Map'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 16),
                     TextFormField(

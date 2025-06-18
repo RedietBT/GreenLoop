@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greenloop/core/commen/widgets/location_map_preview.dart';
 import 'package:greenloop/src/profile/recycling/presentation/cubits/recycling_profile_cubit.dart';
 import 'package:greenloop/src/profile/recycling/presentation/cubits/recycling_profile_state.dart';
+
 
 class RecyclingProfileBody extends StatefulWidget {
   final String userId;
@@ -87,6 +89,14 @@ class _RecyclingProfileBodyState extends State<RecyclingProfileBody> {
                       ],
                     ),
                   ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Location Coordinates Card
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12.0),
+                  child: LocationMapPreview(location: user.location),
                 ),
 
                 const SizedBox(height: 30),

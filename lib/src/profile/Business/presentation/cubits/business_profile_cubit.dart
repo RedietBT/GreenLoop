@@ -6,7 +6,6 @@ import 'package:greenloop/src/profile/cores/domain/repos/storage_repo.dart';
 
 class BusinessProfileCubit extends Cubit<BusinessProfileState> {
   final BusinessRepo businessRepo;
-
   final StorageRepo storageRepo;
 
   BusinessProfileCubit({

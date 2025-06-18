@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenloop/src/profile/Business/presentation/cubits/business_profile_cubit.dart';
 import 'package:greenloop/src/profile/Business/presentation/cubits/business_profile_state.dart';
+import 'package:greenloop/core/commen/widgets/location_map_preview.dart';
+import 'dart:typed_data';
+import 'package:latlong2/latlong.dart';
 
 class BusinessProfileBody extends StatefulWidget {
   final String userId; 
@@ -87,13 +90,8 @@ class _BusinessProfileBodyState extends State<BusinessProfileBody> {
                   style: const TextStyle(fontSize: 16, color: Colors.grey),
                 ),
                 const SizedBox(height: 20), 
-                Text(
-                  user.location != null
-                  ? 'Latitude: ${user.location!.latitude.toStringAsFixed(4)}, Longitude: ${user.location!.longitude.toStringAsFixed(4)}'
-                  : 'No location available.',
-                  style: const TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                  const SizedBox(height: 20),
+                LocationMapPreview(location: user.location),
+                const SizedBox(height: 20),
                 // Achievements Section
                 Align(
                   alignment: Alignment.centerLeft,
@@ -127,5 +125,48 @@ class _BusinessProfileBodyState extends State<BusinessProfileBody> {
         return const SizedBox.shrink();
       },
     );
+  }
+}
+
+LatLng? parseWkbPoint(String? wkbHex) {
+  if (wkbHex == null || wkbHex.length != 50) return null;
+  try {
+    // Convert hex string to bytes
+    final bytes = Uint8List(wkbHex.length ~/ 2);
+    for (int i = 0; i < wkbHex.length; i += 2) {
+      bytes[i ~/ 2] = int.parse(wkbHex.substring(i, i + 2), radix: 16);
+    }
+    // WKB: [byte order][type][SRID][X][Y]
+    // Byte order: 1 byte (0 for big endian, 1 for little endian)
+    // Type: 4 bytes
+    // SRID: 4 bytes
+    // X: 8 bytes (double)
+    // Y: 8 bytes (double)
+    final byteData = ByteData.sublistView(bytes);
+    final isLittleEndian = bytes[0] == 1;
+    final x = byteData.getFloat64(21, isLittleEndian ? Endian.little : Endian.big);
+    final y = byteData.getFloat64(29, isLittleEndian ? Endian.little : Endian.big);
+    return LatLng(y, x);
+  } catch (_) {
+    return null;
+  }
+}
+
+LatLng? parsePostgisWkbPoint(String? wkbHex) {
+  if (wkbHex == null || wkbHex.length != 50) return null;
+  try {
+    final bytes = Uint8List(wkbHex.length ~/ 2);
+    for (int i = 0; i < wkbHex.length; i += 2) {
+      bytes[i ~/ 2] = int.parse(wkbHex.substring(i, i + 2), radix: 16);
+    }
+    final byteData = ByteData.sublistView(bytes);
+    // Byte order: 0 = big endian, 1 = little endian
+    final isLittleEndian = bytes[0] == 1;
+    // X and Y are at offsets 20 and 28 for PostGIS EWKB with SRID
+    final x = byteData.getFloat64(20, isLittleEndian ? Endian.little : Endian.big);
+    final y = byteData.getFloat64(28, isLittleEndian ? Endian.little : Endian.big);
+    return LatLng(y, x);
+  } catch (_) {
+    return null;
   }
 }

@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:latlong2/latlong.dart';
 
 class Individual_User extends Equatable{
   final String id;
@@ -9,6 +10,7 @@ class Individual_User extends Equatable{
   final int? points;
   final String? email;
   final String? description;
+  final LatLng? location;
 
   const Individual_User({
     required this.id,
@@ -19,8 +21,9 @@ class Individual_User extends Equatable{
      this.points,
      this.email,
      this.description,
+     this.location,
   });
 
   @override
-  List<Object?> get props => [id, first_name, last_name, role, avatarUrl, points, email, description];
+  List<Object?> get props => [id, first_name, last_name, role, avatarUrl, points, email, description, location];
 }

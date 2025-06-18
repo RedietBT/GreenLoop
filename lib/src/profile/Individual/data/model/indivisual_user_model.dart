@@ -1,6 +1,7 @@
 // src/profile/Individual/data/models/individual_user_model.dart
 
 import 'package:greenloop/src/profile/Individual/domian/entity/individual_user.dart';
+import 'package:latlong2/latlong.dart';
 
 class Individual_UserModel extends Individual_User {
   const Individual_UserModel({
@@ -12,6 +13,7 @@ class Individual_UserModel extends Individual_User {
     super.points,
     super.email,
     super.description,
+    super.location,
   });
 
   // CRITICAL FIX 1: Make the 'json' input parameter nullable
@@ -19,6 +21,21 @@ class Individual_UserModel extends Individual_User {
     // CRITICAL FIX 2: Explicitly handle if the entire JSON map is null
     if (json == null) {
       throw const FormatException('Individual_UserModel.fromJson: Input map is null. Cannot create model from null data.');
+    }
+
+    LatLng? parsedLocation;
+    final locationString = json['location'] as String?;
+
+    if (locationString != null && locationString.isNotEmpty) {
+      final regex = RegExp(r'POINT\(([^ ]+) ([^ ]+)\)');
+      final match = regex.firstMatch(locationString);
+      if (match != null && match.groupCount == 2) {
+        final longitude = double.tryParse(match.group(1)!);
+        final latitude = double.tryParse(match.group(2)!);
+        if (latitude != null && longitude != null) {
+          parsedLocation = LatLng(latitude, longitude);
+        }
+      }
     }
 
     return Individual_UserModel(
@@ -30,6 +47,7 @@ class Individual_UserModel extends Individual_User {
       points: json['points'] as int?,
       email: json['email'] as String?,     
       description: json['description'] as String?,
+      location: parsedLocation,
     );
   }
 
@@ -43,6 +61,9 @@ class Individual_UserModel extends Individual_User {
       'points': points,
       'email': email,
       'description': description,
+      'location': location != null
+          ? 'SRID=4326;POINT(${location!.longitude} ${location!.latitude})'
+          : null,
     };
   }
 }
