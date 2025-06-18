@@ -1,4 +1,5 @@
 import 'package:greenloop/src/profile/Business/domain/entity/business_user.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class BusinessModel extends Business {
   const BusinessModel({
@@ -13,6 +14,7 @@ class BusinessModel extends Business {
     required super.avatarUrl,
     required super.points,
     required super.description,
+    required super.location,
   });
   
   factory BusinessModel.fromJson(Map<String, dynamic> json) {
@@ -28,6 +30,12 @@ class BusinessModel extends Business {
       avatarUrl: json['avater_url'] as String?,
       points: json['points'] as int?,
       description: json['description'] as String?,
+      location: json['location'] != null
+          ? LatLng(
+              json['location']['latitude'] as double,
+              json['location']['longitude'] as double,
+            )
+          : null,
     );
   }
 
@@ -44,6 +52,12 @@ class BusinessModel extends Business {
       'avater_url': avatarUrl,
       'points': points,
       'description': description,
+      'location': location != null
+          ? {
+              'latitude': location!.latitude,
+              'longitude': location!.longitude,
+            }
+          : null,
     };
   }
 }
