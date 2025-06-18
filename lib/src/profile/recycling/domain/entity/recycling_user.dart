@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class Recycling_User extends Equatable{
   final String id;
@@ -11,6 +12,7 @@ class Recycling_User extends Equatable{
   final String? address;
   final String? avatar_url;
   final String? phone;
+  final LatLng? location;
 
   const Recycling_User({
     required this.id,
@@ -23,6 +25,7 @@ class Recycling_User extends Equatable{
     this.address,
     this.avatar_url,
     this.phone,
+    this.location,
   });
 
   @override
@@ -37,6 +40,7 @@ class Recycling_User extends Equatable{
         address,
         avatar_url,
         phone,
+        location,
       ];
 }
  

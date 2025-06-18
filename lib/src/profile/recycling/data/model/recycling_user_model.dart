@@ -1,3 +1,4 @@
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:greenloop/src/profile/recycling/domain/entity/recycling_user.dart';
 
 class Recycling_UserModel extends Recycling_User {
@@ -12,6 +13,8 @@ class Recycling_UserModel extends Recycling_User {
     super.address,
     super.avatar_url,
     super.phone,
+    super.location,
+    
   });
 
   factory Recycling_UserModel.fromJson(Map<String, dynamic>? json) {
@@ -30,6 +33,13 @@ class Recycling_UserModel extends Recycling_User {
       address: json['address'] as String?,
       avatar_url: json['avater_url'] as String?,
       phone: json['phone'] as String?,
+      location: json['location'] != null
+          ? LatLng(
+              json['location']['latitude'] as double,
+              json['location']['longitude'] as double,
+            )
+          : null,
+
     );
   }
 
@@ -45,6 +55,12 @@ class Recycling_UserModel extends Recycling_User {
       'address': address,
       'avater_url': avatar_url,
       'phone': phone,
+      'location': location != null
+          ? {
+              'latitude': location!.latitude,
+              'longitude': location!.longitude,
+            }
+          : null,
     };
   }
 } 
