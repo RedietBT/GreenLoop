@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:latlong2/latlong.dart';
 
 class Business extends Equatable {
   final String id;
@@ -12,6 +13,8 @@ class Business extends Equatable {
   final int? points;
   final String? email;
   final String? description;
+  final LatLng? location;
+
 
   const Business({
     required this.id,
@@ -25,6 +28,7 @@ class Business extends Equatable {
     this.points,
     this.email,
     this.description,
+    this.location,
   });
 
   @override
@@ -40,5 +44,6 @@ class Business extends Equatable {
         points,
         email,
         description,
+        location,
       ];
 }
