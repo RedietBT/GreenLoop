@@ -1,8 +1,11 @@
 import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greenloop/src/auth/domain/repos/auth_repo.dart';
 import 'package:greenloop/src/profile/Business/domain/repo/business_repo.dart';
 import 'package:greenloop/src/profile/Business/presentation/cubits/business_profile_state.dart';
 import 'package:greenloop/src/profile/cores/domain/repos/storage_repo.dart';
+import 'package:greenloop/src/auth/domain/usecases/signOut.dart';
+import 'package:flutter/material.dart';
 
 class BusinessProfileCubit extends Cubit<BusinessProfileState> {
   final BusinessRepo businessRepo;
@@ -64,5 +67,13 @@ class BusinessProfileCubit extends Cubit<BusinessProfileState> {
         return publicUrl;
       },
     );
+  }
+
+  Future<void> signOut(BuildContext context, AuthRepo authRepo) async {
+    // Use the injected signOut usecase if available, otherwise create it here
+    final signOutUsecase = Signout(authRepo);
+    await signOutUsecase.call();
+    // After sign out, navigate to login
+    Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
   }
 }
