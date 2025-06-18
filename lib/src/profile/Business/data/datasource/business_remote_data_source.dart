@@ -50,35 +50,24 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
     try {
       final Map<String, dynamic> dataToSend = Map.from(data);
 
-      final dynamic responseData = await _supabaseClient
+      await _supabaseClient
           .from('business')
           .update(dataToSend) 
           .eq('id', userId)
           .select()
           .single();
 
-      if (responseData == null) {
-        throw ServerException(
-          message: 'User profile not found for update with ID: $userId',
-          statusCode: 404,
-        );
-      }
-
-      if (responseData is! Map<String, dynamic>) {
-        throw const ServerException(
-          message: 'Invalid data format received after update. Expected Map<String, dynamic>.',
-          statusCode: 500,
-        );
-      }
-      return BusinessModel.fromJson(responseData);
+      // Always fetch the updated profile after update
+      final updatedProfile = await fetchUserProfile(userId);
+      return updatedProfile;
     } on PostgrestException catch (e) {
-      print('Postgrest error updating business profile: ${e.message}, Code: ${e.code}'); // Log more details
+      print('Postgrest error updating business profile: ${e.message}, Code: ${e.code}');
       throw ServerException(
         message: e.message,
         statusCode: int.tryParse(e.code ?? '') ?? 500,
       );
     } catch (e) {
-      print('Unexpected error updating business profile: $e'); // Log unexpected errors
+      print('Unexpected error updating business profile: $e');
       throw ServerException(message: e.toString(), statusCode: 500);
     }
   }

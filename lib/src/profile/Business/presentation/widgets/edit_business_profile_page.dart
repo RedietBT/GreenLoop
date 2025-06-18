@@ -171,11 +171,9 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
       }
     } else if (_originalLocation != null &&
                (_latitudeDisplayController.text.isEmpty && _longitudeDisplayController.text.isEmpty)) {
-      // Location was cleared (if it existed before and now text fields are empty)
-      // This case handles if original location was there, but user cleared the display text field manually
-      // which means they want to set location to null.
+    
       isLocationUpdated = true;
-      _selectedLocationFromMap = null; // Explicitly set to null for update
+      _selectedLocationFromMap = null; 
     }
 
 
@@ -218,10 +216,10 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
       if (businessNameToUpdate != null) 'business_name': businessNameToUpdate,
       if (contactPersonFirstNameToUpdate != null) 'contact_person_first_name': contactPersonFirstNameToUpdate,
       if (contactPersonLastNameToUpdate != null) 'contact_person_last_name': contactPersonLastNameToUpdate,
-      if (phoneNumberToUpdate != null) 'phone_number': phoneNumberToUpdate, // Corrected key to phone_number
+      if (phoneNumberToUpdate != null) 'phone': phoneNumberToUpdate, // Corrected key to phone_number
       if (emailToUpdate != null) 'email': emailToUpdate,
       if (descriptionToUpdate != null) 'description': descriptionToUpdate,
-      if (newAvatarUrl != null) 'avatarUrl': newAvatarUrl, // Corrected key to avatarUrl
+      if (newAvatarUrl != null) 'avater_url': newAvatarUrl, // Corrected key to avatarUrl
       if (addressToUpdate != null) 'address': addressToUpdate,
 
       // Format location properly for Supabase geometry column
@@ -239,6 +237,7 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
       const SnackBar(content: Text('Profile update initiated...')),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -293,7 +292,8 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
         },
         child: BlocBuilder<BusinessProfileCubit, BusinessProfileState>(
           builder: (context, state) {
-            if (state is BusinessProfileLoading || state is BusinessProfileInitial) {
+            if (state is BusinessProfileLoading || state is BusinessProfileInitial||
+            state is BusinessProfileUpdating) {
               return const Center(child: CircularProgressIndicator());
             }
 
@@ -310,17 +310,35 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
                   children: [
                     GestureDetector(
                       onTap: _pickImage,
-                      child: CircleAvatar(
-                        radius: 70,
-                        backgroundColor: Theme.of(context).primaryColor.withOpacity(0.7),
-                        backgroundImage: _pickedImage != null
-                            ? FileImage(_pickedImage!)
-                            : (_currentAvatarUrl != null && _currentAvatarUrl!.isNotEmpty
-                                ? NetworkImage(_currentAvatarUrl!)
-                                : null) as ImageProvider<Object>?,
-                        child: _pickedImage == null && (_currentAvatarUrl == null || _currentAvatarUrl!.isEmpty)
-                            ? const Icon(Icons.business, size: 70, color: Colors.white)
-                            : null,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          CircleAvatar(
+                            radius: 70,
+                            backgroundColor: Theme.of(context).primaryColor.withOpacity(0.7),
+                            backgroundImage: _pickedImage != null
+                                ? FileImage(_pickedImage!)
+                                : (_currentAvatarUrl != null && _currentAvatarUrl!.isNotEmpty
+                                    ? NetworkImage(_currentAvatarUrl!)
+                                    : null) as ImageProvider<Object>?,
+                            child: _pickedImage == null && (_currentAvatarUrl == null || _currentAvatarUrl!.isEmpty)
+                                ? const Icon(Icons.business, size: 70, color: Colors.white)
+                                : null,
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: CircleAvatar(
+                              backgroundColor: Theme.of(context).cardColor,
+                              radius: 20,
+                              child: Icon(
+                                Icons.camera_alt,
+                                size: 20,
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 20),

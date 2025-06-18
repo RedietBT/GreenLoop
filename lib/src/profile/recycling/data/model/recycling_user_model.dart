@@ -25,7 +25,7 @@ class Recycling_UserModel extends Recycling_User {
     final locationString = json['location'] as String?;
 
     if (locationString != null && locationString.isNotEmpty) {
-      final regex = RegExp(r'POINT\(([^ ]+) ([^ ]+)\)');
+      final regex = RegExp(r'POINT\\(([^ ]+) ([^ ]+)\\)');
       final match = regex.firstMatch(locationString);
       if (match != null && match.groupCount == 2) {
         final longitude = double.tryParse(match.group(1)!);

@@ -22,7 +22,7 @@ class BusinessModel extends Business {
     final locationString = json['location'] as String?;
 
     if (locationString != null && locationString.isNotEmpty) {
-      final regex = RegExp(r'POINT\(([^ ]+) ([^ ]+)\)');
+      final regex = RegExp(r'POINT\\(([^ ]+) ([^ ]+)\\)');
       final match = regex.firstMatch(locationString);
       if (match != null && match.groupCount == 2) {
         final longitude = double.tryParse(match.group(1)!);
@@ -41,7 +41,7 @@ class BusinessModel extends Business {
       phone_number: json['phone'] as String?,
       role: json['role'] as String?,
       address: json['address'] as String?,
-      avatarUrl: json['avatar_url'] as String?,
+      avatarUrl: json['avater_url'] as String?,
       points: json['points'] as int?,
       email: json['email'] as String?,
       description: json['description'] as String?,
@@ -55,7 +55,7 @@ class BusinessModel extends Business {
       'business_name': business_name,
       'contact_person_first_name': contact_person_first_name,
       'contact_person_last_name': contact_person_last_name,
-      'phone': phone_number,
+      'phone_number': phone_number,
       'role': role,
       'address': address,
       'avatar_url': avatarUrl,

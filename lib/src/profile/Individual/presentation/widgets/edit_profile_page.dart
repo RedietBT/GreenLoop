@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:latlong2/latlong.dart';
@@ -148,6 +149,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
             : null;
 
     bool isLocationUpdated = false;
+    // Compose location in WKT format
+    String? locationWkt;
+    final latitude = double.tryParse(_latitudeDisplayController.text);
+    final longitude = double.tryParse(_longitudeDisplayController.text);
+    if (latitude != null && longitude != null) {
+      locationWkt = 'SRID=4326;POINT($longitude $latitude)';
+    }
     // Check if location was picked or changed
     if (_selectedLocationFromMap != null) {
       // Location was selected via map
@@ -194,9 +202,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       updateData['avatar_url'] = newAvatarUrl;
     }
     if (isLocationUpdated) {
-      updateData['location'] = _selectedLocationFromMap != null
-          ? 'SRID=4326;POINT(${_selectedLocationFromMap!.longitude} ${_selectedLocationFromMap!.latitude})'
-          : null;
+      updateData['location'] = locationWkt;
     }
 
     context.read<IndividualProfileCubit>().updateProfile(
@@ -462,5 +468,22 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ),
       ),
     );
+  }
+}
+
+LatLng? parsePostgisWkbPoint(String? wkbHex) {
+  if (wkbHex == null || wkbHex.length != 50) return null;
+  try {
+    final bytes = Uint8List(wkbHex.length ~/ 2);
+    for (int i = 0; i < wkbHex.length; i += 2) {
+      bytes[i ~/ 2] = int.parse(wkbHex.substring(i, i + 2), radix: 16);
+    }
+    final byteData = ByteData.sublistView(bytes);
+    final isLittleEndian = bytes[0] == 1;
+    final x = byteData.getFloat64(20, isLittleEndian ? Endian.little : Endian.big);
+    final y = byteData.getFloat64(28, isLittleEndian ? Endian.little : Endian.big);
+    return LatLng(y, x);
+  } catch (_) {
+    return null;
   }
 }

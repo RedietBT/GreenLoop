@@ -136,12 +136,6 @@ LatLng? parseWkbPoint(String? wkbHex) {
     for (int i = 0; i < wkbHex.length; i += 2) {
       bytes[i ~/ 2] = int.parse(wkbHex.substring(i, i + 2), radix: 16);
     }
-    // WKB: [byte order][type][SRID][X][Y]
-    // Byte order: 1 byte (0 for big endian, 1 for little endian)
-    // Type: 4 bytes
-    // SRID: 4 bytes
-    // X: 8 bytes (double)
-    // Y: 8 bytes (double)
     final byteData = ByteData.sublistView(bytes);
     final isLittleEndian = bytes[0] == 1;
     final x = byteData.getFloat64(21, isLittleEndian ? Endian.little : Endian.big);
@@ -170,3 +164,4 @@ LatLng? parsePostgisWkbPoint(String? wkbHex) {
     return null;
   }
 }
+
