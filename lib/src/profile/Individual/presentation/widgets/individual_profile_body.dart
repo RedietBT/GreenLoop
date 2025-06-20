@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenloop/core/res/colors.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_state.dart';
+import 'package:greenloop/core/res/fonts.dart';
 // Ensure your Individual_User entity is imported if needed for direct access to its properties
 // import 'package:greenloop/src/profile/Individual/domian/entity/individual_user.dart';
 
@@ -82,33 +83,38 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
                         child: Row(
-              children: [
+                          children: [
                             Hero(
                               tag: 'profile_image_${state is IndividualProfileLoaded ? state.user.id : ''}',
                               child: Container(
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
+                                  gradient: LinearGradient(
+                                    colors: [AppColors.primary, AppColors.accent],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
                                   boxShadow: [
                                     BoxShadow(
                                       color: AppColors.primary.withOpacity(0.3),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 5),
+                                      blurRadius: 16,
+                                      offset: const Offset(0, 8),
                                     ),
                                   ],
                                 ),
                                 child: CircleAvatar(
-                                  radius: 28,
-                                  backgroundColor: AppColors.primary.withOpacity(0.7),
+                                  radius: 32,
+                                  backgroundColor: Colors.transparent,
                                   backgroundImage: state is IndividualProfileLoaded && state.user.avatarUrl != null
                                       ? NetworkImage(state.user.avatarUrl!)
-                      : null,
+                                      : null,
                                   child: state is! IndividualProfileLoaded || state.user.avatarUrl == null
-                                      ? const Icon(Icons.person, size: 32, color: AppColors.textTertiary)
-                      : null,
-                ),
+                                      ? const Icon(Icons.person, size: 36, color: AppColors.textTertiary)
+                                      : null,
+                                ),
                               ),
                             ),
-                            const SizedBox(width: 16),
+                            const SizedBox(width: 18),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,34 +125,44 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
                                         'Welcome back, ',
                                         style: TextStyle(
                                           color: AppColors.textPrimary,
+                                          fontFamily: Fonts.fontFamilyMedium,
                                           fontWeight: FontWeight.w500,
                                           fontSize: 16,
+                                          letterSpacing: 0.2,
                                         ),
                                       ),
                                       if (state is IndividualProfileLoaded)
-                Text(
+                                        Text(
                                           state.user.first_name ?? '',
                                           style: const TextStyle(
                                             color: AppColors.primary,
+                                            fontFamily: Fonts.fontFamilyBold,
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16,
+                                            letterSpacing: 0.2,
                                           ),
                                         ),
                                     ],
                                   ),
                                   const SizedBox(height: 2),
-                Text(
-                                    state is IndividualProfileLoaded
-                                        ? state.user.email ?? ''
-                                        : '',
-                                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                                  Text(
+                                    state is IndividualProfileLoaded ? state.user.email ?? '' : '',
+                                    style: const TextStyle(
+                                      color: AppColors.textSecondary,
+                                      fontFamily: Fonts.fontFamilyLight,
+                                      fontSize: 13,
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
                             Container(
                               decoration: BoxDecoration(
-                                color: AppColors.primary.withOpacity(0.1),
+                                gradient: LinearGradient(
+                                  colors: [AppColors.primary.withOpacity(0.2), AppColors.secondary.withOpacity(0.2)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
                                 shape: BoxShape.circle,
                               ),
                               child: IconButton(
@@ -164,21 +180,36 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.green[900],
-                        borderRadius: BorderRadius.circular(12),
+                        gradient: LinearGradient(
+                          colors: [AppColors.backgroundTwo, AppColors.primary],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withOpacity(0.08),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                       child: Row(
                         children: [
-                          const Icon(Icons.location_on, color: Colors.black, size: 20),
+                          const Icon(Icons.location_on, color: AppColors.textTertiary, size: 20),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               'B12kk, Addis Ababa , 1994',
-                              style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
+                              style: const TextStyle(
+                                color: AppColors.textTertiary,
+                                fontFamily: Fonts.fontFamilyMedium,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
-                          const Icon(Icons.keyboard_arrow_down, color: Colors.black),
+                          const Icon(Icons.keyboard_arrow_down, color: AppColors.textTertiary),
                         ],
                       ),
                     ),
@@ -187,16 +218,16 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
                     child: Card(
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  elevation: 4,
+                      color: AppColors.cardBackground.withOpacity(0.95),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      elevation: 8,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           ClipRRect(
                             borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(16),
-                              topRight: Radius.circular(16),
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20),
                             ),
                             child: Image.network(
                               'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=800&q=80',
@@ -206,31 +237,35 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.all(12.0),
+                            padding: const EdgeInsets.all(16.0),
                             child: Row(
                               children: [
                                 const Text(
                                   'Give. Take. Repeat',
                                   style: TextStyle(
-                                    color: Colors.black,
+                                    color: AppColors.textTertiary,
+                                    fontFamily: Fonts.fontFamilyBold,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 18,
+                                    fontSize: 20,
+                                    letterSpacing: 0.5,
                                   ),
                                 ),
                                 const Spacer(),
                                 ElevatedButton(
                                   onPressed: () {},
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green,
+                                    backgroundColor: AppColors.primary,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
+                                      borderRadius: BorderRadius.circular(12),
                                     ),
-                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                    elevation: 0,
                                   ),
                                   child: const Text(
                                     'KNOW MORE',
                                     style: TextStyle(
-                                      color: Colors.white,
+                                      color: AppColors.textTertiary,
+                                      fontFamily: Fonts.fontFamilyMedium,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14,
                                     ),
@@ -251,14 +286,16 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
                         const Text(
                           'Your Dashboard',
                           style: TextStyle(
-                            color: Colors.black,
+                            color: AppColors.primary,
+                            fontFamily: Fonts.fontFamilyBold,
                             fontWeight: FontWeight.bold,
-                            fontSize: 20,
+                            fontSize: 22,
+                            letterSpacing: 0.3,
                           ),
                         ),
                         const Spacer(),
                         IconButton(
-                          icon: const Icon(Icons.share, color: Colors.greenAccent),
+                          icon: const Icon(Icons.share, color: AppColors.secondary),
                           onPressed: () {},
                         ),
                       ],
@@ -416,50 +453,9 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
                             ),
                           ],
                         ),
-                    ),
-                  ),
-                ),
-                  // 8. Categories Section
-                  const Padding(
-                    padding: EdgeInsets.only(left: 20, top: 20, bottom: 8),
-                  child: Text(
-                      'Categories',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 90,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.only(left: 16),
-                      children: [
-                        _categoryCard(
-                          icon: Icons.tv,
-                          label: 'LCD/LED TV',
-                          price: '₹ 10/Kg',
-                          imageUrl: 'https://cdn-icons-png.flaticon.com/512/3103/3103446.png',
-                        ),
-                        _categoryCard(
-                          icon: Icons.recycling,
-                          label: 'LDPE',
-                          price: '₹ 13/Kg',
-                          imageUrl: 'https://cdn-icons-png.flaticon.com/512/565/565547.png',
-                        ),
-                        _categoryCard(
-                          icon: Icons.laptop_mac,
-                          label: 'Laptop',
-                          price: '₹ 200/Pc',
-                          imageUrl: 'https://cdn-icons-png.flaticon.com/512/1792/1792864.png',
-                        ),
-                        // Add more categories as needed
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
                 ],
               ),
             ),
@@ -477,35 +473,40 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.2)),
+        gradient: LinearGradient(
+          colors: [color.withOpacity(0.18), color.withOpacity(0.08)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: color.withOpacity(0.18)),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+            color: color.withOpacity(0.12),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withOpacity(0.18),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: color, size: 24),
+            child: Icon(icon, color: color, size: 28),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Text(
             value,
             style: TextStyle(
               color: color,
-              fontSize: 20,
+              fontFamily: Fonts.fontFamilyBold,
+              fontSize: 22,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -513,8 +514,9 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
           Text(
             label,
             style: TextStyle(
-              color: color.withOpacity(0.8),
-              fontSize: 12,
+              color: color.withOpacity(0.85),
+              fontFamily: Fonts.fontFamilyMedium,
+              fontSize: 13,
               fontWeight: FontWeight.w500,
             ),
             textAlign: TextAlign.center,
@@ -532,13 +534,13 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.textTertiary,
-        borderRadius: BorderRadius.circular(12),
+        color: AppColors.cardBackground.withOpacity(0.92),
+        borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.1),
+            color: AppColors.primary.withOpacity(0.10),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -547,14 +549,14 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
+              color: AppColors.primary.withOpacity(0.13),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: AppColors.primary, size: 20),
+            child: Icon(icon, color: AppColors.primary, size: 22),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -563,7 +565,9 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
                   title,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: AppColors.textTertiary,
+                    fontFamily: Fonts.fontFamilyMedium,
+                    fontSize: 15,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -572,6 +576,7 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
                   style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.textSecondary,
+                    fontFamily: Fonts.fontFamilyLight,
                   ),
                 ),
               ],
@@ -582,6 +587,7 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
             style: const TextStyle(
               fontSize: 12,
               color: AppColors.textSecondary,
+              fontFamily: Fonts.fontFamilyLight,
             ),
           ),
         ],
@@ -599,13 +605,17 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
       width: 110,
       margin: const EdgeInsets.only(right: 12),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.7),
-        borderRadius: BorderRadius.circular(14),
+        gradient: LinearGradient(
+          colors: [AppColors.backgroundTwo.withOpacity(0.85), AppColors.cardBackground.withOpacity(0.85)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+            color: AppColors.primary.withOpacity(0.10),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -613,16 +623,17 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Image.network(imageUrl, height: 36, width: 36),
+            padding: const EdgeInsets.only(top: 10.0),
+            child: Image.network(imageUrl, height: 38, width: 38),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Text(
             label,
             style: const TextStyle(
-              color: Colors.black,
+              color: AppColors.textTertiary,
               fontWeight: FontWeight.bold,
-              fontSize: 13,
+              fontFamily: Fonts.fontFamilyMedium,
+              fontSize: 14,
             ),
             textAlign: TextAlign.center,
           ),
@@ -630,8 +641,9 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
           Text(
             price,
             style: const TextStyle(
-              color: Colors.greenAccent,
+              color: AppColors.secondary,
               fontWeight: FontWeight.w600,
+              fontFamily: Fonts.fontFamilyMedium,
               fontSize: 12,
             ),
           ),
