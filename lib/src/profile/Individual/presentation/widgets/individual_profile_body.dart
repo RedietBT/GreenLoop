@@ -7,7 +7,7 @@ import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_
 // import 'package:greenloop/src/profile/Individual/domian/entity/individual_user.dart';
 
 class IndividualProfileBody extends StatefulWidget {
-  final String userId;
+  final String userId; 
   const IndividualProfileBody({super.key, required this.userId});
 
   @override
@@ -82,7 +82,7 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
                         child: Row(
-                          children: [
+              children: [
                             Hero(
                               tag: 'profile_image_${state is IndividualProfileLoaded ? state.user.id : ''}',
                               child: Container(
@@ -101,11 +101,11 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
                                   backgroundColor: AppColors.primary.withOpacity(0.7),
                                   backgroundImage: state is IndividualProfileLoaded && state.user.avatarUrl != null
                                       ? NetworkImage(state.user.avatarUrl!)
-                                      : null,
+                      : null,
                                   child: state is! IndividualProfileLoaded || state.user.avatarUrl == null
                                       ? const Icon(Icons.person, size: 32, color: AppColors.textTertiary)
-                                      : null,
-                                ),
+                      : null,
+                ),
                               ),
                             ),
                             const SizedBox(width: 16),
@@ -124,7 +124,7 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
                                         ),
                                       ),
                                       if (state is IndividualProfileLoaded)
-                                        Text(
+                Text(
                                           state.user.first_name ?? '',
                                           style: const TextStyle(
                                             color: AppColors.primary,
@@ -135,7 +135,7 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
                                     ],
                                   ),
                                   const SizedBox(height: 2),
-                                  Text(
+                Text(
                                     state is IndividualProfileLoaded
                                         ? state.user.email ?? ''
                                         : '',
@@ -189,7 +189,7 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
                     child: Card(
                       color: Colors.white,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      elevation: 4,
+                  elevation: 4,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -416,13 +416,13 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
                             ),
                           ],
                         ),
-                      ),
                     ),
                   ),
+                ),
                   // 8. Categories Section
                   const Padding(
                     padding: EdgeInsets.only(left: 20, top: 20, bottom: 8),
-                    child: Text(
+                  child: Text(
                       'Categories',
                       style: TextStyle(
                         color: Colors.black,
@@ -666,9 +666,9 @@ class _AnimatedGradientContainerState extends State<_AnimatedGradientContainer> 
       CurvedAnimation(
         parent: _controller,
         curve: Curves.easeInOut,
-      ),
-    );
-  }
+            ),
+          );
+        }
 
   @override
   void dispose() {
