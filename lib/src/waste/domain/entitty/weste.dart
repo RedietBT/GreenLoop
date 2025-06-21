@@ -6,7 +6,7 @@ class Weast extends Equatable {
   final String? userId;
   final String? type;
   final String? quantity;
-  final double? location;
+  final String? location;
   final String? recyclingCenterId;
   final String? requestStatus;
 
