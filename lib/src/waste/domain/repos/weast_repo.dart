@@ -5,7 +5,7 @@ import 'package:greenloop/src/waste/domain/entitty/weste.dart';
 abstract class WeastRepo {
   const WeastRepo();
 
-  ResultFuture<Weast> insertWeastProfile(String weastId, {
+  ResultFuture<void> insertWeastProfile(String weastId, {
     required String userId,
     required String type,
     required String quantity,
@@ -18,7 +18,7 @@ abstract class WeastRepo {
   });
   ResultFuture<Recycling_User> fetchRecylingProfile(String resyclingId);
  
-  ResultFuture<Weast> requestForPickup(String id, {
+  ResultFuture<void> requestForPickup(String id, {
     required String userId,
     required String weastId,
     required String recyclingCenterId,
