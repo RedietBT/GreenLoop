@@ -13,7 +13,6 @@ class WeastCubit  extends Cubit<WeastState>{
     required String type,
     required String quantity,
     required String location,
-    required String requestStatus,
   }) async {
     emit(WeastLoading());
     final result = await weastRepo.insertWeastProfile(
@@ -22,7 +21,6 @@ class WeastCubit  extends Cubit<WeastState>{
       type,
       quantity,
       location,
-      requestStatus,
     );
     result.fold(
       (failure) => emit(WeastError(failure.errorMassage)),
@@ -45,12 +43,12 @@ class WeastCubit  extends Cubit<WeastState>{
     );
   }
 
-  Future<void> fetchRecyclingProfile(String recyclingId) async {
+  Future<void> fetchRecyclingCenters(String location) async {
     emit(WeastLoading());
-    final result = await weastRepo.fetchRecylingProfile(recyclingId);
+    final result = await weastRepo.fetchRecylingCenters(location);
     result.fold(
       (failure) => emit(WeastError(failure.errorMassage)),
-      (recyclingUser) => emit(RecyclerLoaded(recyclingUser)),
+      (recyclingCenters) => emit(RecyclingCentersLoaded(recyclingCenters)),
     );
   }
 

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:greenloop/src/waste/presentation/cubits/weast_cubit.dart';
 import 'package:greenloop/src/waste/presentation/wedigit/weast_body.dart';
 
 class WeastPage extends StatefulWidget{
@@ -22,22 +20,18 @@ class WeastPage extends StatefulWidget{
 
 class _WeastPageState extends State<WeastPage>{
 
-  late WeastCubit _weastCubit;
-
   @override
   void initState() {
     super.initState();
-    _weastCubit = context.read<WeastCubit>();
-    _weastCubit.fetchRecyclingProfile(widget.userId);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Weast Page'),
+        title: const Text('Request Waste Pickup'),
       ),
-      body: WeastBody()
+      body: WeastBody(userId: widget.userId)
     );
   }
 }

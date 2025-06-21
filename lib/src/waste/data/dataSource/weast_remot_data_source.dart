@@ -12,7 +12,6 @@ abstract class WeastRemotDataSource {
      String type,
      String quantity,
      String location,
-     String requestStatus,
   );
 
   Future<WeastModel> updateWeastProfile({
@@ -28,7 +27,7 @@ abstract class WeastRemotDataSource {
      String requestStatus,
   );
 
-  Future<Recycling_UserModel> fetchRecylingProfile(String recyclingId);
+  Future<List<Recycling_UserModel>> fetchRecylingCenters(String location);
 }
 
 class WeastRemotDataSourceImpl implements WeastRemotDataSource {
@@ -43,7 +42,6 @@ class WeastRemotDataSourceImpl implements WeastRemotDataSource {
      String type,
      String quantity,
      String location,
-     String requestStatus,
   ) async {
     try {
       await _supabaseClient.from('waste_submission').insert({
@@ -52,7 +50,6 @@ class WeastRemotDataSourceImpl implements WeastRemotDataSource {
         'type': type,
         'quantity': quantity,
         'location': location,
-        'request-status': requestStatus,
       });
     } catch (e) {
       throw Exception('Failed to insert user profile: $e');
@@ -103,7 +100,7 @@ class WeastRemotDataSourceImpl implements WeastRemotDataSource {
       await _supabaseClient.from('pickup_requests').insert({
         'id': id,
         'userID': userId,
-        'weast-submissionID': weastId,
+        'waste-submissionID': weastId,
         'recycling-centerID': recyclingCenterId,
         'request-status': requestStatus,
       });
@@ -113,32 +110,103 @@ class WeastRemotDataSourceImpl implements WeastRemotDataSource {
   }
 
   @override
-  Future<Recycling_UserModel> fetchRecylingProfile(String recyclingId) async {
+  Future<List<Recycling_UserModel>> fetchRecylingCenters(String location) async {
     try {
-      final dynamic response = await _supabaseClient
+      print('Searching for recycling centers with location: $location');
+      
+      // First, try to get all recycling centers to see what's available
+      final allCenters = await _supabaseClient
           .from('recycling_center')
-          .select()
-          .eq('id', recyclingId)
-          .single();
-
-           if (response == null) {
-        throw ServerException(
-          message: 'Recycling profile data not found for ID: $recyclingId',
-          statusCode: 404,
-        );
+          .select();
+      
+      // Try multiple search strategies
+      List<Recycling_UserModel> results = [];
+      
+      // Strategy 1: Search by address with ilike
+      try {
+        final response1 = await _supabaseClient
+            .from('recycling_center')
+            .select()
+            .ilike('address', '%${location.toLowerCase()}%');
+        
+        if (response1.isNotEmpty) {
+          print('Strategy 1 found ${response1.length} centers');
+          results = _parseRecyclingCenters(response1);
+        }
+      } catch (e) {
+        print('Strategy 1 failed: $e');
       }
-
-      // Explicitly cast the dynamic responseData to Map<String, dynamic>
-      if (response is! Map<String, dynamic>) {
-        throw const ServerException(
-          message: 'Invalid data format received from server. Expected Map<String, dynamic>.',
-          statusCode: 500,
-        );
+      
+      if (results.isEmpty) {
+        try {
+          final response2 = await _supabaseClient
+              .from('recycling_center')
+              .select()
+              .ilike('address', '%$location%');
+          
+          if (response2.isNotEmpty) {
+            print('Strategy 2 found ${response2.length} centers');
+            results = _parseRecyclingCenters(response2);
+          }
+        } catch (e) {
+          print('Strategy 2 failed: $e');
+        }
       }
-
-      return Recycling_UserModel.fromJson(response);
+      
+      // Strategy 3: If still no results, try searching by center_name
+      if (results.isEmpty) {
+        try {
+          final response3 = await _supabaseClient
+              .from('recycling_center')
+              .select()
+              .ilike('center_name', '%${location.toLowerCase()}%');
+          
+          if (response3.isNotEmpty) {
+            print('Strategy 3 found ${response3.length} centers');
+            results = _parseRecyclingCenters(response3);
+          }
+        } catch (e) {
+          print('Strategy 3 failed: $e');
+        }
+      }
+      
+      // Strategy 4: If still no results, return all centers (fallback)
+      if (results.isEmpty) {
+        print('No specific matches found, returning all centers as fallback');
+        if (allCenters.isNotEmpty) {
+          results = _parseRecyclingCenters(allCenters);
+        }
+      }
+      
+      print('Final result: ${results.length} recycling centers');
+      return results;
+      
     } catch (e) {
+      print('Error fetching recycling centers: $e');
       throw ServerException(message: e.toString(), statusCode: 500);
     }
+  }
+  
+  List<Recycling_UserModel> _parseRecyclingCenters(dynamic response) {
+    if (response is List) {
+      return response.map((item) {
+        try {
+          return Recycling_UserModel.fromJson(item);
+        } catch (e) {
+          print('Error parsing recycling center: $e');
+          print('Item data: $item');
+          return null;
+        }
+      }).where((center) => center != null).cast<Recycling_UserModel>().toList();
+    } else if (response is Map<String, dynamic>) {
+      try {
+        return [Recycling_UserModel.fromJson(response)];
+      } catch (e) {
+        print('Error parsing single recycling center: $e');
+        print('Response data: $response');
+        return [];
+      }
+    }
+    return [];
   }
 }

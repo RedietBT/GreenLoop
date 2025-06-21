@@ -19,6 +19,8 @@ import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_
 import 'package:greenloop/src/profile/Individual/presentation/view/individual_profile_page.dart';
 import 'package:greenloop/src/profile/recycling/presentation/cubits/recycling_profile_cubit.dart';
 import 'package:greenloop/src/profile/recycling/presentation/view/recycling_profile_page.dart';
+import 'package:greenloop/src/waste/presentation/cubits/weast_cubit.dart';
+import 'package:greenloop/src/waste/presentation/view/weast_page.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
@@ -121,6 +123,25 @@ case IndividualProfilePage.routeName:
     (_) => BlocProvider(
       create: (_) => sl<RecyclingProfileCubit>()..fetchUser(userId),
       child: RecyclingProfilePage(
+        userId: userId,
+        userType: userType,
+      ),
+    ),
+    settings: settings,
+  );
+
+  case WeastPage.routeName:
+  final Map<String, dynamic>? arguments = settings.arguments as Map<String, dynamic>?;
+  if (arguments == null || !arguments.containsKey('userId')) {
+    throw ArgumentError('WeastPage requires a "userId" argument in settings.arguments.');
+  }
+
+  final String userId = arguments['userId'] as String;
+  final String userType = arguments['userType'] as String? ?? 'Waste Pickup';
+  return _pageBuilder(
+    (_) => BlocProvider(
+      create: (_) => sl<WeastCubit>(),
+      child: WeastPage(
         userId: userId,
         userType: userType,
       ),

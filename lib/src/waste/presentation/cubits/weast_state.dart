@@ -20,6 +20,11 @@ class RecyclerLoaded extends WeastState {
   const RecyclerLoaded(this.recyclingUser);
 }
 
+class RecyclingCentersLoaded extends WeastState {
+  final List<Recycling_User> recyclingCenters;
+  const RecyclingCentersLoaded(this.recyclingCenters);
+}
+
 class WeastRequestPickup extends WeastState {}
 
 class WeastLoaded extends WeastState {

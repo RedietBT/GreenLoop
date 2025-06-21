@@ -47,6 +47,12 @@ import 'package:greenloop/src/profile/Business/data/repos/business_repo_impl.dar
 import 'package:greenloop/src/profile/Business/domain/repo/business_repo.dart';
 import 'package:greenloop/src/profile/Business/presentation/cubits/business_profile_cubit.dart';
 
+// Waste imports
+import 'package:greenloop/src/waste/data/dataSource/weast_remot_data_source.dart';
+import 'package:greenloop/src/waste/data/repos/weast_repo_impl.dart';
+import 'package:greenloop/src/waste/domain/repos/weast_repo.dart';
+import 'package:greenloop/src/waste/presentation/cubits/weast_cubit.dart';
+
 final sl = GetIt.instance;
 
 Future<void> init() async {
@@ -195,6 +201,23 @@ Future<void> init() async {
     sl<RecyclingUserRepo>(),
     sl<StorageRepo>(),
   ));
+
+  // ============================
+  // NEW: Waste Feature
+  // ============================
+  // Data Sources
+  sl.registerLazySingleton<WeastRemotDataSource>(
+    () => WeastRemotDataSourceImpl(sl<SupabaseClient>()),
+  );
+  
+  // Repositories
+  sl.registerLazySingleton<WeastRepo>(
+    () => WeastRepoImpl(sl<WeastRemotDataSource>()),
+  );
+  
+  // Cubit
+  sl.registerFactory(() => WeastCubit(sl<WeastRepo>()));
+
   // ============================
 
 }

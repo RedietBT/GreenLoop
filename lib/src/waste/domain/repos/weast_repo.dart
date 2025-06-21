@@ -11,13 +11,12 @@ abstract class WeastRepo {
      String type,
      String quantity,
      String location,
-     String requestStatus,
   );
   ResultFuture<Weast> updateWeastProfile({
    required String weastId, 
     required Map<String, dynamic> data,
   });
-  ResultFuture<Recycling_User> fetchRecylingProfile(String resyclingId);
+  ResultFuture<List<Recycling_User>> fetchRecylingCenters(String location);
  
   ResultFuture<void> requestForPickup(
      String id, 
