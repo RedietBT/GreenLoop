@@ -537,6 +537,53 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
                     ),
                   ),
                   const SizedBox(height: 16),
+                  
+                  // 9. Pickup Waste Button
+                  if (state is IndividualProfileLoaded)
+                    FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: SlideTransition(
+                        position: _slideAnimation,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Container(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/weastPage',
+                                  arguments: {
+                                    'userId': widget.userId,
+                                    'userType': 'Individual',
+                                  },
+                                );
+                              },
+                              icon: const Icon(Icons.recycling, color: Colors.white),
+                              label: const Text(
+                                'Request Waste Pickup',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 4,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  
+                  const SizedBox(height: 20),
                 ],
               ),
             ),

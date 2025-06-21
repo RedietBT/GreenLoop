@@ -14,9 +14,19 @@ class RegisterNewUserRepositoryImpl implements RegisterNewUserRepo {
 
   @override
   ResultFuture<void> insertUserProfile(
-      String id, String firstName, String lastName, String email, String? role) async {
+      String id, 
+      String firstName, 
+      String lastName, 
+      String email, 
+      String? role
+      ) async {
     try {
-      await remoteDataSource.insertUserProfile(id, firstName, lastName, email, role);
+      await remoteDataSource.insertUserProfile(
+        id, 
+        firstName, 
+        lastName, 
+        email, 
+        role);
       return const Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message, statusCode: e.statusCode));

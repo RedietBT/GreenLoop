@@ -185,6 +185,41 @@ class _BusinessProfileBodyState extends State<BusinessProfileBody> {
                               style: TextStyle(color: Colors.green[700]),
                             ),
                           ),
+                          const SizedBox(height: 20),
+                          // Pickup Waste Button
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/weastPage',
+                                  arguments: {
+                                    'userId': widget.userId,
+                                    'userType': 'Business',
+                                  },
+                                );
+                              },
+                              icon: const Icon(Icons.recycling, color: Colors.white),
+                              label: const Text(
+                                'Request Waste Pickup',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF43E97B),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 4,
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
