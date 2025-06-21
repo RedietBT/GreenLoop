@@ -1,3 +1,5 @@
+import 'package:greenloop/core/utils/typedefs.dart';
+import 'package:greenloop/src/waste/domain/entitty/weste.dart';
 import 'package:greenloop/src/waste/domain/repos/weast_repo.dart';
 
 class InsertWeastProfile {
@@ -6,7 +8,7 @@ class InsertWeastProfile {
 
   InsertWeastProfile(this.repository);
 
-  Future<void> call(
+  ResultFuture<Weast> call(
     String weastId, {
     required String userId,
     required String type,
@@ -14,7 +16,7 @@ class InsertWeastProfile {
     required String location,
     required String requestStatus,
   }) async {
-    await repository.insertWeastProfile(
+    return await repository.insertWeastProfile(
       weastId,
       userId: userId,
       type: type,
