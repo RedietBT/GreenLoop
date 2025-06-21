@@ -8,10 +8,13 @@ class UpdateWeastProfile {
 
   UpdateWeastProfile(this.repository);
  
- ResultFuture<Weast> call(
-    String weastId, {
+ ResultFuture<Weast> call({
+    required String weastId,
     required Map<String, dynamic> data,
-  }) async {
-    return await repository.updateWeastProfile(weastId, data: data);
+  }) {
+    return repository.updateWeastProfile(
+      weastId: weastId, 
+      data: data,
+    );
   }
 }

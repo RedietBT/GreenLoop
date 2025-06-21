@@ -8,20 +8,20 @@ class InsertWeastProfile {
   InsertWeastProfile(this.repository);
 
   ResultFuture<void> call(
-    String weastId, {
-    required String userId,
-    required String type,
-    required String quantity,
-    required String location,
-    required String requestStatus,
-  }) async {
+    String weastId, 
+     String userId,
+     String type,
+     String quantity,
+     String location,
+     String requestStatus,
+  ) async {
     return await repository.insertWeastProfile(
       weastId,
-      userId: userId,
-      type: type,
-      quantity: quantity,
-      location: location,
-      requestStatus: requestStatus,
+      userId,
+      type,
+      quantity,
+      location,
+      requestStatus,
     );
   }
 }

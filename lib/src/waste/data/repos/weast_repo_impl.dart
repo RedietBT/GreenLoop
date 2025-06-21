@@ -12,21 +12,22 @@ class WeastRepoImpl implements WeastRepo{
   const WeastRepoImpl(this.remoteDataSource);
 
   @override
-  ResultFuture<void> insertWeastProfile(String weastId, {
-    required String userId,
-    required String type,
-    required String quantity,
-    required String location,
-    required String requestStatus,
-  }) async {
+  ResultFuture<void> insertWeastProfile(
+     String weastId,
+     String userId,
+     String type,
+     String quantity,
+     String location,
+     String requestStatus,
+  ) async {
     try {
        await remoteDataSource.insertWeastProfile(
-        weastId: weastId,
-        userId: userId,
-        type: type,
-        quantity: quantity,
-        location: location,
-        requestStatus: requestStatus,
+        weastId,
+        userId,
+        type,
+        quantity,
+        location,
+        requestStatus,
       );
       return Right(null);
     } catch (e) {
@@ -38,8 +39,8 @@ class WeastRepoImpl implements WeastRepo{
   }
 
   @override
-  ResultFuture<Weast> updateWeastProfile(
-    String weastId, {
+  ResultFuture<Weast> updateWeastProfile({
+    required String weastId,
     required Map<String, dynamic> data,
   }) async {
     try {
@@ -57,21 +58,20 @@ class WeastRepoImpl implements WeastRepo{
   }
 
   @override
-  ResultFuture<void> requestForPickup(String id, {
-    required String userId,
-    required String weastId,
-    required String recyclingCenterId,
-    required String location,
-    required String requestStatus,
-  }) async {
+  ResultFuture<void> requestForPickup(
+     String id, 
+     String userId,
+     String weastId,
+     String recyclingCenterId,
+     String requestStatus,
+  ) async {
     try {
       await remoteDataSource.requestForPickup(
-        id: id,
-        userId: userId,
-        weastId: weastId,
-        recyclingCenterId: recyclingCenterId,
-        location: location,
-        requestStatus: requestStatus,
+        id,
+        userId,
+        weastId,
+        recyclingCenterId,
+        requestStatus,
       );
       return Right(null);
     } catch (e) {

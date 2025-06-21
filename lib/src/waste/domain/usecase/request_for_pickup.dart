@@ -6,18 +6,20 @@ class RequestForPickup {
   final WeastRepo repository;
   const RequestForPickup(this.repository);
 
-  ResultFuture<void> call(String id, {
-    required String userId,
-    required String weastId,
-    required String recyclingCenterId,
-    required String location,
-    required String requestStatus,
-  }) {
-    return repository.requestForPickup(id, 
-      userId: userId, 
-      weastId: weastId, 
-      recyclingCenterId: recyclingCenterId, 
-      location: location, 
-      requestStatus: requestStatus);
+  ResultFuture<void> call(
+    String id, 
+     String userId,
+     String weastId,
+     String recyclingCenterId,
+     String location,
+     String requestStatus,
+  ) {
+    return repository.requestForPickup(
+      id, 
+      userId, 
+      weastId, 
+      recyclingCenterId, 
+      requestStatus
+      );
   }
 }
