@@ -1,7 +1,9 @@
+import 'dart:math';
 import 'package:greenloop/core/errors/exceptions.dart';
 import 'package:greenloop/src/profile/recycling/data/model/recycling_user_model.dart';
 import 'package:greenloop/src/waste/data/model/weast_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:latlong2/latlong.dart';
 
 abstract class WeastRemotDataSource {
 
@@ -28,6 +30,7 @@ abstract class WeastRemotDataSource {
   );
 
   Future<List<Recycling_UserModel>> fetchRecylingCenters(String location);
+  Future<List<Recycling_UserModel>> fetchClosestRecyclingCenters(LatLng userLocation);
 }
 
 class WeastRemotDataSourceImpl implements WeastRemotDataSource {
@@ -185,6 +188,63 @@ class WeastRemotDataSourceImpl implements WeastRemotDataSource {
       print('Error fetching recycling centers: $e');
       throw ServerException(message: e.toString(), statusCode: 500);
     }
+  }
+
+  @override
+  Future<List<Recycling_UserModel>> fetchClosestRecyclingCenters(LatLng userLocation) async {
+    try {
+      print('Fetching closest recycling centers to: ${userLocation.latitude}, ${userLocation.longitude}');
+      
+      // Get all recycling centers
+      final allCenters = await _supabaseClient
+          .from('recycling_center')
+          .select();
+      
+      if (allCenters.isEmpty) {
+        print('No recycling centers found in database');
+        return [];
+      }
+      
+      // Parse centers and calculate distances
+      List<Recycling_UserModel> centers = _parseRecyclingCenters(allCenters);
+      List<MapEntry<Recycling_UserModel, double>> centersWithDistance = [];
+      
+      for (var center in centers) {
+        if (center.location != null) {
+          double distance = _calculateDistance(userLocation, center.location!);
+          centersWithDistance.add(MapEntry(center, distance));
+        }
+      }
+      
+      // Sort by distance (closest first)
+      centersWithDistance.sort((a, b) => a.value.compareTo(b.value));
+      
+      // Return sorted list of centers
+      List<Recycling_UserModel> sortedCenters = centersWithDistance.map((entry) => entry.key).toList();
+      
+      print('Found ${sortedCenters.length} recycling centers, sorted by distance');
+      return sortedCenters;
+      
+    } catch (e) {
+      print('Error fetching closest recycling centers: $e');
+      throw ServerException(message: e.toString(), statusCode: 500);
+    }
+  }
+  
+  double _calculateDistance(LatLng point1, LatLng point2) {
+    const double earthRadius = 6371; // Earth's radius in kilometers
+    
+    double lat1Rad = point1.latitude * (pi / 180);
+    double lat2Rad = point2.latitude * (pi / 180);
+    double deltaLatRad = (point2.latitude - point1.latitude) * (pi / 180);
+    double deltaLonRad = (point2.longitude - point1.longitude) * (pi / 180);
+    
+    double a = sin(deltaLatRad / 2) * sin(deltaLatRad / 2) +
+        cos(lat1Rad) * cos(lat2Rad) *
+        sin(deltaLonRad / 2) * sin(deltaLonRad / 2);
+    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+    
+    return earthRadius * c;
   }
   
   List<Recycling_UserModel> _parseRecyclingCenters(dynamic response) {

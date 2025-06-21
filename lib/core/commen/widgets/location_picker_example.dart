@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:geocoding/geocoding.dart';
 import 'location_picker_widget.dart';
 
 class LocationPickerExample extends StatefulWidget {
@@ -13,21 +14,53 @@ class _LocationPickerExampleState extends State<LocationPickerExample> {
   LatLng? _selectedLocation;
   String _selectedAddress = '';
 
-  void _openLocationPicker() {
-    Navigator.of(context).push(
+  Future<void> _openLocationPicker() async {
+    final LatLng? pickedLocation = await Navigator.of(context).push<LatLng>(
       MaterialPageRoute(
         builder: (context) => LocationPickerWidget(
-          onLocationSelected: (location, address) {
-            setState(() {
-              _selectedLocation = location;
-              _selectedAddress = address;
-            });
-          },
           initialLocation: _selectedLocation,
-          initialAddress: _selectedAddress,
         ),
       ),
     );
+
+    if (pickedLocation != null) {
+      setState(() {
+        _selectedLocation = pickedLocation;
+      });
+      
+      // Get address for the picked location
+      await _getAddressFromLatLng(pickedLocation);
+    }
+  }
+
+  Future<void> _getAddressFromLatLng(LatLng location) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        location.latitude,
+        location.longitude,
+      );
+
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks[0];
+        String address = [
+          place.street,
+          place.subLocality,
+          place.locality,
+          place.administrativeArea,
+          place.postalCode,
+          place.country,
+        ].where((element) => element != null && element.isNotEmpty).join(', ');
+
+        setState(() {
+          _selectedAddress = address;
+        });
+      }
+    } catch (e) {
+      // If reverse geocoding fails, just use coordinates
+      setState(() {
+        _selectedAddress = '${location.latitude.toStringAsFixed(4)}, ${location.longitude.toStringAsFixed(4)}';
+      });
+    }
   }
 
   @override

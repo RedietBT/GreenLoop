@@ -5,6 +5,7 @@ import 'package:greenloop/src/profile/recycling/domain/entity/recycling_user.dar
 import 'package:greenloop/src/waste/data/dataSource/weast_remot_data_source.dart';
 import 'package:greenloop/src/waste/domain/entitty/weste.dart';
 import 'package:greenloop/src/waste/domain/repos/weast_repo.dart';
+import 'package:latlong2/latlong.dart';
 
 class WeastRepoImpl implements WeastRepo{
 
@@ -84,6 +85,19 @@ class WeastRepoImpl implements WeastRepo{
   ResultFuture<List<Recycling_User>> fetchRecylingCenters(String location) async {
     try {
       final profiles = await remoteDataSource.fetchRecylingCenters(location);
+      return Right(profiles);
+    } catch (e) {
+      return Left(ServerFailure(
+        message: e.toString(),
+        statusCode: '500',
+      ));
+    }
+  }
+
+  @override
+  ResultFuture<List<Recycling_User>> fetchClosestRecyclingCenters(LatLng userLocation) async {
+    try {
+      final profiles = await remoteDataSource.fetchClosestRecyclingCenters(userLocation);
       return Right(profiles);
     } catch (e) {
       return Left(ServerFailure(

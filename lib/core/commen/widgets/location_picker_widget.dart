@@ -5,15 +5,11 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 
 class LocationPickerWidget extends StatefulWidget {
-  final Function(LatLng location, String address) onLocationSelected;
   final LatLng? initialLocation;
-  final String? initialAddress;
 
   const LocationPickerWidget({
     Key? key,
-    required this.onLocationSelected,
     this.initialLocation,
-    this.initialAddress,
   }) : super(key: key);
 
   @override
@@ -25,16 +21,19 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
   LatLng? _selectedLocation;
   String _selectedAddress = '';
   bool _isLoading = false;
+  bool _isSearching = false;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _mapController = MapController();
     _selectedLocation = widget.initialLocation;
-    _selectedAddress = widget.initialAddress ?? '';
     
     if (_selectedLocation == null) {
       _getCurrentLocation();
+    } else {
+      _getAddressFromLatLng(_selectedLocation!);
     }
   }
 
@@ -49,7 +48,6 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          // Handle permission denied
           setState(() {
             _isLoading = false;
           });
@@ -58,7 +56,6 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
       }
 
       if (permission == LocationPermission.deniedForever) {
-        // Handle permission permanently denied
         setState(() {
           _isLoading = false;
         });
@@ -81,7 +78,61 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
       setState(() {
         _isLoading = false;
       });
-      // Handle error
+    }
+  }
+
+  Future<void> _searchLocation() async {
+    if (_searchController.text.trim().isEmpty) return;
+
+    setState(() {
+      _isSearching = true;
+    });
+
+    try {
+      List<Location> locations = await locationFromAddress(_searchController.text.trim());
+      
+      if (locations.isNotEmpty) {
+        Location location = locations[0];
+        LatLng newLocation = LatLng(location.latitude, location.longitude);
+        
+        setState(() {
+          _selectedLocation = newLocation;
+          _isSearching = false;
+        });
+
+        // Animate map to new location
+        _mapController.move(newLocation, 15.0);
+        
+        // Get address for the searched location
+        await _getAddressFromLatLng(newLocation);
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Location found!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        setState(() {
+          _isSearching = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Location not found. Try a different search term.'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _isSearching = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error searching location: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -121,9 +172,12 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
 
   void _confirmLocation() {
     if (_selectedLocation != null) {
-      widget.onLocationSelected(_selectedLocation!, _selectedAddress);
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(_selectedLocation);
     }
+  }
+
+  String _formatCoordinates(LatLng location) {
+    return 'SRID=4326;POINT(${location.longitude} ${location.latitude})';
   }
 
   @override
@@ -136,88 +190,173 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
             TextButton(
               onPressed: _confirmLocation,
               child: const Text(
-                'Confirm',
-                style: TextStyle(color: Colors.white),
+                'Set Location',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ),
         ],
       ),
-      body: Stack(
+      body: Column(
         children: [
-          FlutterMap(
-            mapController: _mapController,
-            options: MapOptions(
-              initialCenter: _selectedLocation ?? const LatLng(0, 0),
-              initialZoom: 13.0,
-              onTap: _onMapTap,
-            ),
-            children: [
-              TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.example.greenloop',
-              ),
-              if (_selectedLocation != null)
-                MarkerLayer(
-                  markers: [
-                    Marker(
-                      point: _selectedLocation!,
-                      width: 80,
-                      height: 80,
-                      child: const Icon(
-                        Icons.location_on,
-                        color: Colors.red,
-                        size: 40,
+          // Search Bar
+          Container(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search for a location...',
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),
+                    onSubmitted: (_) => _searchLocation(),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: _isSearching ? null : _searchLocation,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: _isSearching
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.search),
+                ),
+              ],
+            ),
+          ),
+          
+          // Map
+          Expanded(
+            child: Stack(
+              children: [
+                FlutterMap(
+                  mapController: _mapController,
+                  options: MapOptions(
+                    initialCenter: _selectedLocation ?? const LatLng(0, 0),
+                    initialZoom: 13.0,
+                    onTap: _onMapTap,
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      userAgentPackageName: 'com.example.greenloop',
+                    ),
+                    if (_selectedLocation != null)
+                      MarkerLayer(
+                        markers: [
+                          Marker(
+                            point: _selectedLocation!,
+                            width: 80,
+                            height: 80,
+                            child: const Icon(
+                              Icons.location_on,
+                              color: Colors.red,
+                              size: 40,
+                            ),
+                          ),
+                        ],
+                      ),
                   ],
                 ),
-            ],
-          ),
-          if (_isLoading)
-            const Center(
-              child: CircularProgressIndicator(),
+                if (_isLoading)
+                  const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+              ],
             ),
-          Positioned(
-            bottom: 20,
-            left: 20,
-            right: 20,
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      'Selected Location:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+          ),
+          
+          // Location Info Card
+          if (_selectedLocation != null)
+            Container(
+              margin: const EdgeInsets.all(16),
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'Selected Location:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      _selectedAddress.isNotEmpty
-                          ? _selectedAddress
-                          : 'Tap on the map to select a location',
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                    if (_selectedLocation != null) ...[
                       const SizedBox(height: 8),
+                      if (_selectedAddress.isNotEmpty) ...[
+                        Text(
+                          'Address: $_selectedAddress',
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
                       Text(
-                        'Lat: ${_selectedLocation!.latitude.toStringAsFixed(6)}, '
-                        'Lng: ${_selectedLocation!.longitude.toStringAsFixed(6)}',
+                        'Coordinates:',
                         style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Latitude: ${_selectedLocation!.latitude.toStringAsFixed(6)}',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      Text(
+                        'Longitude: ${_selectedLocation!.longitude.toStringAsFixed(6)}',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.blue[50],
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.blue[200]!),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Database Format:',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                color: Colors.blue,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              _formatCoordinates(_selectedLocation!),
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontFamily: 'monospace',
+                                color: Colors.blue,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -230,6 +369,7 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
   @override
   void dispose() {
     _mapController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 } 

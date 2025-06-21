@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenloop/src/waste/domain/repos/weast_repo.dart';
 import 'package:greenloop/src/waste/presentation/cubits/weast_state.dart';
+import 'package:latlong2/latlong.dart';
 
 class WeastCubit  extends Cubit<WeastState>{
 
@@ -46,6 +47,15 @@ class WeastCubit  extends Cubit<WeastState>{
   Future<void> fetchRecyclingCenters(String location) async {
     emit(WeastLoading());
     final result = await weastRepo.fetchRecylingCenters(location);
+    result.fold(
+      (failure) => emit(WeastError(failure.errorMassage)),
+      (recyclingCenters) => emit(RecyclingCentersLoaded(recyclingCenters)),
+    );
+  }
+
+  Future<void> fetchClosestRecyclingCenters(LatLng userLocation) async {
+    emit(WeastLoading());
+    final result = await weastRepo.fetchClosestRecyclingCenters(userLocation);
     result.fold(
       (failure) => emit(WeastError(failure.errorMassage)),
       (recyclingCenters) => emit(RecyclingCentersLoaded(recyclingCenters)),
