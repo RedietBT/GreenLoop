@@ -1,5 +1,5 @@
 import 'package:greenloop/core/utils/typedefs.dart';
-import 'package:greenloop/src/auth/domain/entity/resycling_user.dart';
+import 'package:greenloop/src/profile/recycling/domain/entity/recycling_user.dart';
 import 'package:greenloop/src/waste/domain/entitty/weste.dart';
 
 abstract class WeastRepo {
@@ -16,7 +16,7 @@ abstract class WeastRepo {
     String weastId, {
     required Map<String, dynamic> data,
   });
-  ResultFuture<ResyclingUser> fetchRecylingProfile(String resyclingId);
+  ResultFuture<Recycling_User> fetchRecylingProfile(String resyclingId);
  
   ResultFuture<Weast> requestForPickup(String id, {
     required String userId,
