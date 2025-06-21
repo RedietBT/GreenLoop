@@ -14,21 +14,21 @@ class WeastRepoImpl implements WeastRepo{
 
   @override
   ResultFuture<void> insertWeastProfile(
-     String weastId,
+    String weastId, 
      String userId,
      String type,
      String quantity,
-     String location,
+     LatLng? location,
   ) async {
     try {
-       await remoteDataSource.insertWeastProfile(
+      await remoteDataSource.insertWeastProfile(
         weastId,
         userId,
         type,
         quantity,
         location,
       );
-      return Right(null);
+      return const Right(null);
     } catch (e) {
       return Left(ServerFailure(
         message: e.toString(),

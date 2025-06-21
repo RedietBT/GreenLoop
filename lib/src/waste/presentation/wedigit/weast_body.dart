@@ -260,7 +260,7 @@ class _WeastBodyState extends State<WeastBody>{
         userId: widget.userId,
         type: _typeController.text.trim(),
         quantity: _quantityController.text.trim(),
-        location: _locationController.text.trim(),
+        location: _selectedLocation,
       );
     } else if (_selectedRecyclingCenterId == null) {
       ScaffoldMessenger.of(context).showSnackBar(

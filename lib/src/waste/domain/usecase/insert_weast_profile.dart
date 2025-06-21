@@ -1,5 +1,6 @@
 import 'package:greenloop/core/utils/typedefs.dart';
 import 'package:greenloop/src/waste/domain/repos/weast_repo.dart';
+import 'package:latlong2/latlong.dart';
 
 class InsertWeastProfile {
 
@@ -12,7 +13,7 @@ class InsertWeastProfile {
      String userId,
      String type,
      String quantity,
-     String location,
+     LatLng? location,
   ) async {
     return await repository.insertWeastProfile(
       weastId,

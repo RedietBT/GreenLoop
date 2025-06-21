@@ -13,7 +13,7 @@ abstract class WeastRemotDataSource {
      String userId,
      String type,
      String quantity,
-     String location,
+     LatLng? location,
   );
 
   Future<WeastModel> updateWeastProfile({
@@ -44,7 +44,7 @@ class WeastRemotDataSourceImpl implements WeastRemotDataSource {
      String userId,
      String type,
      String quantity,
-     String location,
+     LatLng? location,
   ) async {
     try {
       await _supabaseClient.from('waste_submission').insert({
@@ -52,7 +52,7 @@ class WeastRemotDataSourceImpl implements WeastRemotDataSource {
         'userID': userId,
         'type': type,
         'quantity': quantity,
-        'location': location,
+        'location': location != null ? WeastModel.formatLocationForDatabase(location) : null,
       });
     } catch (e) {
       throw Exception('Failed to insert user profile: $e');

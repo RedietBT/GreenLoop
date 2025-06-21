@@ -11,7 +11,6 @@ class RequestForPickup {
      String userId,
      String weastId,
      String recyclingCenterId,
-     String location,
      String requestStatus,
   ) {
     return repository.requestForPickup(

@@ -51,6 +51,11 @@ import 'package:greenloop/src/profile/Business/presentation/cubits/business_prof
 import 'package:greenloop/src/waste/data/dataSource/weast_remot_data_source.dart';
 import 'package:greenloop/src/waste/data/repos/weast_repo_impl.dart';
 import 'package:greenloop/src/waste/domain/repos/weast_repo.dart';
+import 'package:greenloop/src/waste/domain/usecase/insert_weast_profile.dart';
+import 'package:greenloop/src/waste/domain/usecase/update_weast_profile.dart';
+import 'package:greenloop/src/waste/domain/usecase/fetch_recyling_profile.dart';
+import 'package:greenloop/src/waste/domain/usecase/fetch_closest_recycling_centers.dart';
+import 'package:greenloop/src/waste/domain/usecase/request_for_pickup.dart';
 import 'package:greenloop/src/waste/presentation/cubits/weast_cubit.dart';
 
 final sl = GetIt.instance;
@@ -215,8 +220,21 @@ Future<void> init() async {
     () => WeastRepoImpl(sl<WeastRemotDataSource>()),
   );
   
+  // Use Cases
+  sl.registerLazySingleton(() => InsertWeastProfile(sl<WeastRepo>()));
+  sl.registerLazySingleton(() => UpdateWeastProfile(sl<WeastRepo>()));
+  sl.registerLazySingleton(() => FetchRecylingCenters(sl<WeastRepo>()));
+  sl.registerLazySingleton(() => FetchClosestRecyclingCenters(sl<WeastRepo>()));
+  sl.registerLazySingleton(() => RequestForPickup(sl<WeastRepo>()));
+  
   // Cubit
-  sl.registerFactory(() => WeastCubit(sl<WeastRepo>()));
+  sl.registerFactory(() => WeastCubit(
+    insertWeastProfile: sl<InsertWeastProfile>(),
+    updateWeastProfile: sl<UpdateWeastProfile>(),
+    fetchRecylingCenters: sl<FetchRecylingCenters>(),
+    fetchClosestRecyclingCenters: sl<FetchClosestRecyclingCenters>(),
+    requestForPickup: sl<RequestForPickup>(),
+  ));
 
   // ============================
 

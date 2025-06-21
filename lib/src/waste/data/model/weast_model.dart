@@ -1,4 +1,5 @@
 import 'package:greenloop/src/waste/domain/entitty/weste.dart';
+import 'package:latlong2/latlong.dart';
 
 class WeastModel extends Weast{
 
@@ -41,5 +42,27 @@ class WeastModel extends Weast{
       'recycling-centerID': recyclingCenterId,
       'request-status': requestStatus,
     };
+  }
+
+  // Helper method to format location for database storage
+  static String formatLocationForDatabase(LatLng? location) {
+    if (location == null) return '';
+    return 'SRID=4326;POINT(${location.longitude} ${location.latitude})';
+  }
+
+  // Helper method to parse location from database format
+  static LatLng? parseLocationFromDatabase(String? locationString) {
+    if (locationString == null || locationString.isEmpty) return null;
+    
+    final regex = RegExp(r'POINT\(([^ ]+) ([^ ]+)\)');
+    final match = regex.firstMatch(locationString);
+    if (match != null && match.groupCount == 2) {
+      final longitude = double.tryParse(match.group(1)!);
+      final latitude = double.tryParse(match.group(2)!);
+      if (latitude != null && longitude != null) {
+        return LatLng(latitude, longitude);
+      }
+    }
+    return null;
   }
 }

@@ -11,7 +11,7 @@ abstract class WeastRepo {
      String userId,
      String type,
      String quantity,
-     String location,
+     LatLng? location,
   );
   ResultFuture<Weast> updateWeastProfile({
    required String weastId, 
