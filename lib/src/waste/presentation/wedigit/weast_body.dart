@@ -1,0 +1,3 @@
+class WeastBody {
+  const WeastBody();
+}
