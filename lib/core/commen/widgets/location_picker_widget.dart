@@ -30,11 +30,8 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
     _mapController = MapController();
     _selectedLocation = widget.initialLocation;
     
-    if (_selectedLocation == null) {
-      _getCurrentLocation();
-    } else {
-      _getAddressFromLatLng(_selectedLocation!);
-    }
+    // Always try to get current location first, then fall back to initial location
+    _getCurrentLocation();
   }
 
   Future<void> _getCurrentLocation() async {
@@ -43,6 +40,21 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
     });
 
     try {
+      // Check if location services are enabled
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Location services are disabled. Please enable location services.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
       // Check permissions
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
@@ -51,6 +63,12 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
           setState(() {
             _isLoading = false;
           });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Location permission denied. Please grant location permission.'),
+              backgroundColor: Colors.red,
+            ),
+          );
           return;
         }
       }
@@ -59,6 +77,12 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
         setState(() {
           _isLoading = false;
         });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Location permissions are permanently denied. Please enable in settings.'),
+            backgroundColor: Colors.red,
+          ),
+        );
         return;
       }
 
@@ -67,17 +91,43 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
         desiredAccuracy: LocationAccuracy.high,
       );
 
+      final newLocation = LatLng(position.latitude, position.longitude);
       setState(() {
-        _selectedLocation = LatLng(position.latitude, position.longitude);
+        _selectedLocation = newLocation;
         _isLoading = false;
       });
 
+      // Move map to current location
+      _mapController.move(newLocation, 15.0);
+
       // Get address for current location
-      await _getAddressFromLatLng(_selectedLocation!);
+      await _getAddressFromLatLng(newLocation);
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Current location detected!'),
+          backgroundColor: Colors.green,
+        ),
+      );
     } catch (e) {
       setState(() {
         _isLoading = false;
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error getting location: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      
+      // If current location fails and we have an initial location, use that
+      if (widget.initialLocation != null) {
+        setState(() {
+          _selectedLocation = widget.initialLocation;
+        });
+        _mapController.move(widget.initialLocation!, 15.0);
+        await _getAddressFromLatLng(widget.initialLocation!);
+      }
     }
   }
 
@@ -173,6 +223,13 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
   void _confirmLocation() {
     if (_selectedLocation != null) {
       Navigator.of(context).pop(_selectedLocation);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a location first'),
+          backgroundColor: Colors.orange,
+        ),
+      );
     }
   }
 
@@ -186,14 +243,13 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
       appBar: AppBar(
         title: const Text('Pick Location'),
         actions: [
-          if (_selectedLocation != null)
-            TextButton(
-              onPressed: _confirmLocation,
-              child: const Text(
-                'Set Location',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              ),
+          TextButton(
+            onPressed: _confirmLocation,
+            child: const Text(
+              'Set Location',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
+          ),
         ],
       ),
       body: Column(
