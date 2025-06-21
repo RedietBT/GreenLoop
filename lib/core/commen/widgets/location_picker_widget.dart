@@ -242,15 +242,9 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pick Location'),
-        actions: [
-          TextButton(
-            onPressed: _confirmLocation,
-            child: const Text(
-              'Set Location',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+        elevation: 2,
       ),
       body: Column(
         children: [
@@ -289,6 +283,26 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.search),
+                ),
+              ],
+            ),
+          ),
+          
+          // Instructions
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                Icon(Icons.info_outline, color: Colors.blue[600], size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Tap on the map to select a location, or use the search bar above',
+                    style: TextStyle(
+                      color: Colors.blue[600],
+                      fontSize: 12,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -340,18 +354,28 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
             Container(
               margin: const EdgeInsets.all(16),
               child: Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
-                        'Selected Location:',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
+                      Row(
+                        children: [
+                          Icon(Icons.location_on, color: Colors.green[600], size: 20),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Selected Location:',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 8),
                       if (_selectedAddress.isNotEmpty) ...[
@@ -417,7 +441,74 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _getCurrentLocation,
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
         child: const Icon(Icons.my_location),
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: ElevatedButton(
+                onPressed: _selectedLocation != null ? _confirmLocation : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 2,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.check, size: 20),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Set Location',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey[300],
+                foregroundColor: Colors.black87,
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 1,
+              ),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
