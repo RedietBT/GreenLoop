@@ -34,6 +34,7 @@ class WeastCubit  extends Cubit<WeastState>{
     required String type,
     required String quantity,
     required LatLng? location,
+    Function()? onSuccess,
   }) async {
     emit(WeastLoading());
     final result = await _insertWeastProfile(
@@ -45,7 +46,12 @@ class WeastCubit  extends Cubit<WeastState>{
     );
     result.fold(
       (failure) => emit(WeastError(failure.errorMassage)),
-      (_) => emit(WeastInserted()),
+      (_) {
+        emit(WeastInserted());
+        if (onSuccess != null) {
+          onSuccess();
+        }
+      },
     );
   }
 

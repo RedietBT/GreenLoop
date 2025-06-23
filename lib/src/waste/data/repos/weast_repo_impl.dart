@@ -106,4 +106,17 @@ class WeastRepoImpl implements WeastRepo{
       ));
     }
   }
+
+  @override
+  ResultFuture<void> incrementUserWasteCount(String userId) async {
+    try {
+      await remoteDataSource.incrementUserWasteCount(userId);
+      return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure(
+        message: e.toString(),
+        statusCode: '500',
+      ));
+    }
+  }
 }

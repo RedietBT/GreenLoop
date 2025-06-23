@@ -31,6 +31,9 @@ abstract class WeastRemotDataSource {
 
   Future<List<Recycling_UserModel>> fetchRecylingCenters(String location);
   Future<List<Recycling_UserModel>> fetchClosestRecyclingCenters(LatLng userLocation);
+  
+  // New method to increment user's waste count
+  Future<void> incrementUserWasteCount(String userId);
 }
 
 class WeastRemotDataSourceImpl implements WeastRemotDataSource {
@@ -47,6 +50,7 @@ class WeastRemotDataSourceImpl implements WeastRemotDataSource {
      LatLng? location,
   ) async {
     try {
+      // Insert the waste submission
       await _supabaseClient.from('waste_submission').insert({
         'id': weastId,
         'userID': userId,
@@ -54,6 +58,9 @@ class WeastRemotDataSourceImpl implements WeastRemotDataSource {
         'quantity': quantity,
         'location': location != null ? WeastModel.formatLocationForDatabase(location) : null,
       });
+      
+      // Increment the user's waste count
+      await incrementUserWasteCount(userId);
     } catch (e) {
       throw Exception('Failed to insert user profile: $e');
     }
@@ -268,5 +275,32 @@ class WeastRemotDataSourceImpl implements WeastRemotDataSource {
       }
     }
     return [];
+  }
+
+  @override
+  Future<void> incrementUserWasteCount(String userId) async {
+    try {
+      // First, get the current waste count from the profile table
+      final currentUser = await _supabaseClient
+          .from('profile')
+          .select('no_of_weaste')
+          .eq('id', userId)
+          .single();
+      
+      final currentCount = currentUser['no_of_weaste'] as int? ?? 0;
+      final newCount = currentCount + 1;
+      
+      // Update the user's waste count in the profile table
+      await _supabaseClient
+          .from('profile')
+          .update({'no_of_weaste': newCount})
+          .eq('id', userId);
+          
+    } catch (e) {
+      throw ServerException(
+        message: 'Failed to increment user waste count: $e',
+        statusCode: 500,
+      );
+    }
   }
 }

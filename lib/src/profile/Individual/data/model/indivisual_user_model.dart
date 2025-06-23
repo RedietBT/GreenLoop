@@ -14,6 +14,7 @@ class Individual_UserModel extends Individual_User {
     super.email,
     super.description,
     super.location,
+    super.no_of_weaste,
   });
 
   // CRITICAL FIX 1: Make the 'json' input parameter nullable
@@ -48,6 +49,7 @@ class Individual_UserModel extends Individual_User {
       email: json['email'] as String?,     
       description: json['description'] as String?,
       location: parsedLocation,
+      no_of_weaste: json['no_of_weaste'] as int? ?? 0,
     );
   }
 
@@ -64,6 +66,7 @@ class Individual_UserModel extends Individual_User {
       'location': location != null
           ? 'SRID=4326;POINT(${location!.longitude} ${location!.latitude})'
           : null,
+      'no_of_weaste': no_of_weaste,
     };
   }
 }

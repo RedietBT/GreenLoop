@@ -30,24 +30,24 @@ class IndividualProfileDrawer extends StatelessWidget {
                 opacity: 1.0,
                 duration: const Duration(milliseconds: 700),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 700),
                       curve: Curves.easeOutBack,
                       child: CircleAvatar(
-                        radius: 30,
-                        backgroundColor: Theme.of(context).colorScheme.secondary.withOpacity(0.5),
-                        child: const Icon(Icons.person, size: 30, color: Colors.white),
+                    radius: 30,
+                    backgroundColor: Theme.of(context).colorScheme.secondary.withOpacity(0.5),
+                    child: const Icon(Icons.person, size: 30, color: Colors.white),
                       ),
-                    ),
-                    const SizedBox(height: 8),
+                  ),
+                  const SizedBox(height: 8),
                     Text(
-                      'Loading Profile...',
+                    'Loading Profile...',
                       style: TextStyle(color: textColor, fontSize: 18),
-                    ),
-                  ],
+                  ),
+                ],
                 ),
               );
 
@@ -57,34 +57,34 @@ class IndividualProfileDrawer extends StatelessWidget {
                   opacity: 1.0,
                   duration: const Duration(milliseconds: 700),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
                       AnimatedContainer(
                         duration: const Duration(milliseconds: 700),
                         curve: Curves.easeOutBack,
                         child: CircleAvatar(
-                          radius: 30,
-                          backgroundImage: user.avatarUrl != null && user.avatarUrl!.isNotEmpty
-                              ? NetworkImage(user.avatarUrl!)
-                              : null,
-                          backgroundColor: Colors.white.withOpacity(0.3),
-                          child: user.avatarUrl == null || user.avatarUrl!.isEmpty
-                              ? const Icon(Icons.person, size: 30, color: Colors.white)
-                              : null,
+                      radius: 30,
+                      backgroundImage: user.avatarUrl != null && user.avatarUrl!.isNotEmpty
+                          ? NetworkImage(user.avatarUrl!)
+                          : null,
+                      backgroundColor: Colors.white.withOpacity(0.3),
+                      child: user.avatarUrl == null || user.avatarUrl!.isEmpty
+                          ? const Icon(Icons.person, size: 30, color: Colors.white)
+                          : null,
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
                         "${user.first_name ?? ''} ${user.last_name ?? ''}",
                         style: TextStyle(
                           color: textColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
-                      const SizedBox(height: 4),
-                    ],
+                    ),
+                    const SizedBox(height: 4),
+                  ],
                   ),
                 );
               } else if (state is IndividualProfileError) {
@@ -183,13 +183,16 @@ class _DrawerTileState extends State<_DrawerTile> {
     return MouseRegion(
       onEnter: (_) => setState(() => _hovering = true),
       onExit: (_) => setState(() => _hovering = false),
-      child: ListTile(
-        leading: Icon(widget.icon, color: iconColor),
-        title: Text(widget.label, style: TextStyle(color: textColor, fontWeight: widget.isLogout ? FontWeight.bold : FontWeight.normal)),
-        tileColor: tileColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        onTap: widget.onTap,
-        hoverColor: tileColor,
+      child: Container(
+        height: 56, // Fixed height for equal sizes
+        child: ListTile(
+          leading: Icon(widget.icon, color: iconColor, size: 24),
+          title: Text(widget.label, style: TextStyle(color: textColor, fontWeight: widget.isLogout ? FontWeight.bold : FontWeight.normal)),
+          tileColor: tileColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          onTap: widget.onTap,
+          hoverColor: tileColor,
+        ),
       ),
     );
   }

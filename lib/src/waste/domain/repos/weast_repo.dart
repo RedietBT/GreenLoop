@@ -27,4 +27,7 @@ abstract class WeastRepo {
      String recyclingCenterId,
      String requestStatus,
   );
+  
+  // New method to increment user's waste count
+  ResultFuture<void> incrementUserWasteCount(String userId);
 }

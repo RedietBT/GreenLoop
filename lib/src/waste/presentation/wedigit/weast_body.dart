@@ -261,6 +261,11 @@ class _WeastBodyState extends State<WeastBody>{
         type: _typeController.text.trim(),
         quantity: _quantityController.text.trim(),
         location: _selectedLocation,
+        onSuccess: () {
+          // Refresh the user profile to get updated no_of_weaste count
+          // This will be called after successful waste insertion
+          print('Waste submitted successfully, profile should be refreshed');
+        },
       );
     } else if (_selectedRecyclingCenterId == null) {
       ScaffoldMessenger.of(context).showSnackBar(

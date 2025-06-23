@@ -24,6 +24,7 @@ class IndividualProfilePage extends StatefulWidget {
 
 class _IndividualProfilePageState extends State<IndividualProfilePage> {
   late IndividualProfileCubit _individualProfileCubit;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -36,11 +37,37 @@ class _IndividualProfilePageState extends State<IndividualProfilePage> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
-        title: const Text('My Profile'),
+        title: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.3),
+              width: 1,
+            ),
+          ),
+          child: const Text(
+            'Profile',
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: 'Poppins-Bold',
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ),
+        centerTitle: true,
         backgroundColor: isDark ? AppColors.backgroundDark : AppColors.primary,
         foregroundColor: isDark ? Colors.white : Colors.white,
-        elevation: 2,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.settings),
+          onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+        ),
       ),
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundTwo,
       drawer: const IndividualProfileDrawer(), 
