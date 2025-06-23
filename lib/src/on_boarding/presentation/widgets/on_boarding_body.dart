@@ -50,12 +50,21 @@ class _OnBoardingBodyState extends State<OnBoardingBody> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color bg1 = isDark ? const Color(0xFF181C1B) : AppColors.background;
+    final Color bg2 = isDark ? const Color(0xFF232A28) : AppColors.backgroundTwo;
+    final Color textPrimary = isDark ? Colors.white : AppColors.textPrimary;
+    final Color textSecondary = isDark ? Colors.white70 : AppColors.textSecondary;
+    final Color cardBg = isDark ? const Color(0xFF232A28) : AppColors.background;
+    final Color shadow = isDark ? Colors.black.withOpacity(0.3) : AppColors.textPrimary.withOpacity(0.08);
+    final Color accent = Theme.of(context).colorScheme.secondary;
+    final Color primary = Theme.of(context).colorScheme.primary;
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [AppColors.background, AppColors.backgroundTwo],
+          colors: [bg1, bg2],
         ),
       ),
       child: Center(
@@ -72,8 +81,8 @@ class _OnBoardingBodyState extends State<OnBoardingBody> with SingleTickerProvid
                   child: LinearProgressIndicator(
                     value: (widget.pageIndex + 1) / widget.totalPages,
                     minHeight: 10,
-                    backgroundColor: AppColors.accent.withOpacity(0.2),
-                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                    backgroundColor: accent.withOpacity(0.2),
+                    valueColor: AlwaysStoppedAnimation<Color>(primary),
                   ),
                 ),
               ),
@@ -85,11 +94,11 @@ class _OnBoardingBodyState extends State<OnBoardingBody> with SingleTickerProvid
                   child: Container(
                     margin: const EdgeInsets.symmetric(vertical: 10),
                     decoration: BoxDecoration(
-                      color: AppColors.background,
+                      color: cardBg,
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.textPrimary.withOpacity(0.08),
+                          color: shadow,
                           blurRadius: 12,
                           offset: const Offset(0, 6),
                         ),
@@ -116,18 +125,18 @@ class _OnBoardingBodyState extends State<OnBoardingBody> with SingleTickerProvid
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.emoji_events, color: AppColors.primary, size: 32),
+                        Icon(Icons.emoji_events, color: primary, size: 32),
                         const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: AppColors.accent.withOpacity(0.1),
+                            color: accent.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Text(
                             '1,000 XP',
                             style: TextStyle(
-                              color: AppColors.primary,
+                              color: primary,
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
                             ),
@@ -150,7 +159,7 @@ class _OnBoardingBodyState extends State<OnBoardingBody> with SingleTickerProvid
                     style: TextStyle(
                       fontSize: 38,
                       fontWeight: FontWeight.w900,
-                      color: AppColors.textPrimary,
+                      color: isDark ? primary : AppColors.textPrimary,
                       letterSpacing: 1.2,
                     ),
                   ),
@@ -168,7 +177,7 @@ class _OnBoardingBodyState extends State<OnBoardingBody> with SingleTickerProvid
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.textSecondary,
+                      color: isDark ? textSecondary : AppColors.textPrimary,
                     ),
                   ),
                 ),
@@ -179,8 +188,8 @@ class _OnBoardingBodyState extends State<OnBoardingBody> with SingleTickerProvid
                 scale: _buttonScale,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.textTertiary,
+                    backgroundColor: primary,
+                    foregroundColor: textPrimary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -189,17 +198,18 @@ class _OnBoardingBodyState extends State<OnBoardingBody> with SingleTickerProvid
                       vertical: 18,
                     ),
                     elevation: 4,
-                    shadowColor: AppColors.primary.withOpacity(0.3),
+                    shadowColor: primary.withOpacity(0.3),
                   ),
                   onPressed: () {
                     context.read<OnBoardingCubit>().casheFirstTimeUser();
                   },
-                  child: const Text(
+                  child: Text(
                     "Let's Get Started",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.1,
+                      color: isDark ? Colors.white : AppColors.textTertiary,
                     ),
                   ),
                 ),

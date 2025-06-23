@@ -4,9 +4,9 @@ import 'package:greenloop/core/commen/widgets/location_map_preview.dart';
 import 'package:greenloop/core/res/colors.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_state.dart';
+import 'package:greenloop/core/res/fonts.dart';
 
-// Ensure your Individual_User entity is imported if needed for direct access to its properties
-// import 'package:greenloop/src/profile/Individual/domian/entity/individual_user.dart';
+
 
 class IndividualProfileBody extends StatefulWidget {
   final String userId;
@@ -18,9 +18,6 @@ class IndividualProfileBody extends StatefulWidget {
 
 class _IndividualProfileBodyState extends State<IndividualProfileBody> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
-  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
@@ -30,18 +27,8 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
-    _scaleAnimation = Tween<double>(begin: 0.95, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
 
     _controller.forward();
     context.read<IndividualProfileCubit>().fetchUser(widget.userId);
@@ -57,15 +44,13 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
   Widget build(BuildContext context) {
     return BlocBuilder<IndividualProfileCubit, IndividualProfileState>(
       builder: (context, state) {
+        final user = state is IndividualProfileLoaded ? state.user : null;
         return Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [
-                AppColors.primary.withOpacity(0.1),
-                AppColors.background,
-              ],
+              colors: [AppColors.background, AppColors.backgroundTwo],
             ),
           ),
           child: SafeArea(
@@ -76,514 +61,178 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: [
-                  // 1. Top Bar with Avatar, Greeting, Notification
-                  FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: SlideTransition(
-                      position: _slideAnimation,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
-                        child: Row(
-                          children: [
-                            Hero(
-                              tag: 'profile_image_${state is IndividualProfileLoaded ? state.user.id : ''}',
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: AppColors.primary.withOpacity(0.3),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 5),
-                                    ),
-                                  ],
-                                ),
-                                child: CircleAvatar(
-                                  radius: 28,
-                                  backgroundColor: AppColors.primary.withOpacity(0.7),
-                                  backgroundImage: state is IndividualProfileLoaded && state.user.avatarUrl != null
-                                      ? NetworkImage(state.user.avatarUrl!)
-                                      : null,
-                                  child: state is! IndividualProfileLoaded || state.user.avatarUrl == null
-                                      ? const Icon(Icons.person, size: 32, color: AppColors.textTertiary)
-                                      : null,
-                                ),
-                              ),
+                  // 1. Centered Animated Profile Image
+                  Padding(
+                    padding: const EdgeInsets.only(top: 32, bottom: 16),
+                    child: Center(
+                      child: AnimatedScale(
+                        scale: 1.0,
+                        duration: const Duration(milliseconds: 800),
+                        curve: Curves.elasticOut,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppColors.primary,
+                              width: 5,
                             ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      const Text(
-                                        'Welcome back, ',
-                                        style: TextStyle(
-                                          color: AppColors.textPrimary,
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                      if (state is IndividualProfileLoaded)
-                                        Text(
-                                          state.user.first_name ?? '',
-                                          style: const TextStyle(
-                                            color: AppColors.primary,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    state is IndividualProfileLoaded
-                                        ? state.user.email ?? ''
-                                        : '',
-                                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
-                                  ),
-                                ],
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primary.withOpacity(0.18),
+                                blurRadius: 18,
+                                offset: const Offset(0, 8),
                               ),
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: AppColors.primary.withOpacity(0.1),
-                                shape: BoxShape.circle,
-                              ),
-                              child: IconButton(
-                                icon: const Icon(Icons.notifications, color: AppColors.primary),
-                                onPressed: () {},
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
+                          child: CircleAvatar(
+                            radius: 54,
+                            backgroundColor: AppColors.accent.withOpacity(0.2),
+                            backgroundImage: user?.avatarUrl != null
+                                ? NetworkImage(user!.avatarUrl!)
+                                : null,
+                            child: user?.avatarUrl == null
+                                ? const Icon(Icons.person, size: 60, color: AppColors.primary)
+                                : null,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  // 2. Location Bar
+                  // 2. Stat Cards (Points & Rewards)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.green[900],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.location_on, color: Colors.black, size: 20),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'B12kk, Addis Ababa , 1994',
-                              style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
-                            ),
-                          ),
-                          const Icon(Icons.keyboard_arrow_down, color: Colors.black),
-                        ],
-                      ),
-                    ),
-                  ),
-                  // 3. Promotional/Image Card
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
-                    child: Card(
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      elevation: 4,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(16),
-                              topRight: Radius.circular(16),
-                            ),
-                            child: Image.network(
-                              'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=800&q=80',
-                              height: 120,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Row(
-                              children: [
-                                const Text(
-                                  'Give. Take. Repeat',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                                const Spacer(),
-                                ElevatedButton(
-                                  onPressed: () {},
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                  ),
-                                  child: const Text(
-                                    'KNOW MORE',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  // 4. Dashboard Title & Share
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          'Your Dashboard',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ),
+                        _cartoonStatCard(
+                          icon: Icons.star_rounded,
+                          label: 'Points',
+                          value: user?.points?.toString() ?? '0',
+                          color: AppColors.primary,
+                          iconColor: AppColors.accent,
                         ),
-                        const Spacer(),
-                        IconButton(
-                          icon: const Icon(Icons.share, color: Colors.greenAccent),
-                          onPressed: () {},
+                        const SizedBox(width: 16),
+                        _cartoonStatCard(
+                          icon: Icons.card_giftcard_rounded,
+                          label: 'Rewards',
+                          value: '—',
+                          color: AppColors.accent,
+                          iconColor: AppColors.primary,
+                          isMock: true,
                         ),
                       ],
                     ),
                   ),
-                  // 5. Stats Cards
-                  ScaleTransition(
-                    scale: _scaleAnimation,
-                    child: FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        child: state is IndividualProfileLoaded
-                            ? GridView.count(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                crossAxisCount: 2,
-                                mainAxisSpacing: 12,
-                                crossAxisSpacing: 12,
-                                childAspectRatio: 1.5,
-                                children: [
-                                  _buildStatCard(
-                                    icon: Icons.star,
-                                    value: '${state.user.points ?? 0}',
-                                    label: 'Points',
-                                    color: AppColors.primary,
-                                  ),
-                                  _buildStatCard(
-                                    icon: Icons.recycling,
-                                    value: '0',
-                                    label: 'Recycled Items',
-                                    color: AppColors.accent,
-                                  ),
-                                  _buildStatCard(
-                                    icon: Icons.volunteer_activism,
-                                    value: '0',
-                                    label: 'Donations',
-                                    color: AppColors.backgroundTwo,
-                                  ),
-                                  _buildStatCard(
-                                    icon: Icons.emoji_events,
-                                    value: '0',
-                                    label: 'Achievements',
-                                    color: AppColors.cardBackground,
-                                  ),
-                                ],
-                              )
-                            : const Center(child: CircularProgressIndicator()),
-                      ),
-                    ),
-                  ),
-                  // 6. About Section
-                  if (state is IndividualProfileLoaded && state.user.description != null)
-                    FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: SlideTransition(
-                        position: _slideAnimation,
+                  // 3. About Me Section
+                  if (user?.description != null && user!.description!.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      child: Card(
+                        color: AppColors.cardBackground,
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                         child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: AppColors.textTertiary,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.primary.withOpacity(0.1),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 5),
+                          padding: const EdgeInsets.all(20),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: AppColors.accent.withOpacity(0.18),
+                                  shape: BoxShape.circle,
                                 ),
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
+                                child: const Icon(Icons.info_outline, color: AppColors.primary, size: 28),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primary.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: const Icon(Icons.info_outline, color: AppColors.primary),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    const Text(
+                                    Text(
                                       'About Me',
                                       style: TextStyle(
-                                        fontSize: 18,
+                                        fontFamily: Fonts.fontFamilyBold,
                                         fontWeight: FontWeight.bold,
+                                        fontSize: 18,
                                         color: AppColors.textPrimary,
                                       ),
                                     ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  state.user.description!,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: AppColors.textSecondary,
-                                    height: 1.5,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  
-                  // 6.1 Address Section
-                  if (state is IndividualProfileLoaded)
-                    FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: SlideTransition(
-                        position: _slideAnimation,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: AppColors.textTertiary,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.primary.withOpacity(0.1),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 5),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primary.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: const Icon(Icons.location_on, color: AppColors.primary),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    const Text(
-                                      'Address',
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      user.description!,
                                       style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.textPrimary,
+                                        fontFamily: Fonts.fontFamily,
+                                        fontSize: 15,
+                                        color: AppColors.textSecondary,
                                       ),
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  'No address available.',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: AppColors.textSecondary,
-                                    height: 1.5,
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
                     ),
-                  
-                  // 6.2 Location Section
-                  if (state is IndividualProfileLoaded)
-                    FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: SlideTransition(
-                        position: _slideAnimation,
+                  // 4. Map Section
+                  if (user?.location != null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                      child: Card(
+                        color: AppColors.cardBackground,
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                         child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: LocationMapPreview(location: state.user.location),
-                        ),
-                      ),
-                    ),
-                  
-                  // 7. Recent Activity
-                  FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: SlideTransition(
-                      position: _slideAnimation,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primary.withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: const Icon(Icons.history, color: AppColors.primary),
-                                ),
-                                const SizedBox(width: 12),
-                                const Text(
-                                  'Recent Activity',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            _buildActivityItem(
-                              icon: Icons.recycling,
-                              title: 'Recycling Event',
-                              subtitle: 'Participated in community recycling drive',
-                              time: '2 days ago',
-                            ),
-                            _buildActivityItem(
-                              icon: Icons.volunteer_activism,
-                              title: 'Donation Made',
-                              subtitle: 'Donated 5kg of recyclable materials',
-                              time: '1 week ago',
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  // 8. Categories Section
-                  const Padding(
-                    padding: EdgeInsets.only(left: 20, top: 20, bottom: 8),
-                    child: Text(
-                      'Categories',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 90,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.only(left: 16),
-                      children: [
-                        _categoryCard(
-                          icon: Icons.tv,
-                          label: 'LCD/LED TV',
-                          price: '₹ 10/Kg',
-                          imageUrl: 'https://cdn-icons-png.flaticon.com/512/3103/3103446.png',
-                        ),
-                        _categoryCard(
-                          icon: Icons.recycling,
-                          label: 'LDPE',
-                          price: '₹ 13/Kg',
-                          imageUrl: 'https://cdn-icons-png.flaticon.com/512/565/565547.png',
-                        ),
-                        _categoryCard(
-                          icon: Icons.laptop_mac,
-                          label: 'Laptop',
-                          price: '₹ 200/Pc',
-                          imageUrl: 'https://cdn-icons-png.flaticon.com/512/1792/1792864.png',
-                        ),
-                        // Add more categories as needed
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  
-                  // 9. Pickup Waste Button
-                  if (state is IndividualProfileLoaded)
-                    FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: SlideTransition(
-                        position: _slideAnimation,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Container(
-                            width: double.infinity,
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                Navigator.pushNamed(
-                                  context,
-                                  '/weastPage',
-                                  arguments: {
-                                    'userId': widget.userId,
-                                    'userType': 'Individual',
-                                  },
-                                );
-                              },
-                              icon: const Icon(Icons.recycling, color: Colors.white),
-                              label: const Text(
-                                'Request Waste Pickup',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                elevation: 4,
-                              ),
-                            ),
+                          padding: const EdgeInsets.all(12),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: LocationMapPreview(location: user!.location),
                           ),
                         ),
                       ),
                     ),
-                  
-                  const SizedBox(height: 20),
+                  // 5. Animated Carousel of Recycling Tips
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    child: _RecyclingTipsCarousel(),
+                  ),
+                  // 6. (Optional) Pickup Waste Button (kept as is)
+                  if (user != null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/weastPage',
+                            arguments: {
+                              'userId': widget.userId,
+                              'userType': 'Individual',
+                            },
+                          );
+                        },
+                        icon: const Icon(Icons.recycling, color: Colors.white),
+                        label: const Text(
+                          'Request Waste Pickup',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 4,
+                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 32),
                 ],
               ),
             ),
@@ -593,170 +242,218 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
     );
   }
 
-  Widget _buildStatCard({
+  Widget _cartoonStatCard({
     required IconData icon,
-    required String value,
     required String label,
+    required String value,
     required Color color,
+    required Color iconColor,
+    bool isMock = false,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.2)),
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              shape: BoxShape.circle,
+    return Expanded(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 700),
+        curve: Curves.easeOutBack,
+        margin: const EdgeInsets.symmetric(horizontal: 2),
+        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 8),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.13),
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.13),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
-            child: Icon(icon, color: color, size: 24),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              color: color,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: iconColor, size: 38),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: TextStyle(
+                fontFamily: Fonts.fontFamilyBold,
+                fontWeight: FontWeight.bold,
+                fontSize: 22,
+                color: AppColors.textPrimary,
+              ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: color.withOpacity(0.8),
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: Fonts.fontFamily,
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+                color: AppColors.textSecondary,
+              ),
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+            if (isMock)
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.warning.withOpacity(0.8),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    'Coming Soon!',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
+}
 
-  Widget _buildActivityItem({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required String time,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
+// --- Animated Carousel Widget ---
+class _RecyclingTipsCarousel extends StatefulWidget {
+  @override
+  State<_RecyclingTipsCarousel> createState() => _RecyclingTipsCarouselState();
+}
+
+class _RecyclingTipsCarouselState extends State<_RecyclingTipsCarousel> {
+  final PageController _pageController = PageController(viewportFraction: 0.78);
+  int _currentPage = 0;
+
+  final List<_TipCardData> _tips = [
+    _TipCardData(
+      image: 'https://cdn.pixabay.com/photo/2017/01/31/13/14/animal-2023924_1280.png',
+      title: 'Recycle Bottles',
+      description: 'Always recycle plastic bottles to keep the planet clean!',
+      bgColor: AppColors.accent,
+    ),
+    _TipCardData(
+      image: 'https://cdn.pixabay.com/photo/2017/01/31/13/14/animal-2023922_1280.png',
+      title: 'Use Bins',
+      description: 'Throw waste in bins, not on the ground. Help the earth!',
+      bgColor: AppColors.primary,
+    ),
+    _TipCardData(
+      image: 'https://cdn.pixabay.com/photo/2017/01/31/13/14/animal-2023923_1280.png',
+      title: 'Compost',
+      description: 'Compost food scraps to reduce landfill waste.',
+      bgColor: AppColors.accent,
+    ),
+    _TipCardData(
+      image: 'https://cdn.pixabay.com/photo/2017/01/31/13/14/animal-2023925_1280.png',
+      title: 'Save Water',
+      description: 'Turn off the tap while brushing your teeth!',
+      bgColor: AppColors.primary,
+    ),
+    _TipCardData(
+      image: 'https://cdn.pixabay.com/photo/2017/01/31/13/14/animal-2023926_1280.png',
+      title: 'Plant Trees',
+      description: 'Plant a tree and watch the world get greener.',
+      bgColor: AppColors.accent,
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 220,
+      child: PageView.builder(
+        controller: _pageController,
+        itemCount: _tips.length,
+        onPageChanged: (i) => setState(() => _currentPage = i),
+        itemBuilder: (context, i) {
+          final tip = _tips[i];
+          final isActive = i == _currentPage;
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeOutBack,
+            margin: EdgeInsets.symmetric(horizontal: isActive ? 8 : 18, vertical: isActive ? 0 : 18),
+            child: Transform.scale(
+              scale: isActive ? 1.05 : 0.93,
+              child: _CartoonTipCard(data: tip, isActive: isActive),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _TipCardData {
+  final String image;
+  final String title;
+  final String description;
+  final Color bgColor;
+  const _TipCardData({required this.image, required this.title, required this.description, required this.bgColor});
+}
+
+class _CartoonTipCard extends StatelessWidget {
+  final _TipCardData data;
+  final bool isActive;
+  const _CartoonTipCard({required this.data, required this.isActive});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOutBack,
       decoration: BoxDecoration(
-        color: AppColors.textTertiary,
-        borderRadius: BorderRadius.circular(12),
+        color: data.bgColor.withOpacity(isActive ? 0.95 : 0.7),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+            color: data.bgColor.withOpacity(0.18),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: Row(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
+          AnimatedScale(
+            scale: isActive ? 1.1 : 0.95,
+            duration: const Duration(milliseconds: 500),
+            child: Image.network(
+              data.image,
+              height: 70,
+              width: 70,
+              fit: BoxFit.contain,
             ),
-            child: Icon(icon, color: AppColors.primary, size: 20),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                  ),
+          const SizedBox(height: 16),
+          Text(
+            data.title,
+            style: TextStyle(
+              fontFamily: Fonts.fontFamilyBold,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: Colors.white,
+              shadows: [
+                Shadow(
+                  color: Colors.black.withOpacity(0.13),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
           ),
-          Text(
-            time,
-            style: const TextStyle(
-              fontSize: 12,
-              color: AppColors.textSecondary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  static Widget _categoryCard({
-    required IconData icon,
-    required String label,
-    required String price,
-    required String imageUrl,
-  }) {
-    return Container(
-      width: 110,
-      margin: const EdgeInsets.only(right: 12),
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.7),
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Image.network(imageUrl, height: 36, width: 36),
-          ),
           const SizedBox(height: 8),
           Text(
-            label,
-            style: const TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-              fontSize: 13,
-            ),
+            data.description,
             textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 2),
-          Text(
-            price,
-            style: const TextStyle(
-              color: Colors.greenAccent,
-              fontWeight: FontWeight.w600,
-              fontSize: 12,
+            style: TextStyle(
+              fontFamily: Fonts.fontFamily,
+              fontSize: 13,
+              color: Colors.white.withOpacity(0.93),
             ),
           ),
         ],

@@ -2,7 +2,7 @@ import 'dart:ui';
 
 class AppColors {
   // Primary brand colors
-  static const Color primary = Color.fromARGB(255, 30, 156, 36);      // Dark Green
+  static const Color primary = Color.fromARGB(255, 35, 188, 43);      // Dark Green
   static const Color secondary = Color.fromARGB(255, 57, 193, 62);    // Medium Green
   static const Color accent = Color(0xFF81C784);       // Light Green
   
@@ -18,6 +18,6 @@ class AppColors {
   
   // Status colors
   static const Color error = Color(0xFFEF5350);        // Red
-  static const Color success = Color.fromARGB(255, 4, 243, 16);      // Green
+  static const Color success = Color.fromARGB(255, 40, 198, 48);      // Green
   static const Color warning = Color(0xFFFFCA28);      // Yellow
 }
