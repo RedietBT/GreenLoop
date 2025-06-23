@@ -2,10 +2,10 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greenloop/core/commen/widgets/location_picker_widget.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_state.dart';
-import 'package:greenloop/src/profile/Individual/presentation/widgets/location_picker_screen.dart';
 import 'package:image_picker/image_picker.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -78,7 +78,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final LatLng? pickedLocation = await Navigator.push<LatLng>(
       context,
       MaterialPageRoute(
-        builder: (context) => IndividualLocationPickerScreen(
+        builder: (context) => LocationPickerWidget(
           initialLocation: _selectedLocationFromMap ?? _originalLocation,
         ),
       ),

@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greenloop/core/commen/widgets/location_picker_widget.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:greenloop/src/profile/recycling/presentation/cubits/recycling_profile_cubit.dart';
 import 'package:greenloop/src/profile/recycling/presentation/cubits/recycling_profile_state.dart';
-import 'package:greenloop/src/profile/recycling/presentation/widgets/location_picker_screen.dart';
 import 'package:image_picker/image_picker.dart';
 
 class EditRecyclingProfilePage extends StatefulWidget {
@@ -88,7 +88,7 @@ class _EditRecyclingProfilePageState extends State<EditRecyclingProfilePage> {
     final LatLng? pickedLocation = await Navigator.push<LatLng>(
       context,
       MaterialPageRoute(
-        builder: (context) => RecyclingLocationPickerScreen(
+        builder: (context) => LocationPickerWidget(
           initialLocation: _selectedLocationFromMap ?? _originalLocation,
         ),
       ),

@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greenloop/core/commen/widgets/location_picker_widget.dart';
 import 'package:greenloop/src/profile/Business/presentation/cubits/business_profile_cubit.dart';
 import 'package:greenloop/src/profile/Business/presentation/cubits/business_profile_state.dart';
-import 'package:greenloop/src/profile/Business/presentation/widgets/location_picker_screen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -91,7 +91,7 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
     final LatLng? pickedLocation = await Navigator.push<LatLng>(
       context,
       MaterialPageRoute(
-        builder: (context) => LocationPickerScreen(
+        builder: (context) => LocationPickerWidget(
           initialLocation: _selectedLocationFromMap ?? _originalLocation,
         ),
       ),
