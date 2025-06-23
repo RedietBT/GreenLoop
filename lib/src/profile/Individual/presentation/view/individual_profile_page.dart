@@ -4,6 +4,7 @@ import 'package:greenloop/core/res/colors.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
 import 'package:greenloop/src/profile/Individual/presentation/widgets/individual_profile_body.dart';
 import 'package:greenloop/src/profile/Individual/presentation/widgets/individual_profile_drawer.dart';
+import 'package:greenloop/core/commen/widgets/global_footer.dart';
 
 class IndividualProfilePage extends StatefulWidget {
   
@@ -25,12 +26,65 @@ class IndividualProfilePage extends StatefulWidget {
 class _IndividualProfilePageState extends State<IndividualProfilePage> {
   late IndividualProfileCubit _individualProfileCubit;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  int _currentFooterIndex = 0; // Profile page index
 
   @override
   void initState() {
     super.initState();
     _individualProfileCubit = context.read<IndividualProfileCubit>();
     _individualProfileCubit.fetchUser(widget.userId);
+  }
+
+  void _onFooterTap(int index) {
+    setState(() {
+      _currentFooterIndex = index;
+    });
+
+    switch (index) {
+      case 0: // Home
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/home', // Replace with your home route
+          (route) => false,
+        );
+        break;
+      case 1: // AI
+        Navigator.pushNamed(
+          context,
+          '/ai', // Replace with your AI route
+        );
+        break;
+      case 2: // Logout
+        _showLogoutDialog();
+        break;
+    }
+  }
+
+  void _showLogoutDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/login', // Replace with your login route
+                (route) => false,
+              );
+            },
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -49,10 +103,10 @@ class _IndividualProfilePageState extends State<IndividualProfilePage> {
               width: 1,
             ),
           ),
-          child: const Text(
+          child: Text(
             'Profile',
             style: TextStyle(
-              color: Colors.white,
+              color: isDark ? Colors.white : AppColors.textPrimary,
               fontFamily: 'Poppins-Bold',
               fontWeight: FontWeight.bold,
               fontSize: 18,
@@ -61,17 +115,30 @@ class _IndividualProfilePageState extends State<IndividualProfilePage> {
           ),
         ),
         centerTitle: true,
-        backgroundColor: isDark ? AppColors.backgroundDark : AppColors.primary,
-        foregroundColor: isDark ? Colors.white : Colors.white,
+        backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundTwo,
+        foregroundColor: Colors.white,
         elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.transparent,
         leading: IconButton(
           icon: const Icon(Icons.settings),
           onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+          color: isDark ? Colors.white : AppColors.textPrimary,
         ),
       ),
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundTwo,
       drawer: const IndividualProfileDrawer(), 
-      body: IndividualProfileBody(userId: widget.userId),
+      body: Column(
+        children: [
+          Expanded(
+            child: IndividualProfileBody(userId: widget.userId),
+          ),
+          GlobalFooter(
+            currentIndex: _currentFooterIndex,
+            onTap: _onFooterTap,
+          ),
+        ],
+      ),
     );
   }
 }

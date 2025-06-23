@@ -1193,10 +1193,15 @@ class _WasteSubmissionsSection extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              AppColors.primary.withOpacity(0.1),
-              AppColors.accent.withOpacity(0.05),
-            ],
+            colors: isDark 
+              ? [
+                  AppColors.primary.withOpacity(0.12),
+                  AppColors.accent.withOpacity(0.08),
+                ]
+              : [
+                  AppColors.primary.withOpacity(0.06),
+                  AppColors.accent.withOpacity(0.04),
+                ],
           ),
         ),
         child: Row(
@@ -1477,17 +1482,17 @@ class _AnimatedTrophyState extends State<_AnimatedTrophy> with TickerProviderSta
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withOpacity(0.15),
             shape: BoxShape.circle,
             border: Border.all(
-              color: color.withOpacity(0.3),
+              color: color.withOpacity(0.4),
               width: 2,
             ),
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(0.3),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
+                color: color.withOpacity(0.4),
+                blurRadius: 15,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
@@ -1707,8 +1712,24 @@ class _CombinedStatsCardState extends State<_CombinedStatsCard> with SingleTicke
                 borderRadius: BorderRadius.circular(16),
               ),
               color: isDark ? AppColors.cardBackgroundDark : AppColors.cardBackground,
-              child: Padding(
+              child: Container(
                 padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: isDark 
+                      ? [
+                          AppColors.primary.withOpacity(0.15),
+                          AppColors.accent.withOpacity(0.1),
+                        ]
+                      : [
+                          AppColors.primary.withOpacity(0.08),
+                          AppColors.accent.withOpacity(0.05),
+                        ],
+                  ),
+                ),
                 child: Row(
                   children: [
                     // Points Section
