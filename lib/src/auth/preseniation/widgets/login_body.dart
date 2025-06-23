@@ -42,17 +42,12 @@ class _LoginBodyState extends State<LoginBody> {
     final Color hintColor = isDark ? Colors.white : AppColors.textSecondary;
     final String fontFamily = 'Poppins';
     final String fontFamilyBold = 'Poppins-Bold';
+    String? errorMessage;
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: BlocConsumer<LoginCubit, LoginState>(
         listener: (context, state) {
-          if (state is LoginLoading) {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Logging in...")),
-            );
-          } else if (state is LoginSuccess) {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          if (state is LoginSuccess) {
             String userId = state.userId;
             String userRole = state.role;
 
@@ -79,20 +74,50 @@ class _LoginBodyState extends State<LoginBody> {
                 SnackBar(content: Text('Unknown user role: $userRole')),
               );
             }
-          } else if (state is LoginFailure) {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text("Login failed: ${state.message}"),
-                backgroundColor: Colors.red,
-              ),
-            );
           }
         },
         builder: (context, state) {
+          if (state is LoginFailure) {
+            errorMessage = state.message;
+          } else {
+            errorMessage = null;
+          }
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              if (errorMessage != null && errorMessage!.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 18.0),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF232A28) : Colors.grey[100],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: isDark ? Colors.grey[700]! : Colors.grey[300]!, width: 1.2),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Wrong credentials, please try again.',
+                              style: TextStyle(
+                                color: isDark ? Colors.white : Colors.black,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: fontFamilyBold,
+                                fontSize: 15.5,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               _styledTextField(
                 context: context,
                 label: "Email",
