@@ -18,7 +18,7 @@ class RoleRepositoryImpl implements RoleRepository {
       final roles = await remoteDataSource.getRoles();
       return Right(roles);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+      return Left(ServerFailure(message: e.message, statusCode: e.statusCode.toString()));
     }
   }
 }

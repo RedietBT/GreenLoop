@@ -76,7 +76,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
 case IndividualProfilePage.routeName:
   final Map<String, dynamic>? arguments = settings.arguments as Map<String, dynamic>?;
   if (arguments == null || !arguments.containsKey('userId')) {
-    throw ArgumentError('IndividualProfilePage requires a "userId" argument in settings.arguments.');
+    return _pageBuilder(
+      (_) => const LoginScreen(),
+      settings: settings,
+    );
   }
 
   final String userId = arguments['userId'] as String;
@@ -95,7 +98,10 @@ case IndividualProfilePage.routeName:
   case BusinessProfilePage.routeName:
   final Map<String, dynamic>? arguments = settings.arguments as Map<String, dynamic>?;
   if (arguments == null || !arguments.containsKey('userId')) {
-    throw ArgumentError('BusinessProfilePage requires a "userId" argument in settings.arguments.');
+    return _pageBuilder(
+      (_) => const LoginScreen(),
+      settings: settings,
+    );
   }
 
   final String userId = arguments['userId'] as String;
@@ -114,7 +120,10 @@ case IndividualProfilePage.routeName:
    case RecyclingProfilePage.routeName:
   final Map<String, dynamic>? arguments = settings.arguments as Map<String, dynamic>?;
   if (arguments == null || !arguments.containsKey('userId')) {
-    throw ArgumentError('RecyclingProfilePage requires a "userId" argument in settings.arguments.');
+    return _pageBuilder(
+      (_) => const LoginScreen(),
+      settings: settings,
+    );
   }
 
   final String userId = arguments['userId'] as String;
@@ -133,7 +142,10 @@ case IndividualProfilePage.routeName:
   case WeastPage.routeName:
   final Map<String, dynamic>? arguments = settings.arguments as Map<String, dynamic>?;
   if (arguments == null || !arguments.containsKey('userId')) {
-    throw ArgumentError('WeastPage requires a "userId" argument in settings.arguments.');
+    return _pageBuilder(
+      (_) => const LoginScreen(),
+      settings: settings,
+    );
   }
 
   final String userId = arguments['userId'] as String;
@@ -150,8 +162,8 @@ case IndividualProfilePage.routeName:
   );
 
     default:
-      return CupertinoPageRoute(
-        builder: (_) => const PageUnderConstraction(),
+      return _pageBuilder(
+        (_) => const PageUnderConstraction(),
         settings: settings,
       );
   }

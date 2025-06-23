@@ -20,7 +20,7 @@ class IndividualUserRepoImpl implements IndividualUserRepo{
     } on ServerException catch (e) {
       return Left(ServerFailure(
         message: e.message,
-        statusCode: e.statusCode,
+        statusCode: e.statusCode.toString(),
       ));
     } catch (e) {
       return Left(ServerFailure(
@@ -45,7 +45,7 @@ class IndividualUserRepoImpl implements IndividualUserRepo{
     } on ServerException catch (e) {
       return Left(ServerFailure(
         message: e.message,
-        statusCode: e.statusCode,
+        statusCode: e.statusCode.toString(),
       ));
     } catch (e) {
       return Left(ServerFailure(

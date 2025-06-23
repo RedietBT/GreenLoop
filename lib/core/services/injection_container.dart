@@ -58,6 +58,14 @@ import 'package:greenloop/src/waste/domain/usecase/fetch_closest_recycling_cente
 import 'package:greenloop/src/waste/domain/usecase/request_for_pickup.dart';
 import 'package:greenloop/src/waste/presentation/cubits/weast_cubit.dart';
 
+// Pickup Request imports
+import 'package:greenloop/src/pickup_request/data/datasources/pickup_request_remote_data_source.dart';
+import 'package:greenloop/src/pickup_request/data/repos/pickup_request_repo_impl.dart';
+import 'package:greenloop/src/pickup_request/domain/repos/pickup_request_repo.dart';
+import 'package:greenloop/src/pickup_request/domain/usecases/get_pickup_requests.dart';
+import 'package:greenloop/src/pickup_request/domain/usecases/update_pickup_request_status.dart';
+import 'package:greenloop/src/pickup_request/presentation/cubit/pickup_request_cubit.dart';
+
 final sl = GetIt.instance;
 
 Future<void> init() async {
@@ -237,5 +245,27 @@ Future<void> init() async {
   ));
 
   // ============================
+  // Pickup Request Feature
+  // ============================
 
+  // Remote Data Source
+  sl.registerLazySingleton<PickupRequestRemoteDataSource>(
+    () => PickupRequestRemoteDataSourceImpl(sl<SupabaseClient>()),
+  );
+
+  // Repository
+  sl.registerLazySingleton<PickupRequestRepo>(
+    () => PickupRequestRepoImpl(sl<PickupRequestRemoteDataSource>()),
+  );
+
+  // Usecases
+  sl.registerLazySingleton(() => GetPickupRequests(sl<PickupRequestRepo>()));
+  sl.registerLazySingleton(
+      () => UpdatePickupRequestStatus(sl<PickupRequestRepo>()));
+
+  // Cubit
+  sl.registerFactory(() => PickupRequestCubit(
+        getPickupRequests: sl<GetPickupRequests>(),
+        updatePickupRequestStatus: sl<UpdatePickupRequestStatus>(),
+      ));
 }
