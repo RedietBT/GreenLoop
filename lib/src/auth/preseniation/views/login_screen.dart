@@ -14,7 +14,7 @@ class LoginScreen extends StatelessWidget {
     return BlocProvider(
       create: (_) => sl<LoginCubit>(),
       child:  Scaffold(
-        appBar: AppBar(title: Text('Login')),
+        appBar: AppBar(),
         body: LoginBody(),
       ),
     );
