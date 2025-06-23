@@ -51,9 +51,21 @@ class _OnBordingScreanState extends State<OnBordingScrean> {
                 PageView(
                   controller: pageController,
                   children: const [
-                    OnBoardingBody(pageContaint: PageContaint.first()),
-                    OnBoardingBody(pageContaint: PageContaint.second()),
-                    OnBoardingBody(pageContaint: PageContaint.third()),
+                    OnBoardingBody(
+                      pageContaint: PageContaint.first(),
+                      pageIndex: 0,
+                      totalPages: 3,
+                    ),
+                    OnBoardingBody(
+                      pageContaint: PageContaint.second(),
+                      pageIndex: 1,
+                      totalPages: 3,
+                    ),
+                    OnBoardingBody(
+                      pageContaint: PageContaint.third(),
+                      pageIndex: 2,
+                      totalPages: 3,
+                    ),
                   ],
                 ),
               Align(
