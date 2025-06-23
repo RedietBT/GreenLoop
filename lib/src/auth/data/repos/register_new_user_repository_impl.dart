@@ -29,7 +29,7 @@ class RegisterNewUserRepositoryImpl implements RegisterNewUserRepo {
         role);
       return const Right(null);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+      return Left(ServerFailure(message: e.message, statusCode: e.statusCode.toString()));
     }
   }
 
@@ -40,7 +40,7 @@ class RegisterNewUserRepositoryImpl implements RegisterNewUserRepo {
       await remoteDataSource.insertIntoRecyclingTable(id, centerName, contactPersonFirstName, contactPersonLastName, email, phoneNo, role);
       return const Right(null);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+      return Left(ServerFailure(message: e.message, statusCode: e.statusCode.toString()));
     }
   }
   @override
@@ -50,7 +50,7 @@ class RegisterNewUserRepositoryImpl implements RegisterNewUserRepo {
       await remoteDataSource.insertIntoBusinessTable(id, businessName, contactPersonFirstName, contactPersonLastName, email, phoneNo, role);
       return const Right(null);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+      return Left(ServerFailure(message: e.message, statusCode: e.statusCode.toString()));
     }
   }
 }

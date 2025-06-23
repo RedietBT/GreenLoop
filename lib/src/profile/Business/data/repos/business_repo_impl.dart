@@ -18,10 +18,10 @@ class BusinessRepoImpl implements BusinessRepo {
     } on ServerException catch (e) {
       return Left(ServerFailure(
         message: e.message,
-        statusCode: e.statusCode,
+        statusCode: e.statusCode.toString(),
       ));
     } catch (e) {
-      return Left(ServerFailure(message: e.toString(), statusCode: 500));
+      return Left(ServerFailure(message: e.toString(), statusCode: "500"));
     }
   }
 
@@ -31,21 +31,13 @@ class BusinessRepoImpl implements BusinessRepo {
     required Map<String, dynamic> data,
   }) async {
     try {
-      await  _remoteDataSource.updateUserProfile(
-        userId,
-        data: data,
-      );
-      final updatedUser = await  _remoteDataSource.fetchUserProfile(userId);
-      return Right(updatedUser); 
+      final result =
+          await _remoteDataSource.updateUserProfile(userId, data: data);
+      return Right(result);
     } on ServerException catch (e) {
       return Left(ServerFailure(
         message: e.message,
-        statusCode: e.statusCode,
-      ));
-    } catch (e) {
-      return Left(ServerFailure(
-        message: e.toString(),
-        statusCode: '500',
+        statusCode: e.statusCode.toString(),
       ));
     }
   }

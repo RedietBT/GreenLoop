@@ -4,6 +4,7 @@ import 'package:greenloop/core/commen/widgets/location_map_preview.dart';
 import 'package:greenloop/src/profile/recycling/presentation/cubits/recycling_profile_cubit.dart';
 import 'package:greenloop/src/profile/recycling/presentation/cubits/recycling_profile_state.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:greenloop/src/pickup_request/presentation/views/pickup_requests_screen.dart';
 
 
 class RecyclingProfileBody extends StatefulWidget {
@@ -81,6 +82,40 @@ class _RecyclingProfileBodyState extends State<RecyclingProfileBody> {
                   user.phone ?? 'No phone available',
                   style: Theme.of(context).textTheme.titleMedium,
                   textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+
+                // Summary Cards
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildSummaryCard(
+                        context, Icons.pending_actions, 'Pending Requests', '0'),
+                    _buildSummaryCard(
+                        context, Icons.check_circle, 'Completed Pickups', '0'),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
+                // View Requests Button
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PickupRequestsScreen(
+                          recyclingCenterId: user.id,
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.list_alt),
+                  label: const Text('View Pickup Requests'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
+                    textStyle: const TextStyle(fontSize: 16),
+                  ),
                 ),
                 const SizedBox(height: 20),
 
@@ -166,4 +201,29 @@ class _RecyclingProfileBodyState extends State<RecyclingProfileBody> {
       },
     );
   }
-} 
+
+  Widget _buildSummaryCard(
+      BuildContext context, IconData icon, String title, String count) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        width: MediaQuery.of(context).size.width * 0.4,
+        child: Column(
+          children: [
+            Icon(icon, size: 30, color: Theme.of(context).primaryColor),
+            const SizedBox(height: 8),
+            Text(title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 4),
+            Text(count,
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          ],
+        ),
+      ),
+    );
+  }
+}
