@@ -28,7 +28,7 @@ class StorageRepoImpl implements StorageRepo {
     } on ServerException catch (e) {
       return Left(ServerFailure(
         message: e.message,
-        statusCode: e.statusCode,
+        statusCode: e.statusCode.toString(),
       ));
     } catch (e) {
       return Left(ServerFailure(

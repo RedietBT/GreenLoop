@@ -5,8 +5,9 @@ class MediaRes {
 
 // Images
   static const constraction = '$_baseImage/constraction.jpg';
+  static const onBoarding = '$_baseImage/on_boarding_1.jpg';
   static const onBoarding1 = '$_baseImage/on_boarding_1.jpg';
   static const onBoarding2 = '$_baseImage/on_boarding_2.jpg';
   static const onBoarding3 = '$_baseImage/on_boarding_3.jpg';
-  static const onBoarding = '$_baseImage/on_boarding_backround.jpg';
-  }
+  static const background = '$_baseImage/on_boarding_2.jpg';
+}

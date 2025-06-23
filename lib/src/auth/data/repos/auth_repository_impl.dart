@@ -17,7 +17,7 @@ class AuthRepositoryImpl extends AuthRepo {
       await remote.signInWithEmailAndPassword(email, password);
       return Right(this); // AuthRepo returned
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+      return Left(ServerFailure(message: e.message, statusCode: e.statusCode.toString()));
     }
   }
 
@@ -33,7 +33,7 @@ class AuthRepositoryImpl extends AuthRepo {
       await remote.signUpWithEmailAndPassword(email, password, firstName, lastName, role);
       return Right(this);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+      return Left(ServerFailure(message: e.message, statusCode: e.statusCode.toString()));
     }
   }
 
@@ -43,7 +43,7 @@ class AuthRepositoryImpl extends AuthRepo {
       await remote.signOut();
       return const Right(null);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+      return Left(ServerFailure(message: e.message, statusCode: e.statusCode.toString()));
     }
   }
 
@@ -53,10 +53,11 @@ class AuthRepositoryImpl extends AuthRepo {
       final email = await remote.getCurrentUserEmail();
       return Right(email);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+      return Left(ServerFailure(message: e.message, statusCode: e.statusCode.toString()));
     }
   }
-@override
+
+  @override
   ResultFuture<String?> getCurrentUserId() async {
     try {
       final userId = remote.client.auth.currentUser?.id;

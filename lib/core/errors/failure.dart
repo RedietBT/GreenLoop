@@ -1,21 +1,16 @@
 import 'package:equatable/equatable.dart';
 import 'package:greenloop/core/errors/exceptions.dart';
 
-abstract class Failure extends Equatable{
-  Failure({required this.message, required this.statusCode}) {
-    assert(
-      statusCode is String || statusCode is int,
-      'StatusCode cannot be a ${statusCode.runtimeType}'
-    );
-  }
+abstract class Failure extends Equatable {
+  const Failure({required this.message, required this.statusCode});
 
   final String message;
-  final dynamic statusCode;
+  final String statusCode;
 
-  String get errorMassage =>'$statusCode Error: $message';
+  String get errorMassage => '$statusCode Error: $message';
 
   @override
-  List<Object?> get props => [message, statusCode];
+  List<Object> get props => [message, statusCode];
 }
 
 class CacheFailure extends Failure {
@@ -23,11 +18,8 @@ class CacheFailure extends Failure {
 }
 
 class ServerFailure extends Failure {
-  ServerFailure({required super.message, required super.statusCode});
+  const ServerFailure({required super.message, required super.statusCode});
 
-  ServerFailure.formException(ServerException exception)
-  :this(
-    message: exception.message,
-    statusCode: exception.statusCode,
-  );
+  ServerFailure.fromException(ServerException exception)
+      : this(message: exception.message, statusCode: exception.statusCode.toString());
 }
