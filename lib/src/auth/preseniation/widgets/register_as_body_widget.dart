@@ -5,16 +5,17 @@ import 'package:greenloop/core/commen/views/loading_view.dart';
 import 'package:greenloop/core/res/colors.dart';
 
 class RegisterAsPageBody extends StatelessWidget {
-  const RegisterAsPageBody({super.key});
+  final double cardElevation;
+  const RegisterAsPageBody({super.key, this.cardElevation = 8});
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final Color buttonTextColor = isDark ? Colors.white : AppColors.textPrimary;
+    final Color buttonTextColor = AppColors.textTertiary;
     final Color buttonBgColor = AppColors.primary;
     final Color buttonFgColor = isDark ? Colors.white : AppColors.textTertiary;
     final Color cardBg = isDark ? const Color(0xFF232A28) : Colors.white;
-    final Color shadow = isDark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.08);
+    final Color shadow = isDark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.5);
     return Container(
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF181C1B) : null,
@@ -35,7 +36,7 @@ class RegisterAsPageBody extends StatelessWidget {
             return Center(
               child: Card(
                 color: cardBg,
-                elevation: 8,
+                elevation: cardElevation,
                 shadowColor: shadow,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                 child: Padding(
@@ -48,7 +49,7 @@ class RegisterAsPageBody extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: buttonTextColor,
+                          color: isDark? AppColors.textTertiary : AppColors.textPrimary,
                           letterSpacing: 1.1,
                         ),
                       ),
