@@ -4,6 +4,7 @@ import 'package:greenloop/core/services/injection_container.dart';
 import 'package:greenloop/src/pickup_request/presentation/cubit/pickup_request_cubit.dart';
 import 'package:greenloop/src/pickup_request/presentation/widgets/pickup_request_list.dart';
 import 'package:greenloop/core/commen/widgets/global_footer.dart';
+import 'package:greenloop/core/res/colors.dart';
 
 class PickupRequestsScreen extends StatefulWidget {
   static const routeName = '/pickup-requests';
@@ -64,13 +65,42 @@ class _PickupRequestsScreenState extends State<PickupRequestsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return BlocProvider(
       create: (_) => sl<PickupRequestCubit>()
         ..getPickupRequests(widget.recyclingCenterId),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Pickup Requests'),
+          title: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            child: Text(
+              'Pickup Requests',
+              style: TextStyle(
+                color: isDark ? Colors.white : AppColors.textPrimary,
+                fontFamily: 'Poppins-Bold',
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+          centerTitle: true,
+          backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundTwo,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          leading: BackButton(color: isDark ? Colors.white : AppColors.textPrimary),
         ),
+        backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundTwo,
         body: Column(
           children: [
             Expanded(

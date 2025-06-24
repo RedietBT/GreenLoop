@@ -8,6 +8,9 @@ import 'package:greenloop/src/pickup_request/presentation/views/pickup_requests_
 import 'package:greenloop/core/res/colors.dart';
 import 'package:greenloop/core/res/fonts.dart';
 import 'package:greenloop/core/res/image.dart';
+import 'package:greenloop/src/pickup_request/presentation/cubit/pickup_request_cubit.dart';
+import 'package:greenloop/src/pickup_request/presentation/cubit/pickup_request_state.dart';
+import 'package:greenloop/core/services/injection_container.dart';
 
 class RecyclingProfileBody extends StatefulWidget {
   final String userId;
@@ -27,80 +30,107 @@ class _RecyclingProfileBodyState extends State<RecyclingProfileBody> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RecyclingProfileCubit, RecyclingProfileState>(
-      builder: (context, state) {
-        if (state is RecyclingProfileLoading || state is RecyclingProfileInitial) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (state is RecyclingProfileError) {
-          return Center(child: Text('Error: ${state.message}'));
-        } else if (state is RecyclingProfileLoaded) {
-          final user = state.user;
-          // Defensive: parse location from WKT if needed
-          LatLng? location = user.location;
-          if (location == null && user.location is String) {
-            final locationString = user.location as String?;
-            if (locationString != null && locationString.isNotEmpty) {
-              final regex = RegExp(r'POINT\(([^ ]+) ([^ ]+)\)');
-              final match = regex.firstMatch(locationString);
-              if (match != null && match.groupCount == 2) {
-                final longitude = double.tryParse(match.group(1)!);
-                final latitude = double.tryParse(match.group(2)!);
-                if (latitude != null && longitude != null) {
-                  location = LatLng(latitude, longitude);
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<PickupRequestCubit>(
+          create: (context) => sl<PickupRequestCubit>()..getPickupRequests(widget.userId),
+        ),
+      ],
+      child: BlocBuilder<RecyclingProfileCubit, RecyclingProfileState>(
+        builder: (context, profileState) {
+          if (profileState is RecyclingProfileLoading || profileState is RecyclingProfileInitial) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (profileState is RecyclingProfileError) {
+            return Center(child: Text('Error: ${profileState.message}'));
+          } else if (profileState is RecyclingProfileLoaded) {
+            final user = profileState.user;
+            // Defensive: parse location from WKT if needed
+            LatLng? location = user.location;
+            if (location == null && user.location is String) {
+              final locationString = user.location as String?;
+              if (locationString != null && locationString.isNotEmpty) {
+                final regex = RegExp(r'POINT\(([^ ]+) ([^ ]+)\)');
+                final match = regex.firstMatch(locationString);
+                if (match != null && match.groupCount == 2) {
+                  final longitude = double.tryParse(match.group(1)!);
+                  final latitude = double.tryParse(match.group(2)!);
+                  if (latitude != null && longitude != null) {
+                    location = LatLng(latitude, longitude);
+                  }
                 }
               }
             }
+
+            return BlocBuilder<PickupRequestCubit, PickupRequestState>(
+              builder: (context, requestState) {
+                int pendingCount = 0;
+                int completedCount = 0;
+
+                if (requestState is PickupRequestLoaded) {
+                  for (final request in requestState.requests) {
+                    if (request.requestStatus.toLowerCase() == 'pending') {
+                      pendingCount++;
+                    } else if (request.requestStatus.toLowerCase() == 'approved' || 
+                               request.requestStatus.toLowerCase() == 'completed') {
+                      completedCount++;
+                    }
+                  }
+                }
+
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Profile Header with animations
+                      _RecyclingProfileHeader(
+                        user: user,
+                        delay: 0.1,
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Stats Card with real data
+                      _RecyclingStatsCard(
+                        user: user,
+                        pendingCount: pendingCount,
+                        completedCount: completedCount,
+                        delay: 0.2,
+                      ),
+                      const SizedBox(height: 24),
+
+                      // About Section
+                      _RecyclingAboutSection(
+                        user: user,
+                        delay: 0.3,
+                      ),
+
+                      // Location Map
+                      _RecyclingLocationSection(
+                        user: user,
+                        location: location,
+                        delay: 0.4,
+                      ),
+
+                      // Carousel with slide animation
+                      _RecyclingCarouselSection(
+                        delay: 0.5,
+                      ),
+
+                      // Pickup Requests Button at bottom
+                      _RecyclingPickupButton(
+                        user: user,
+                        delay: 0.6,
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                );
+              },
+            );
           }
-
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Profile Header with animations
-                _RecyclingProfileHeader(
-                  user: user,
-                  delay: 0.1,
-                ),
-                const SizedBox(height: 24),
-
-                // Stats Card
-                _RecyclingStatsCard(
-                  user: user,
-                  delay: 0.2,
-                ),
-                const SizedBox(height: 24),
-
-                // About Section
-                _RecyclingAboutSection(
-                  user: user,
-                  delay: 0.3,
-                ),
-
-                // Location Map
-                _RecyclingLocationSection(
-                  user: user,
-                  location: location,
-                  delay: 0.4,
-                ),
-
-                // Carousel with slide animation
-                _RecyclingCarouselSection(
-                  delay: 0.5,
-                ),
-
-                // Pickup Requests Button at bottom
-                _RecyclingPickupButton(
-                  user: user,
-                  delay: 0.6,
-                ),
-                const SizedBox(height: 20),
-              ],
-            ),
-          );
-        }
-        return const SizedBox.shrink();
-      },
+          return const SizedBox.shrink();
+        },
+      ),
     );
   }
 }
@@ -180,8 +210,10 @@ class _RecyclingProfileHeader extends StatelessWidget {
 
 class _RecyclingStatsCard extends StatelessWidget {
   final dynamic user;
+  final int pendingCount;
+  final int completedCount;
   final double delay;
-  const _RecyclingStatsCard({required this.user, required this.delay});
+  const _RecyclingStatsCard({required this.user, required this.pendingCount, required this.completedCount, required this.delay});
 
   @override
   Widget build(BuildContext context) {
@@ -233,14 +265,28 @@ class _RecyclingStatsCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Text(
-                      '0',
-                      style: const TextStyle(
-                        fontFamily: Fonts.fontFamilyBold,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
-                      ),
+                    BlocBuilder<PickupRequestCubit, PickupRequestState>(
+                      builder: (context, state) {
+                        if (state is PickupRequestLoading) {
+                          return const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                            ),
+                          );
+                        }
+                        return Text(
+                          '$pendingCount',
+                          style: const TextStyle(
+                            fontFamily: Fonts.fontFamilyBold,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -277,14 +323,28 @@ class _RecyclingStatsCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Text(
-                      '0',
-                      style: const TextStyle(
-                        fontFamily: Fonts.fontFamilyBold,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.accent,
-                      ),
+                    BlocBuilder<PickupRequestCubit, PickupRequestState>(
+                      builder: (context, state) {
+                        if (state is PickupRequestLoading) {
+                          return const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(AppColors.accent),
+                            ),
+                          );
+                        }
+                        return Text(
+                          '$completedCount',
+                          style: const TextStyle(
+                            fontFamily: Fonts.fontFamilyBold,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.accent,
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -602,122 +662,127 @@ class _CartoonTipCard extends StatelessWidget {
   void _showTipPopup(BuildContext context, _TipCardData tip) {
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Container(
-          constraints: const BoxConstraints(maxHeight: 500),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-                child: Stack(
-                  children: [
-                    Image.asset(
-                      tip.asset,
-                      width: double.infinity,
-                      height: 180,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        height: 180,
-                        color: tip.bgColor,
-                        child: const Icon(Icons.broken_image, color: Colors.white, size: 64),
-                      ),
+      builder: (context) {
+        final maxHeight = MediaQuery.of(context).size.height * 0.8;
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: maxHeight),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
                     ),
-                    Positioned.fill(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.transparent,
-                              Colors.black.withOpacity(0.5),
-                            ],
+                    child: Stack(
+                      children: [
+                        Image.asset(
+                          tip.asset,
+                          width: double.infinity,
+                          height: 180,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            height: 180,
+                            color: tip.bgColor,
+                            child: const Icon(Icons.broken_image, color: Colors.white, size: 64),
                           ),
                         ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 16,
-                      right: 16,
-                      child: GestureDetector(
-                        onTap: () => Navigator.of(context).pop(),
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.5),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.close, color: Colors.white, size: 20),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      tip.title,
-                      style: const TextStyle(
-                        fontFamily: Fonts.fontFamilyBold,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      tip.detailedDescription,
-                      style: const TextStyle(
-                        fontFamily: Fonts.fontFamily,
-                        fontSize: 14,
-                        height: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Key Points:',
-                      style: TextStyle(
-                        fontFamily: Fonts.fontFamilyBold,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    ...tip.tips.map((tipText) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 2),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(Icons.check_circle, color: AppColors.primary, size: 16),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              tipText,
-                              style: const TextStyle(
-                                fontFamily: Fonts.fontFamily,
-                                fontSize: 14,
+                        Positioned.fill(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.transparent,
+                                  Colors.black.withOpacity(0.5),
+                                ],
                               ),
                             ),
                           ),
-                        ],
-                      ),
-                    )),
-                  ],
-                ),
+                        ),
+                        Positioned(
+                          top: 16,
+                          right: 16,
+                          child: GestureDetector(
+                            onTap: () => Navigator.of(context).pop(),
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.5),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.close, color: Colors.white, size: 20),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          tip.title,
+                          style: const TextStyle(
+                            fontFamily: Fonts.fontFamilyBold,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          tip.detailedDescription,
+                          style: const TextStyle(
+                            fontFamily: Fonts.fontFamily,
+                            fontSize: 14,
+                            height: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Key Points:',
+                          style: TextStyle(
+                            fontFamily: Fonts.fontFamilyBold,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        ...tip.tips.map((tipText) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(Icons.check_circle, color: AppColors.primary, size: 16),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  tipText,
+                                  style: const TextStyle(
+                                    fontFamily: Fonts.fontFamily,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 

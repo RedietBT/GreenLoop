@@ -55,13 +55,6 @@ class RecyclingProfileDrawer extends StatelessWidget {
                 ),
               ),
               ListTile(
-                leading: const Icon(Icons.person),
-                title: const Text('Profile'),
-                onTap: () {
-                  Navigator.pop(context); // Close drawer
-                },
-              ),
-              ListTile(
                 leading: const Icon(Icons.settings),
                 title: const Text('Edit Settings'),
                 onTap: () async{

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenloop/core/res/colors.dart';
+import 'package:greenloop/src/pickup_request/presentation/cubit/pickup_request_cubit.dart';
 import 'package:greenloop/src/profile/recycling/presentation/cubits/recycling_profile_cubit.dart';
 import 'package:greenloop/src/profile/recycling/presentation/widgets/recycling_profile_body.dart';
 import 'package:greenloop/src/profile/recycling/presentation/widgets/recycling_profile_drawer.dart';
@@ -130,7 +131,15 @@ class _RecyclingProfilePageState extends State<RecyclingProfilePage> {
       body: Column(
         children: [
           Expanded(
-            child: RecyclingProfileBody(userId: widget.userId),
+            child: RefreshIndicator(
+              onRefresh: () async {
+                _recyclingProfileCubit.fetchUser(widget.userId);
+                final pickupCubit = context.read<PickupRequestCubit?>();
+                pickupCubit?.getPickupRequests(widget.userId);
+                await Future.delayed(const Duration(milliseconds: 500));
+              },
+              child: RecyclingProfileBody(userId: widget.userId),
+            ),
           ),
           GlobalFooter(
             currentIndex: _currentFooterIndex,
