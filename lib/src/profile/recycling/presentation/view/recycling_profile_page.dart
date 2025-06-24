@@ -36,25 +36,52 @@ class _RecyclingProfilePageState extends State<RecyclingProfilePage> {
   }
 
   void _onFooterTap(int index) {
+    if (index == 0 && _currentFooterIndex == 0) {
+      return;
+    }
     setState(() {
       _currentFooterIndex = index;
     });
-
     switch (index) {
-      case 0: // Home
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          '/home', // Replace with your home route
-          (route) => false,
-        );
+      case 0:
+        // Navigate to the correct profile page based on userType
+        if (widget.userType == 'Individual') {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/individualProfile',
+            (route) => false,
+            arguments: {
+              'userId': widget.userId,
+              'userType': widget.userType,
+            },
+          );
+        } else if (widget.userType == 'Business') {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/businessProfile',
+            (route) => false,
+            arguments: {
+              'userId': widget.userId,
+              'userType': widget.userType,
+            },
+          );
+        } else {
+          // Default to recycling profile
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            RecyclingProfilePage.routeName,
+            (route) => false,
+            arguments: {
+              'userId': widget.userId,
+              'userType': widget.userType,
+            },
+          );
+        }
         break;
-      case 1: // AI
-        Navigator.pushNamed(
-          context,
-          '/ai', // Replace with your AI route
-        );
+      case 1:
+        Navigator.pushNamed(context, '/ai');
         break;
-      case 2: // Logout
+      case 2:
         _showLogoutDialog();
         break;
     }
