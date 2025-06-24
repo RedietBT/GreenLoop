@@ -31,63 +31,68 @@ class _OnBordingScreanState extends State<OnBordingScrean> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: GradientBackground(
-        image: MediaRes.onBoarding,
-        child: BlocConsumer<OnBoardingCubit, OnBoardingState>(
-          listener: (context, state) {
+      body: SafeArea(
+        child: GradientBackground(
+          image: MediaRes.onBoarding,
+          child: BlocConsumer<OnBoardingCubit, OnBoardingState>(
+            listener: (context, state) {
         
-            if (state is OnBoardingStaus && !state.isFirstTimeUser) {
-              Navigator.pushReplacementNamed(context, '/login');
-            }else if (state is UserCashed) {
-                Navigator.pushReplacementNamed(context, '/registerAs');
+              if (state is OnBoardingStaus && !state.isFirstTimeUser) {
+                Navigator.pushReplacementNamed(context, '/login');
+              }else if (state is UserCashed) {
+                  Navigator.pushReplacementNamed(context, '/registerAs');
+                } 
+            },
+              builder: (context, state) {
+                if (state is CheckIfUserisFirstTimerState || state is CasheFirstTimer) {
+                  return const LoadingView();
               } 
-          },
-            builder: (context, state) {
-              if (state is CheckIfUserisFirstTimerState || state is CasheFirstTimer) {
-                return const LoadingView();
-            } 
-            return Stack(
-              children: [
-                PageView(
-                  controller: pageController,
-                  children: const [
-                    OnBoardingBody(
-                      pageContaint: PageContaint.first(),
-                      pageIndex: 0,
-                      totalPages: 3,
-                    ),
-                    OnBoardingBody(
-                      pageContaint: PageContaint.second(),
-                      pageIndex: 1,
-                      totalPages: 3,
-                    ),
-                    OnBoardingBody(
-                      pageContaint: PageContaint.third(),
-                      pageIndex: 2,
-                      totalPages: 3,
-                    ),
-                  ],
-                ),
-              Align(
-                alignment: const Alignment(0.0, 0.04),
-                child: SmoothPageIndicator(
-                  controller: pageController,
-                  count: 3,
-                  onDotClicked: (index) {
-                    pageController.animateToPage(index, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
-                  },
-                  effect: WormEffect(
-                    activeDotColor: Theme.of(context).colorScheme.primary,
-                    dotColor: Colors.white,
-                    dotHeight: 10,
-                    dotWidth: 10,
-                    spacing: 40.0,
+              return Stack(
+                children: [
+                  PageView(
+                    controller: pageController,
+                    children: const [
+                      OnBoardingBody(
+                        pageContaint: PageContaint.first(),
+                        pageIndex: 0,
+                        totalPages: 3,
+                      ),
+                      OnBoardingBody(
+                        pageContaint: PageContaint.second(),
+                        pageIndex: 1,
+                        totalPages: 3,
+                      ),
+                      OnBoardingBody(
+                        pageContaint: PageContaint.third(),
+                        pageIndex: 2,
+                        totalPages: 3,
+                      ),
+                    ],
                   ),
-                ),
-              )
-              ],
-            );
-            }
+                  Align(
+                    alignment: const Alignment(0.0, 0.85),
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 32),
+                      child: SmoothPageIndicator(
+                        controller: pageController,
+                        count: 3,
+                        onDotClicked: (index) {
+                          pageController.animateToPage(index, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+                        },
+                        effect: WormEffect(
+                          activeDotColor: Theme.of(context).colorScheme.primary,
+                          dotColor: Colors.white,
+                          dotHeight: 10,
+                          dotWidth: 10,
+                          spacing: 40.0,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+              }
+          ),
         ),
       ),
     );

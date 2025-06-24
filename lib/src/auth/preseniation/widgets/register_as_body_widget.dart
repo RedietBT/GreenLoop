@@ -5,16 +5,26 @@ import 'package:greenloop/core/commen/views/loading_view.dart';
 import 'package:greenloop/core/res/colors.dart';
 
 class RegisterAsPageBody extends StatelessWidget {
-  const RegisterAsPageBody({super.key});
+  final double cardElevation;
+  const RegisterAsPageBody({super.key, this.cardElevation = 8});
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color buttonTextColor = AppColors.textTertiary;
+    final Color buttonBgColor = AppColors.primary;
+    final Color buttonFgColor = isDark ? Colors.white : AppColors.textTertiary;
+    final Color cardBg = isDark ? const Color(0xFF232A28) : Colors.white;
+    final Color shadow = isDark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.5);
     return Container(
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/images/background.jpg'), // Ensure you have this image
-          fit: BoxFit.cover,
-        ),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF181C1B) : null,
+        image: isDark
+            ? null
+            : const DecorationImage(
+                image: AssetImage('assets/images/background.jpg'),
+                fit: BoxFit.cover,
+              ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -23,89 +33,132 @@ class RegisterAsPageBody extends StatelessWidget {
             if (state is RegisterAsLoading) {
               return const LoadingView();
             }
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    final role = 'Individual / Household';
-                    context.read<RegisterAsCubit>().selectRole(role);
-                    Navigator.pushReplacementNamed(context, '/registerForIndividual', arguments: role);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(50),
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.textTertiary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    elevation: 5,
+            return Center(
+              child: Card(
+                color: cardBg,
+                elevation: cardElevation,
+                shadowColor: shadow,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Sign Up As',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: isDark? AppColors.textTertiary : AppColors.textPrimary,
+                          letterSpacing: 1.1,
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      _registerButton(
+                        context: context,
+                        label: 'Individual / Household',
+                        onTap: () {
+                          final role = 'Individual / Household';
+                          context.read<RegisterAsCubit>().selectRole(role);
+                          Navigator.pushReplacementNamed(context, '/registerForIndividual', arguments: role);
+                        },
+                        buttonBgColor: buttonBgColor,
+                        buttonFgColor: buttonFgColor,
+                        buttonTextColor: buttonTextColor,
+                      ),
+                      const SizedBox(height: 20),
+                      _registerButton(
+                        context: context,
+                        label: 'Recycling Center',
+                        onTap: () {
+                          final role = 'Recycling Center';
+                          context.read<RegisterAsCubit>().selectRole(role);
+                          Navigator.pushReplacementNamed(context, '/register-recycling', arguments: role);
+                        },
+                        buttonBgColor: buttonBgColor,
+                        buttonFgColor: buttonFgColor,
+                        buttonTextColor: buttonTextColor,
+                      ),
+                      const SizedBox(height: 20),
+                      _registerButton(
+                        context: context,
+                        label: 'Business',
+                        onTap: () {
+                          final role = 'Business';
+                          context.read<RegisterAsCubit>().selectRole(role);
+                          Navigator.pushReplacementNamed(context, '/registerForBussiness', arguments: role);
+                        },
+                        buttonBgColor: buttonBgColor,
+                        buttonFgColor: buttonFgColor,
+                        buttonTextColor: buttonTextColor,
+                      ),
+                      const SizedBox(height: 20),
+                      _registerButton(
+                        context: context,
+                        label: 'Has an account Login',
+                        onTap: () {
+                          final role = 'Has an account Login';
+                          context.read<RegisterAsCubit>().selectRole(role);
+                          Navigator.pushReplacementNamed(context, '/login');
+                        },
+                        buttonBgColor: buttonBgColor,
+                        buttonFgColor: buttonFgColor,
+                        buttonTextColor: buttonTextColor,
+                      ),
+                      const SizedBox(height: 20),
+                      if (state is RegisterAsRoleSelected)
+                        Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Text('Selected Role: ${state.role}', style: TextStyle(color: buttonTextColor)),
+                        ),
+                    ],
                   ),
-                  child: const Text("Individual / Household"),
                 ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    final role = 'Recycling Center';
-                    context.read<RegisterAsCubit>().selectRole(role);
-                    Navigator.pushReplacementNamed(context, '/register-recycling', arguments: role);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(50),
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.textTertiary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    elevation: 5,
-                  ),
-                  child: const Text("Recycling Center"),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    final role = 'Business';
-                    context.read<RegisterAsCubit>().selectRole(role);
-                    Navigator.pushReplacementNamed(context, '/registerForBussiness', arguments: role);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(50),
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.textTertiary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    elevation: 5,
-                  ),
-                  child: const Text("Business"),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    final role = 'Has an account Login';
-                    context.read<RegisterAsCubit>().selectRole(role);
-                    Navigator.pushReplacementNamed(context, '/login');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(50),
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.textTertiary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    elevation: 5,
-                  ),
-                  child: const Text("Has an account Login"),
-                ),
-                const SizedBox(height: 20),
-                if (state is RegisterAsRoleSelected)
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Text('Selected Role: ${state.role}'),
-                  ),
-              ],
+              ),
             );
           },
+        ),
+      ),
+    );
+  }
+
+  Widget _registerButton({
+    required BuildContext context,
+    required String label,
+    required VoidCallback onTap,
+    required Color buttonBgColor,
+    required Color buttonFgColor,
+    required Color buttonTextColor,
+  }) {
+    return SizedBox(
+      width: 320,
+      child: ElevatedButton(
+        onPressed: onTap,
+        style: ElevatedButton.styleFrom(
+          minimumSize: const Size.fromHeight(56),
+          backgroundColor: buttonBgColor,
+          foregroundColor: buttonFgColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 7,
+          padding: const EdgeInsets.symmetric(vertical: 18),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: buttonTextColor,
+            letterSpacing: 1.1,
+            shadows: [
+              Shadow(
+                color: buttonBgColor.withOpacity(0.18),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
         ),
       ),
     );

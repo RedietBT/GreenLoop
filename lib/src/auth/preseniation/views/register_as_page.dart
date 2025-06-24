@@ -10,11 +10,26 @@ class RegisterAsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color appBarBg = isDark ? const Color(0xFF181C1B) : Colors.transparent;
     return BlocProvider(
       create: (_) => RegisterAsCubit(),
       child: Scaffold(
-        appBar: AppBar(title: const Text("Sign Up As")),
-        body: const RegisterAsPageBody(), // Use the new body widget here
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: appBarBg,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          toolbarHeight: 80,
+        ),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: RegisterAsPageBody(
+              cardElevation: isDark ? 24 : 32,
+            ),
+          ),
+        ),
       ),
     );
   }

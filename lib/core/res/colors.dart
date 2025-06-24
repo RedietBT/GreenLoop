@@ -10,6 +10,11 @@ class AppColors {
   static const Color background = Color(0xFFFFFFFF);   // Pure White
   static const Color backgroundTwo = Color(0xFFF8F9FA); // Very Light Gray
   static const Color cardBackground = Color(0xFFFFFFFF); // White
+
+  // Dark mode backgrounds
+  static const Color backgroundDark = Color(0xFF181C1B); // Deep dark
+  static const Color backgroundTwoDark = Color(0xFF232A28); // Slightly lighter dark
+  static const Color cardBackgroundDark = Color(0xFF232A28); // Card dark
   
   // Text colors
   static const Color textPrimary = Color(0xFF212121);   // Almost Black

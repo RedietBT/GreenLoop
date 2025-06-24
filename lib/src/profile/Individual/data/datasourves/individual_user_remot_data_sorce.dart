@@ -1,4 +1,3 @@
-
 import 'package:greenloop/src/profile/Individual/data/model/indivisual_user_model.dart';
 import 'package:greenloop/src/profile/Individual/domian/entity/individual_user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';

@@ -57,6 +57,7 @@ import 'package:greenloop/src/waste/domain/usecase/fetch_recyling_profile.dart';
 import 'package:greenloop/src/waste/domain/usecase/fetch_closest_recycling_centers.dart';
 import 'package:greenloop/src/waste/domain/usecase/request_for_pickup.dart';
 import 'package:greenloop/src/waste/presentation/cubits/weast_cubit.dart';
+import 'package:greenloop/src/waste/domain/usecase/increment_user_waste_count.dart';
 
 // Pickup Request imports
 import 'package:greenloop/src/pickup_request/data/datasources/pickup_request_remote_data_source.dart';
@@ -234,6 +235,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => FetchRecylingCenters(sl<WeastRepo>()));
   sl.registerLazySingleton(() => FetchClosestRecyclingCenters(sl<WeastRepo>()));
   sl.registerLazySingleton(() => RequestForPickup(sl<WeastRepo>()));
+  sl.registerLazySingleton(() => IncrementUserWasteCount(sl<WeastRepo>()));
   
   // Cubit
   sl.registerFactory(() => WeastCubit(

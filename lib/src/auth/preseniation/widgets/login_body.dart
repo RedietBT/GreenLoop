@@ -35,17 +35,19 @@ class _LoginBodyState extends State<LoginBody> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color borderColor = isDark ? AppColors.accent : AppColors.primary;
+    final Color fillColor = isDark ? const Color(0xFF232A28) : Colors.white;
+    final Color labelColor = isDark ? Colors.white : AppColors.textPrimary;
+    final Color hintColor = isDark ? Colors.white : AppColors.textSecondary;
+    final String fontFamily = 'Poppins';
+    final String fontFamilyBold = 'Poppins-Bold';
+    String? errorMessage;
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: BlocConsumer<LoginCubit, LoginState>(
         listener: (context, state) {
-          if (state is LoginLoading) {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Logging in...")),
-            );
-          } else if (state is LoginSuccess) {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          if (state is LoginSuccess) {
             String userId = state.userId;
             String userRole = state.role;
 
@@ -72,43 +74,73 @@ class _LoginBodyState extends State<LoginBody> {
                 SnackBar(content: Text('Unknown user role: $userRole')),
               );
             }
-          } else if (state is LoginFailure) {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text("Login failed: ${state.message}"),
-                backgroundColor: Colors.red,
-              ),
-            );
           }
         },
         builder: (context, state) {
+          if (state is LoginFailure) {
+            errorMessage = state.message;
+          } else {
+            errorMessage = null;
+          }
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              TextField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  labelText: "Email",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+              if (errorMessage != null && errorMessage!.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 18.0),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF232A28) : Colors.grey[100],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: isDark ? Colors.grey[700]! : Colors.grey[300]!, width: 1.2),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Wrong credentials, please try again.',
+                              style: TextStyle(
+                                color: isDark ? Colors.white : Colors.black,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: fontFamilyBold,
+                                fontSize: 15.5,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  filled: true,
-                  fillColor: Colors.white,
                 ),
+              _styledTextField(
+                context: context,
+                label: "Email",
+                controller: _emailController,
+                borderColor: borderColor,
+                fillColor: fillColor,
+                labelColor: labelColor,
+                hintColor: hintColor,
+                fontFamily: fontFamily,
+                fontFamilyBold: fontFamilyBold,
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 12),
-              TextField(
+              _styledTextField(
+                context: context,
+                label: "Password",
                 controller: _passwordController,
-                decoration: InputDecoration(
-                  labelText: "Password",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                ),
+                borderColor: borderColor,
+                fillColor: fillColor,
+                labelColor: labelColor,
+                hintColor: hintColor,
+                fontFamily: fontFamily,
+                fontFamilyBold: fontFamilyBold,
                 obscureText: true,
               ),
               const SizedBox(height: 20),
@@ -139,11 +171,11 @@ class _LoginBodyState extends State<LoginBody> {
                 child: RichText(
                   text: TextSpan(
                     text: "Don't have an account? ",
-                    style: const TextStyle(color: Colors.black),
+                    style: TextStyle(color: isDark ? Colors.white : Colors.black),
                     children: [
                       TextSpan(
                         text: 'Register here.',
-                        style: TextStyle(color: AppColors.primary),
+                        style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -155,4 +187,65 @@ class _LoginBodyState extends State<LoginBody> {
       ),
     );
   }
+
+Widget _styledTextField({
+  required BuildContext context,
+  required String label,
+  TextEditingController? controller,
+  ValueChanged<String>? onChanged,
+  required Color borderColor,
+  required Color fillColor,
+  required Color labelColor,
+  required Color hintColor,
+  required String fontFamily,
+  required String fontFamilyBold,
+  bool obscureText = false,
+  TextInputType? keyboardType,
+}) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  return TextField(
+    controller: controller,
+    obscureText: obscureText,
+    keyboardType: keyboardType,
+    style: TextStyle(
+      color: isDark ? Colors.white : AppColors.textPrimary,
+      fontFamily: fontFamilyBold,
+      fontWeight: FontWeight.w600,
+      fontSize: 16,
+    ),
+    decoration: InputDecoration(
+      labelText: label,
+      labelStyle: TextStyle(
+        color: labelColor,
+        fontFamily: fontFamilyBold,
+        fontWeight: FontWeight.bold,
+        fontSize: 16,
+      ),
+      hintText: label,
+      hintStyle: TextStyle(
+        color: hintColor,
+        fontFamily: fontFamilyBold,
+        fontWeight: FontWeight.bold,
+        fontSize: 15,
+        letterSpacing: 1.1,
+      ),
+      filled: true,
+      fillColor: fillColor,
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(color: borderColor, width: 2.2),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(color: borderColor, width: 2.8),
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(color: borderColor, width: 2.2),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+    ),
+    onChanged: onChanged,
+  );
+}
 }

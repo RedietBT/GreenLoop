@@ -14,6 +14,7 @@ class Business extends Equatable {
   final String? email;
   final String? description;
   final LatLng? location;
+  final int? no_of_weaste;
 
 
   const Business({
@@ -29,6 +30,7 @@ class Business extends Equatable {
     this.email,
     this.description,
     this.location,
+    this.no_of_weaste,
   });
 
   @override
@@ -45,5 +47,6 @@ class Business extends Equatable {
         email,
         description,
         location,
+        no_of_weaste,
       ];
 }

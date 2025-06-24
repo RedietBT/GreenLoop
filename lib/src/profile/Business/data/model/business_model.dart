@@ -15,6 +15,7 @@ class BusinessModel extends Business {
     super.email,
     super.description,
     super.location, // Include location in the constructor
+    super.no_of_weaste,
   });
 
   factory BusinessModel.fromJson(Map<String, dynamic> json) {
@@ -46,6 +47,7 @@ class BusinessModel extends Business {
       email: json['email'] as String?,
       description: json['description'] as String?,
       location: parsedLocation,
+      no_of_weaste: json['no_of_weaste'] as int?,
     );
   }
 
@@ -65,6 +67,7 @@ class BusinessModel extends Business {
       'location': location != null
           ? 'SRID=4326;POINT(${location!.longitude} ${location!.latitude})'
           : null,
+      'no_of_weaste': no_of_weaste,
     };
   }
 
@@ -82,6 +85,7 @@ class BusinessModel extends Business {
       email: entity.email,
       description: entity.description,
       location: entity.location,
+      no_of_weaste: entity.no_of_weaste,
     );
   }
 }

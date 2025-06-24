@@ -115,38 +115,7 @@ class _OnBoardingBodyState extends State<OnBoardingBody> with SingleTickerProvid
                   ),
                 ),
               ),
-              // Gamified badge/coin
-              FadeTransition(
-                opacity: _fadeAnimation,
-                child: SlideTransition(
-                  position: _slideAnimation,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.emoji_events, color: primary, size: 32),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: accent.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Text(
-                            '1,000 XP',
-                            style: TextStyle(
-                              color: primary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+              SizedBox(height: context.height * .02),
               // Title
               SizedBox(height: context.height * .01),
               FadeTransition(

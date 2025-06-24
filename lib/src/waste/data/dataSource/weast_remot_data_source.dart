@@ -14,6 +14,7 @@ abstract class WeastRemotDataSource {
      String type,
      String quantity,
      LatLng? location,
+     String userType,
   );
 
   Future<WeastModel> updateWeastProfile({
@@ -31,6 +32,9 @@ abstract class WeastRemotDataSource {
 
   Future<List<Recycling_UserModel>> fetchRecylingCenters(String location);
   Future<List<Recycling_UserModel>> fetchClosestRecyclingCenters(LatLng userLocation);
+  
+  // New method to increment user's waste count
+  Future<void> incrementUserWasteCount(String userId, String userType);
 }
 
 class WeastRemotDataSourceImpl implements WeastRemotDataSource {
@@ -45,8 +49,10 @@ class WeastRemotDataSourceImpl implements WeastRemotDataSource {
      String type,
      String quantity,
      LatLng? location,
+     String userType,
   ) async {
     try {
+      // Insert the waste submission
       await _supabaseClient.from('waste_submission').insert({
         'id': weastId,
         'userID': userId,
@@ -54,6 +60,9 @@ class WeastRemotDataSourceImpl implements WeastRemotDataSource {
         'quantity': quantity,
         'location': location != null ? WeastModel.formatLocationForDatabase(location) : null,
       });
+      
+      // Increment the user's waste count
+      await incrementUserWasteCount(userId, userType);
     } catch (e) {
       throw Exception('Failed to insert user profile: $e');
     }
@@ -268,5 +277,45 @@ class WeastRemotDataSourceImpl implements WeastRemotDataSource {
       }
     }
     return [];
+  }
+
+  @override
+  Future<void> incrementUserWasteCount(String userId, String userType) async {
+    try {
+      String tableName;
+      
+      // Determine which table to update based on user type
+      if (userType == 'Individual' || userType == 'USER101') {
+        tableName = 'profile';
+      } else if (userType == 'Business' || userType == 'USER103') {
+        tableName = 'business';
+      } else {
+        throw Exception('Unknown user type: $userType');
+      }
+      
+      // First, get the current waste count from the appropriate table
+      final currentUser = await _supabaseClient
+          .from(tableName)
+          .select('no_of_weaste')
+          .eq('id', userId)
+          .single();
+      
+      final currentCount = currentUser['no_of_weaste'] as int? ?? 0;
+      final newCount = currentCount + 1;
+      
+      // Update the user's waste count in the appropriate table
+      await _supabaseClient
+          .from(tableName)
+          .update({'no_of_weaste': newCount})
+          .eq('id', userId);
+          
+      print('Updated $tableName table for user $userId: waste count incremented from $currentCount to $newCount');
+          
+    } catch (e) {
+      throw ServerException(
+        message: 'Failed to increment user waste count: $e',
+        statusCode: 500,
+      );
+    }
   }
 }

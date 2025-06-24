@@ -12,6 +12,7 @@ abstract class WeastRepo {
      String type,
      String quantity,
      LatLng? location,
+     String userType,
   );
   ResultFuture<Weast> updateWeastProfile({
    required String weastId, 
@@ -27,4 +28,7 @@ abstract class WeastRepo {
      String recyclingCenterId,
      String requestStatus,
   );
+  
+  // New method to increment user's waste count
+  ResultFuture<void> incrementUserWasteCount(String userId, String userType);
 }

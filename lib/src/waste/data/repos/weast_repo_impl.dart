@@ -19,6 +19,7 @@ class WeastRepoImpl implements WeastRepo{
      String type,
      String quantity,
      LatLng? location,
+     String userType,
   ) async {
     try {
       await remoteDataSource.insertWeastProfile(
@@ -27,6 +28,7 @@ class WeastRepoImpl implements WeastRepo{
         type,
         quantity,
         location,
+        userType,
       );
       return const Right(null);
     } catch (e) {
@@ -99,6 +101,19 @@ class WeastRepoImpl implements WeastRepo{
     try {
       final profiles = await remoteDataSource.fetchClosestRecyclingCenters(userLocation);
       return Right(profiles);
+    } catch (e) {
+      return Left(ServerFailure(
+        message: e.toString(),
+        statusCode: '500',
+      ));
+    }
+  }
+
+  @override
+  ResultFuture<void> incrementUserWasteCount(String userId, String userType) async {
+    try {
+      await remoteDataSource.incrementUserWasteCount(userId, userType);
+      return const Right(null);
     } catch (e) {
       return Left(ServerFailure(
         message: e.toString(),

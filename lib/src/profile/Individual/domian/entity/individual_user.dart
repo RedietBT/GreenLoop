@@ -11,6 +11,7 @@ class Individual_User extends Equatable{
   final String? email;
   final String? description;
   final LatLng? location;
+  final int? no_of_weaste;
 
   const Individual_User({
     required this.id,
@@ -22,8 +23,9 @@ class Individual_User extends Equatable{
      this.email,
      this.description,
      this.location,
+     this.no_of_weaste,
   });
 
   @override
-  List<Object?> get props => [id, first_name, last_name, role, avatarUrl, points, email, description, location];
+  List<Object?> get props => [id, first_name, last_name, role, avatarUrl, points, email, description, location, no_of_weaste];
 }
