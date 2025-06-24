@@ -1,0 +1,8 @@
+glass
+metal
+paper
+plastic
+cardboard
+clothes
+electronic
+battrey

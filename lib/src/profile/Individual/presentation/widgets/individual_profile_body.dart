@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenloop/core/res/colors.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_state.dart';
+import 'package:greenloop/src/waste_detection/presentation/view/waste_detection_view.dart';
 // Ensure your Individual_User entity is imported if needed for direct access to its properties
 // import 'package:greenloop/src/profile/Individual/domian/entity/individual_user.dart';
 
@@ -310,7 +311,96 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
                       ),
                     ),
                   ),
-                  // 6. About Section
+                  // 6. Waste Detection Feature Card
+                  SlideTransition(
+                    position: _slideAnimation,
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Colors.green.shade400, Colors.green.shade600],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.green.withOpacity(0.3),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(16),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const WasteDetectionView(),
+                                  ),
+                                );
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(20),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.2),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: const Icon(
+                                        Icons.camera_alt,
+                                        size: 32,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            'Scan Your Waste',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            'Identify waste type and get sorting instructions',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.white.withOpacity(0.9),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const Icon(
+                                      Icons.arrow_forward_ios,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // 7. About Section
                   if (state is IndividualProfileLoaded && state.user.description != null)
                     FadeTransition(
                       opacity: _fadeAnimation,
@@ -370,7 +460,7 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
                         ),
                       ),
                     ),
-                  // 7. Recent Activity
+                  // 8. Recent Activity
                   FadeTransition(
                     opacity: _fadeAnimation,
                     child: SlideTransition(
@@ -419,7 +509,7 @@ class _IndividualProfileBodyState extends State<IndividualProfileBody> with Sing
                       ),
                     ),
                   ),
-                  // 8. Categories Section
+                  // 9. Categories Section
                   const Padding(
                     padding: EdgeInsets.only(left: 20, top: 20, bottom: 8),
                     child: Text(

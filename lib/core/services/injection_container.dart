@@ -47,6 +47,14 @@ import 'package:greenloop/src/profile/Business/data/repos/business_repo_impl.dar
 import 'package:greenloop/src/profile/Business/domain/repo/business_repo.dart';
 import 'package:greenloop/src/profile/Business/presentation/cubits/business_profile_cubit.dart';
 
+// Waste Detection imports
+import 'package:greenloop/src/waste_detection/data/datasources/waste_detection_remote_data_source.dart';
+import 'package:greenloop/src/waste_detection/data/repos/waste_detection_repo_impl.dart';
+import 'package:greenloop/src/waste_detection/domain/repos/waste_detection_repo.dart';
+import 'package:greenloop/src/waste_detection/domain/usecases/detect_waste_usecase.dart';
+import 'package:greenloop/src/waste_detection/domain/usecases/pick_image_usecase.dart';
+import 'package:greenloop/src/waste_detection/presentation/cubits/waste_detection_cubit.dart';
+
 final sl = GetIt.instance;
 
 Future<void> init() async {
@@ -195,6 +203,31 @@ Future<void> init() async {
     sl<RecyclingUserRepo>(),
     sl<StorageRepo>(),
   ));
+
+  // ============================
+  // NEW: Waste Detection Feature
+  // ============================
+
+  // Data Sources
+  sl.registerLazySingleton<WasteDetectionRemoteDataSource>(
+    () => WasteDetectionRemoteDataSourceImpl(),
+  );
+
+  // Repositories
+  sl.registerLazySingleton<WasteDetectionRepo>(
+    () => WasteDetectionRepoImpl(sl<WasteDetectionRemoteDataSource>()),
+  );
+
+  // Use Cases
+  sl.registerLazySingleton(() => DetectWasteUseCase(sl<WasteDetectionRepo>()));
+  sl.registerLazySingleton(() => PickImageUseCase(sl<WasteDetectionRepo>()));
+
+  // Cubit
+  sl.registerFactory(() => WasteDetectionCubit(
+    detectWasteUseCase: sl<DetectWasteUseCase>(),
+    pickImageUseCase: sl<PickImageUseCase>(),
+  ));
+
   // ============================
 
 }
