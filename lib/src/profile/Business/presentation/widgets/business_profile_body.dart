@@ -141,17 +141,29 @@ class _BusinessProfileHeader extends StatelessWidget {
       duration: Duration(milliseconds: (400 + delay * 200).round()),
       child: Column(
         children: [
-          CircleAvatar(
-            radius: 54,
-            backgroundColor: Colors.white,
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: AppColors.primary,
+                width: 4,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withOpacity(0.3),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
             child: CircleAvatar(
               radius: 50,
-              backgroundColor: Colors.grey[200],
+              backgroundColor: AppColors.primary.withOpacity(0.1),
               backgroundImage: business?.avatarUrl != null && business.avatarUrl.isNotEmpty
                   ? NetworkImage(business.avatarUrl)
                   : null,
               child: business?.avatarUrl == null || business.avatarUrl.isEmpty
-                  ? const Icon(Icons.business, size: 50, color: Colors.grey)
+                  ? const Icon(Icons.business, size: 50, color: AppColors.primary)
                   : null,
             ),
           ),
@@ -271,7 +283,7 @@ class _BusinessStatsCard extends StatelessWidget {
                 height: 80,
                 color: Colors.transparent,
               ),
-              // Waste Submissions Section
+              // Rewards Section
               Expanded(
                 child: Column(
                   children: [
@@ -282,24 +294,24 @@ class _BusinessStatsCard extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
-                        Icons.recycling,
+                        Icons.card_giftcard,
                         color: AppColors.accent,
                         size: 28,
                       ),
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      '${business?.no_of_weaste ?? 0}',
+                      'Coming Soon!',
                       style: const TextStyle(
                         fontFamily: Fonts.fontFamilyBold,
-                        fontSize: 24,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: AppColors.accent,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Waste Submissions',
+                      'Rewards',
                       style: TextStyle(
                         fontFamily: Fonts.fontFamily,
                         fontSize: 14,

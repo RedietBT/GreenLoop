@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenloop/core/res/colors.dart';
-import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_state.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
 import 'package:greenloop/src/profile/Business/presentation/cubits/business_profile_cubit.dart';
-import 'package:greenloop/src/profile/Business/presentation/cubits/business_profile_state.dart';
 import 'package:greenloop/src/waste/presentation/cubits/weast_cubit.dart';
 import 'package:greenloop/src/waste/presentation/cubits/weast_state.dart';
 import 'package:uuid/uuid.dart';
@@ -300,66 +298,20 @@ class _WeastBodyState extends State<WeastBody>{
       print('User ID: ${widget.userId}');
       
       if (userType == 'Individual' || userType == 'USER101') {
-        // Handle individual user (stored in 'profile' table)
+        // Refresh individual user profile to show updated data
         final individualProfileCubit = context.read<IndividualProfileCubit>();
-        
-        // First fetch the current user profile to get current points and waste count
         await individualProfileCubit.fetchUser(widget.userId);
-        
-        // Listen to the state to get the current user data
-        final currentState = individualProfileCubit.state;
-        if (currentState is IndividualProfileLoaded) {
-          final currentPoints = currentState.user.points ?? 0;
-          final currentWasteCount = currentState.user.no_of_weaste ?? 0;
-          final newPoints = currentPoints + 50;
-          final newWasteCount = currentWasteCount + 1;
-          
-          // Update user points and waste count
-          await individualProfileCubit.updateProfile(
-            userId: widget.userId,
-            data: {
-              'points': newPoints,
-              'no_of_weaste': newWasteCount,
-            },
-          );
-          
-          print('Individual user points incremented by 50 and waste count by 1. New total: $newPoints points, $newWasteCount waste submissions');
-        } else {
-          print('Could not get current individual user profile to increment points');
-        }
+        print('Individual user profile refreshed to show updated points and waste count');
       } else if (userType == 'Business' || userType == 'USER103') {
-        // Handle business user (stored in 'business' table)
+        // Refresh business user profile to show updated data
         final businessProfileCubit = context.read<BusinessProfileCubit>();
-        
-        // First fetch the current business profile to get current points and waste count
         await businessProfileCubit.fetchUserProfile(widget.userId);
-        
-        // Listen to the state to get the current business data
-        final currentState = businessProfileCubit.state;
-        if (currentState is BusinessProfileLoaded) {
-          final currentPoints = currentState.business.points ?? 0;
-          final currentWasteCount = currentState.business.no_of_weaste ?? 0;
-          final newPoints = currentPoints + 50;
-          final newWasteCount = currentWasteCount + 1;
-          
-          // Update business points and waste count
-          await businessProfileCubit.updateProfile(
-            userId: widget.userId,
-            data: {
-              'points': newPoints,
-              'no_of_weaste': newWasteCount,
-            },
-          );
-          
-          print('Business user points incremented by 50 and waste count by 1. New total: $newPoints points, $newWasteCount waste submissions');
-        } else {
-          print('Could not get current business profile to increment points');
-        }
+        print('Business user profile refreshed to show updated points and waste count');
       } else {
-        print('Unknown user type: $userType. Cannot increment points.');
+        print('Unknown user type: $userType. Cannot refresh profile.');
       }
     } catch (e) {
-      print('Error incrementing user points: $e');
+      print('Error refreshing user profile: $e');
     }
   }
 

@@ -1581,57 +1581,33 @@ class _AnimatedPickupButtonState extends State<_AnimatedPickupButton> with Singl
             opacity: _fadeAnimation.value,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              child: _AnimatedScaleButton(
-                onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    '/weastPage',
-                    arguments: {
-                      'userId': widget.userId,
-                      'userType': 'Individual',
-                    },
-                  );
-                },
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [AppColors.primary, AppColors.primary.withOpacity(0.8)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+            child: _AnimatedScaleButton(
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  '/weastPage',
+                  arguments: {
+                    'userId': widget.userId,
+                    'userType': 'Individual',
+                  },
+                );
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.recycling, color: Colors.white),
+                  const SizedBox(width: 10),
+                  const Text(
+                    'Request Waste Pickup',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withOpacity(0.3),
-                        blurRadius: 12,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.recycling,
-                        color: Colors.white,
-                        size: 22,
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        'Request Waste Pickup',
-                        style: TextStyle(
-                          fontFamily: Fonts.fontFamilyBold,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                ],
               ),
+            ),
             ),
           ),
         );

@@ -293,27 +293,32 @@ class WeastRemotDataSourceImpl implements WeastRemotDataSource {
         throw Exception('Unknown user type: $userType');
       }
       
-      // First, get the current waste count from the appropriate table
+      // First, get the current waste count and points from the appropriate table
       final currentUser = await _supabaseClient
           .from(tableName)
-          .select('no_of_weaste')
+          .select('no_of_weaste, points')
           .eq('id', userId)
           .single();
       
       final currentCount = currentUser['no_of_weaste'] as int? ?? 0;
+      final currentPoints = currentUser['points'] as int? ?? 0;
       final newCount = currentCount + 1;
+      final newPoints = currentPoints + 50;
       
-      // Update the user's waste count in the appropriate table
+      // Update the user's waste count and points in the appropriate table
       await _supabaseClient
           .from(tableName)
-          .update({'no_of_weaste': newCount})
+          .update({
+            'no_of_weaste': newCount,
+            'points': newPoints,
+          })
           .eq('id', userId);
           
-      print('Updated $tableName table for user $userId: waste count incremented from $currentCount to $newCount');
+      print('Updated $tableName table for user $userId: waste count incremented from $currentCount to $newCount, points incremented from $currentPoints to $newPoints');
           
     } catch (e) {
       throw ServerException(
-        message: 'Failed to increment user waste count: $e',
+        message: 'Failed to increment user waste count and points: $e',
         statusCode: 500,
       );
     }

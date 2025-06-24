@@ -1,6 +1,7 @@
 // src/profile/Individual/presentation/widgets/individual_profile_drawer.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greenloop/core/res/colors.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_state.dart';
 import 'package:greenloop/src/profile/Individual/presentation/widgets/edit_profile_page.dart'; // Import your EditProfilePage
@@ -175,10 +176,10 @@ class _DrawerTileState extends State<_DrawerTile> {
         ? (widget.isDark ? Colors.grey[800]! : Colors.grey[200]!)
         : Colors.transparent;
     final Color iconColor = widget.isLogout
-        ? Colors.red
+        ? widget.isDark ? Colors.white : AppColors.textPrimary
         : (widget.isDark ? Colors.white : Colors.black87);
     final Color textColor = widget.isLogout
-        ? Colors.red
+        ? widget.isDark ? Colors.white : AppColors.textPrimary
         : (widget.isDark ? Colors.white : Colors.black87);
     return MouseRegion(
       onEnter: (_) => setState(() => _hovering = true),
