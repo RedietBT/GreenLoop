@@ -98,6 +98,32 @@ class RecyclingProfileDrawer extends StatelessWidget {
               ListTile(
                 leading: const Icon(Icons.logout),
                 title: const Text('Logout'),
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Logout'),
+                      content: const Text('Are you sure you want to logout?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              '/login',
+                              (route) => false,
+                            );
+                          },
+                          child: const Text('Logout'),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ],
           ),

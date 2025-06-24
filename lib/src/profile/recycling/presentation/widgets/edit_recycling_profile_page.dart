@@ -6,6 +6,9 @@ import 'package:latlong2/latlong.dart';
 import 'package:greenloop/src/profile/recycling/presentation/cubits/recycling_profile_cubit.dart';
 import 'package:greenloop/src/profile/recycling/presentation/cubits/recycling_profile_state.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:greenloop/core/res/colors.dart';
+import 'package:greenloop/core/res/fonts.dart';
+import 'package:greenloop/core/commen/widgets/global_footer.dart';
 
 class EditRecyclingProfilePage extends StatefulWidget {
   final String userId;
@@ -42,6 +45,7 @@ class _EditRecyclingProfilePageState extends State<EditRecyclingProfilePage> {
   LatLng? _selectedLocationFromMap;
 
   bool _updateInProgress = false;
+  int _currentFooterIndex = 0;
 
   @override
   void initState() {
@@ -241,12 +245,85 @@ class _EditRecyclingProfilePageState extends State<EditRecyclingProfilePage> {
     );
   }
 
+  void _onFooterTap(int index) {
+    setState(() {
+      _currentFooterIndex = index;
+    });
+    switch (index) {
+      case 0:
+        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+        break;
+      case 1:
+        Navigator.pushNamed(context, '/ai');
+        break;
+      case 2:
+        _showLogoutDialog();
+        break;
+    }
+  }
+
+  void _showLogoutDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/login',
+                (route) => false,
+              );
+            },
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Recycling Profile'),
+        title: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.3),
+              width: 1,
+            ),
+          ),
+          child: Text(
+            'Edit Profile',
+            style: TextStyle(
+              color: isDark ? Colors.white : AppColors.textPrimary,
+              fontFamily: 'Poppins-Bold',
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundTwo,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.transparent,
+        leading: BackButton(color: isDark ? Colors.white : AppColors.textPrimary),
       ),
+      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundTwo,
       body: BlocListener<RecyclingProfileCubit, RecyclingProfileState>(
         listener: (context, state) {
           if (state is RecyclingProfileLoaded) {
@@ -303,151 +380,242 @@ class _EditRecyclingProfilePageState extends State<EditRecyclingProfilePage> {
 
             return Form(
               key: _formKey,
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: _pickImage,
-                      child: CircleAvatar(
-                        radius: 70,
-                        backgroundColor: Theme.of(context).primaryColor.withOpacity(0.7),
-                        backgroundImage: _pickedImage != null
-                            ? FileImage(_pickedImage!)
-                            : (_currentAvatarUrl != null && _currentAvatarUrl!.isNotEmpty
-                                  ? NetworkImage(_currentAvatarUrl!)
-                                  : null) as ImageProvider<Object>?,
-                        child: _pickedImage == null &&
-                                (_currentAvatarUrl == null || _currentAvatarUrl!.isEmpty)
-                            ? const Icon(Icons.camera_alt, size: 70, color: Colors.white)
-                            : null,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                            onTap: _pickImage,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: AppColors.primary,
+                                      width: 4,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.primary.withOpacity(0.3),
+                                        blurRadius: 20,
+                                        offset: const Offset(0, 10),
+                                      ),
+                                    ],
+                                  ),
+                                  child: CircleAvatar(
+                                    radius: 60,
+                                    backgroundColor: AppColors.primary.withOpacity(0.1),
+                                    backgroundImage: _pickedImage != null
+                                        ? FileImage(_pickedImage!)
+                                        : (_currentAvatarUrl != null && _currentAvatarUrl!.isNotEmpty
+                                              ? NetworkImage(_currentAvatarUrl!)
+                                              : null) as ImageProvider<Object>?,
+                                    child: _pickedImage == null &&
+                                            (_currentAvatarUrl == null || _currentAvatarUrl!.isEmpty)
+                                        ? const Icon(Icons.camera_alt, size: 70, color: AppColors.primary)
+                                        : null,
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primary,
+                                      shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: AppColors.primary.withOpacity(0.3),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    padding: const EdgeInsets.all(6),
+                                    child: const Icon(Icons.camera_alt, color: Colors.white, size: 22),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          _styledTextField(_centerNameController, 'Center Name', validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter the center name';
+                            }
+                            return null;
+                          }),
+                          const SizedBox(height: 16),
+                          _styledTextField(_contactPersonFirstNameController, 'Contact Person First Name', validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter contact person first name';
+                            }
+                            return null;
+                          }),
+                          const SizedBox(height: 16),
+                          _styledTextField(_contactPersonLastNameController, 'Contact Person Last Name', validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter contact person last name';
+                            }
+                            return null;
+                          }),
+                          const SizedBox(height: 16),
+                          _styledTextField(_emailController, 'Email',
+                            keyboardType: TextInputType.emailAddress,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter an email';
+                              }
+                              if (!value.contains('@')) {
+                                return 'Please enter a valid email';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          _styledTextField(_phoneController, 'Phone Number', keyboardType: TextInputType.phone),
+                          const SizedBox(height: 16),
+                          _styledTextField(_addressController, 'Address', maxLines: 3),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _styledTextField(_latitudeDisplayController, 'Latitude',
+                                  enabled: false,
+                                  prefixIcon: const Icon(Icons.location_on_outlined),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: _styledTextField(_longitudeDisplayController, 'Longitude',
+                                  enabled: false,
+                                  prefixIcon: const Icon(Icons.location_on_outlined),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton.icon(
+                            onPressed: _openLocationPicker,
+                            icon: const Icon(Icons.map),
+                            label: const Text('Pick Location on Map'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          _styledTextField(_descriptionController, 'Description', maxLines: 5),
+                          const SizedBox(height: 30),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: _updateInProgress ? null : _updateProfile,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 4,
+                                textStyle: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              child: _updateInProgress
+                                  ? const CircularProgressIndicator(color: Colors.white)
+                                  : const Text('Save Changes'),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    TextFormField(
-                      controller: _centerNameController,
-                      decoration: const InputDecoration(labelText: 'Center Name'),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter the center name';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _contactPersonFirstNameController,
-                      decoration: const InputDecoration(labelText: 'Contact Person First Name'),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter contact person first name';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _contactPersonLastNameController,
-                      decoration: const InputDecoration(labelText: 'Contact Person Last Name'),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter contact person last name';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: const InputDecoration(labelText: 'Email'),
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter an email';
-                        }
-                        if (!value.contains('@')) {
-                          return 'Please enter a valid email';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _phoneController,
-                      decoration: const InputDecoration(labelText: 'Phone Number'),
-                      keyboardType: TextInputType.phone,
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _addressController,
-                      decoration: const InputDecoration(labelText: 'Address'),
-                      maxLines: 3,
-                    ),
-                    const SizedBox(height: 16),
-                    
-                    // Location Display Fields (Read-only)
-                    TextFormField(
-                      controller: _latitudeDisplayController,
-                      decoration: InputDecoration(
-                        labelText: 'Latitude',
-                        enabled: false,
-                        filled: true,
-                        fillColor: Colors.grey[200],
-                        prefixIcon: const Icon(Icons.location_on_outlined),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _longitudeDisplayController,
-                      decoration: InputDecoration(
-                        labelText: 'Longitude',
-                        enabled: false,
-                        filled: true,
-                        fillColor: Colors.grey[200],
-                        prefixIcon: const Icon(Icons.location_on_outlined),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    
-                    // Location Picker Button
-                    ElevatedButton.icon(
-                      onPressed: _openLocationPicker,
-                      icon: const Icon(Icons.map),
-                      label: const Text('Pick Location on Map'),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    
-                    TextFormField(
-                      controller: _descriptionController,
-                      decoration: const InputDecoration(labelText: 'Description'),
-                      maxLines: 5,
-                    ),
-                    const SizedBox(height: 30),
-                    ElevatedButton(
-                      onPressed: _updateInProgress ? null : _updateProfile,
-                      child: _updateInProgress
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text('Save Changes'),
-                    ),
-                  ],
-                ),
+                  ),
+                  GlobalFooter(
+                    currentIndex: _currentFooterIndex,
+                    onTap: _onFooterTap,
+                  ),
+                ],
               ),
             );
           },
         ),
+      ),
+    );
+  }
+
+  Widget _styledTextField(
+    TextEditingController controller,
+    String label, {
+    int maxLines = 1,
+    bool enabled = true,
+    TextInputType? keyboardType,
+    Widget? prefixIcon,
+    String? Function(String?)? validator,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return TextFormField(
+      controller: controller,
+      enabled: enabled,
+      maxLines: maxLines,
+      keyboardType: keyboardType,
+      validator: validator,
+      style: TextStyle(
+        color: isDark ? Colors.white : AppColors.textPrimary,
+        fontWeight: FontWeight.w500,
+        fontFamily: Fonts.fontFamily,
+      ),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(
+          color: isDark ? Colors.white70 : AppColors.textSecondary,
+          fontWeight: FontWeight.bold,
+          fontFamily: Fonts.fontFamilyBold,
+        ),
+        filled: true,
+        fillColor: isDark ? AppColors.cardBackgroundDark : Colors.white,
+        prefixIcon: prefixIcon,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: AppColors.primary.withOpacity(0.4),
+            width: 1.5,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: AppColors.primary.withOpacity(0.4),
+            width: 1.5,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: AppColors.primary,
+            width: 2,
+          ),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            color: Colors.red,
+            width: 1.5,
+          ),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
       ),
     );
   }
