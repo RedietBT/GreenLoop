@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenloop/core/res/colors.dart';
+import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_state.dart';
+import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_cubit.dart';
+import 'package:greenloop/src/profile/Business/presentation/cubits/business_profile_cubit.dart';
+import 'package:greenloop/src/profile/Business/presentation/cubits/business_profile_state.dart';
 import 'package:greenloop/src/waste/presentation/cubits/weast_cubit.dart';
 import 'package:greenloop/src/waste/presentation/cubits/weast_state.dart';
 import 'package:uuid/uuid.dart';
@@ -254,6 +258,12 @@ class _WeastBodyState extends State<WeastBody>{
         _generatedWeastId = const Uuid().v4();
       });
       
+      // Get user type from route arguments
+      final args = ModalRoute.of(context)?.settings.arguments;
+      final userType = (args is Map && args['userType'] is String)
+          ? args['userType'] as String
+          : 'Individual';
+      
       // First insert the waste profile
       context.read<WeastCubit>().insertWeast(
         weastId: _generatedWeastId!,
@@ -261,6 +271,7 @@ class _WeastBodyState extends State<WeastBody>{
         type: _typeController.text.trim(),
         quantity: _quantityController.text.trim(),
         location: _selectedLocation,
+        userType: userType,
         onSuccess: () {
           // Refresh the user profile to get updated no_of_weaste count
           // This will be called after successful waste insertion
@@ -274,6 +285,81 @@ class _WeastBodyState extends State<WeastBody>{
           backgroundColor: Colors.red,
         ),
       );
+    }
+  }
+
+  Future<void> _incrementUserPoints() async {
+    try {
+      // Determine user type and get the appropriate cubit
+      final args = ModalRoute.of(context)?.settings.arguments;
+      final userType = (args is Map && args['userType'] is String)
+          ? args['userType'] as String
+          : 'Individual';
+      
+      print('User type detected: $userType');
+      print('User ID: ${widget.userId}');
+      
+      if (userType == 'Individual' || userType == 'USER101') {
+        // Handle individual user (stored in 'profile' table)
+        final individualProfileCubit = context.read<IndividualProfileCubit>();
+        
+        // First fetch the current user profile to get current points and waste count
+        await individualProfileCubit.fetchUser(widget.userId);
+        
+        // Listen to the state to get the current user data
+        final currentState = individualProfileCubit.state;
+        if (currentState is IndividualProfileLoaded) {
+          final currentPoints = currentState.user.points ?? 0;
+          final currentWasteCount = currentState.user.no_of_weaste ?? 0;
+          final newPoints = currentPoints + 50;
+          final newWasteCount = currentWasteCount + 1;
+          
+          // Update user points and waste count
+          await individualProfileCubit.updateProfile(
+            userId: widget.userId,
+            data: {
+              'points': newPoints,
+              'no_of_weaste': newWasteCount,
+            },
+          );
+          
+          print('Individual user points incremented by 50 and waste count by 1. New total: $newPoints points, $newWasteCount waste submissions');
+        } else {
+          print('Could not get current individual user profile to increment points');
+        }
+      } else if (userType == 'Business' || userType == 'USER103') {
+        // Handle business user (stored in 'business' table)
+        final businessProfileCubit = context.read<BusinessProfileCubit>();
+        
+        // First fetch the current business profile to get current points and waste count
+        await businessProfileCubit.fetchUserProfile(widget.userId);
+        
+        // Listen to the state to get the current business data
+        final currentState = businessProfileCubit.state;
+        if (currentState is BusinessProfileLoaded) {
+          final currentPoints = currentState.business.points ?? 0;
+          final currentWasteCount = currentState.business.no_of_weaste ?? 0;
+          final newPoints = currentPoints + 50;
+          final newWasteCount = currentWasteCount + 1;
+          
+          // Update business points and waste count
+          await businessProfileCubit.updateProfile(
+            userId: widget.userId,
+            data: {
+              'points': newPoints,
+              'no_of_weaste': newWasteCount,
+            },
+          );
+          
+          print('Business user points incremented by 50 and waste count by 1. New total: $newPoints points, $newWasteCount waste submissions');
+        } else {
+          print('Could not get current business profile to increment points');
+        }
+      } else {
+        print('Unknown user type: $userType. Cannot increment points.');
+      }
+    } catch (e) {
+      print('Error incrementing user points: $e');
     }
   }
 
@@ -296,9 +382,13 @@ class _WeastBodyState extends State<WeastBody>{
           setState(() {
             _isSubmitting = false;
           });
+          
+          // Increment user points by 50 for successful waste submission
+          _incrementUserPoints();
+          
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Waste pickup request submitted successfully!'),
+              content: Text('Waste pickup request submitted successfully! +50 points earned and waste count updated!'),
               backgroundColor: Colors.green,
             ),
           );
@@ -389,39 +479,117 @@ class _WeastBodyState extends State<WeastBody>{
                   const SizedBox(height: 24),
                   
                   // Waste Type
-                  TextFormField(
-                    controller: _typeController,
-                    decoration: const InputDecoration(
-                      labelText: 'Waste Type',
-                      hintText: 'e.g., Plastic, Paper, Electronics, Metal',
-                      prefixIcon: Icon(Icons.category),
-                      border: OutlineInputBorder(),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Please enter waste type';
-                      }
-                      return null;
-                    },
+                    child: TextFormField(
+                      controller: _typeController,
+                      decoration: InputDecoration(
+                        labelText: 'Waste Type',
+                        hintText: 'e.g., Plastic, Paper, Electronics, Metal',
+                        prefixIcon: const Icon(Icons.category, color: AppColors.primary),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.primary, width: 2),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.primary, width: 2.5),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.primary, width: 2),
+                        ),
+                        fillColor: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF222831)
+                            : Colors.white,
+                        filled: true,
+                        labelStyle: TextStyle(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        hintStyle: TextStyle(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Please enter waste type';
+                        }
+                        return null;
+                      },
+                    ),
                   ),
                   
                   const SizedBox(height: 16),
                   
                   // Quantity
-                  TextFormField(
-                    controller: _quantityController,
-                    decoration: const InputDecoration(
-                      labelText: 'Quantity',
-                      hintText: 'e.g., 5 kg, 2 bags, 1 box',
-                      prefixIcon: Icon(Icons.scale),
-                      border: OutlineInputBorder(),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Please enter quantity';
-                      }
-                      return null;
-                    },
+                    child: TextFormField(
+                      controller: _quantityController,
+                      decoration: InputDecoration(
+                        labelText: 'Quantity',
+                        hintText: 'e.g., 5 kg, 2 bags, 1 box',
+                        prefixIcon: const Icon(Icons.scale, color: AppColors.primary),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.primary, width: 2),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.primary, width: 2.5),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.primary, width: 2),
+                        ),
+                        fillColor: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF222831)
+                            : Colors.white,
+                        filled: true,
+                        labelStyle: TextStyle(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        hintStyle: TextStyle(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Please enter quantity';
+                        }
+                        return null;
+                      },
+                    ),
                   ),
                   
                   const SizedBox(height: 16),
@@ -449,20 +617,59 @@ class _WeastBodyState extends State<WeastBody>{
                           const SizedBox(height: 12),
                           
                           // Location Input
-                          TextFormField(
-                            controller: _locationController,
-                            decoration: InputDecoration(
-                              labelText: 'Your Location',
-                              hintText: 'e.g., New York, Los Angeles, Chicago',
-                              prefixIcon: const Icon(Icons.edit_location),
-                              border: const OutlineInputBorder(),
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primary.withOpacity(0.1),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
                             ),
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Please enter location';
-                              }
-                              return null;
-                            },
+                            child: TextFormField(
+                              controller: _locationController,
+                              decoration: InputDecoration(
+                                labelText: 'Your Location',
+                                hintText: 'e.g., New York, Los Angeles, Chicago',
+                                prefixIcon: const Icon(Icons.edit_location, color: AppColors.primary),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(color: AppColors.primary, width: 2),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(color: AppColors.primary, width: 2.5),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(color: AppColors.primary, width: 2),
+                                ),
+                                fillColor: Theme.of(context).brightness == Brightness.dark
+                                    ? const Color(0xFF222831) // or AppColors.textPrimary if it's dark
+                                    : Colors.white,
+                                filled: true,
+                                labelStyle: TextStyle(
+                                  color: Theme.of(context).brightness == Brightness.dark
+                                      ? Colors.white
+                                      : Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                hintStyle: TextStyle(
+                                  color: Theme.of(context).brightness == Brightness.dark
+                                      ? Colors.white
+                                      : Colors.black,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Please enter location';
+                                }
+                                return null;
+                              },
+                            ),
                           ),
                           
                           // Show selected coordinates if available
@@ -511,8 +718,13 @@ class _WeastBodyState extends State<WeastBody>{
                                     : const Icon(Icons.my_location),
                                   label: Text(_isGettingLocation ? 'Getting...' : 'Use Current Location'),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blue,
+                                    backgroundColor: AppColors.primary,
                                     foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    elevation: 2,
                                   ),
                                 ),
                               ),
@@ -523,8 +735,13 @@ class _WeastBodyState extends State<WeastBody>{
                                   icon: const Icon(Icons.map),
                                   label: const Text('Pick on Map'),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green,
+                                    backgroundColor: AppColors.accent,
                                     foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    elevation: 2,
                                   ),
                                 ),
                               ),
@@ -578,6 +795,8 @@ class _WeastBodyState extends State<WeastBody>{
                               : const Icon(Icons.search),
                             label: const Text('Search by Location Name'),
                             style: OutlinedButton.styleFrom(
+                              foregroundColor: AppColors.primary,
+                              side: BorderSide(color: AppColors.primary, width: 2),
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -796,48 +1015,6 @@ class _WeastBodyState extends State<WeastBody>{
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 16),
-                  
-                  // Instructions
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.blue[50],
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.blue[200]!),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.info_outline, color: Colors.blue[700]),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Instructions',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blue[700],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          '1. Fill in the waste type and quantity\n'
-                          '2. Set your location (use current location or pick on map)\n'
-                          '3. Choose how to find recycling centers:\n'
-                          '   • "Find Closest" - Shows centers sorted by distance\n'
-                          '   • "Search by Location Name" - Text-based search\n'
-                          '4. Select a recycling center from the list\n'
-                          '5. Submit your request\n\n'
-                          'The recycling center will contact you to arrange pickup.',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                      ],
                     ),
                   ),
                 ],

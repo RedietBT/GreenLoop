@@ -8,6 +8,7 @@ import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_
 import 'package:greenloop/src/profile/Individual/presentation/cubits/individual_profile_state.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:greenloop/core/commen/widgets/location_picker_widget.dart';
+import 'package:greenloop/core/commen/widgets/global_footer.dart';
 
 class EditProfilePage extends StatefulWidget {
   final String userId;
@@ -38,6 +39,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   LatLng? _selectedLocationFromMap;
 
   bool _updateInProgress = false;
+  
+  // Footer state management
+  int _currentFooterIndex = 0;
 
   @override
   void initState() {
@@ -205,6 +209,61 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
+  void _onFooterTap(int index) {
+    setState(() {
+      _currentFooterIndex = index;
+    });
+    
+    switch (index) {
+      case 0: // Home
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/individualProfile',
+          arguments: widget.userId,
+          (route) => false,
+        );
+        break;
+      case 1: // AI
+        // Navigate to AI page when implemented
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('AI feature coming soon!')),
+        );
+        break;
+      case 2: // Logout
+        _showLogoutDialog();
+        break;
+    }
+  }
+
+  void _showLogoutDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Logout'),
+          content: const Text('Are you sure you want to logout?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/login',
+                  (route) => false,
+                );
+              },
+              child: const Text('Logout'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -213,10 +272,41 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return _PageEntranceAnimation(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Edit Profile'),
-          backgroundColor: isDark ? AppColors.backgroundDark : AppColors.primary,
-          foregroundColor: Colors.white,
-          elevation: 2,
+          title: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            child: Text(
+              'Edit Profile',
+              style: TextStyle(
+                color: isDark ? Colors.white : AppColors.textPrimary,
+                fontFamily: 'Poppins-Bold',
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+          centerTitle: true,
+          backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundTwo,
+          foregroundColor: isDark ? Colors.white : AppColors.textPrimary,
+          elevation: 0,
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back,
+              color: isDark ? Colors.white : AppColors.textPrimary,
+              size: 24,
+            ),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
         ),
         backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundTwo,
         body: BlocListener<IndividualProfileCubit, IndividualProfileState>(
@@ -268,142 +358,153 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
               return Form(
                 key: _formKey,
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: _pickImage,
-                        child: Stack(
-                          alignment: Alignment.center,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 500),
-                              child: CircleAvatar(
-                                key: ValueKey(_pickedImage?.path ?? _currentAvatarUrl ?? 'default'),
-                                radius: 70,
-                                backgroundColor: Theme.of(context).primaryColor.withOpacity(0.7),
-                                backgroundImage: _pickedImage != null
-                                    ? FileImage(_pickedImage!)
-                                    : (_currentAvatarUrl != null && _currentAvatarUrl!.isNotEmpty
-                                        ? NetworkImage(_currentAvatarUrl!)
-                                        : null) as ImageProvider<Object>?,
-                                child: _pickedImage == null && (_currentAvatarUrl == null || _currentAvatarUrl!.isEmpty)
-                                    ? const Icon(Icons.person, size: 70, color: Colors.white)
-                                    : null,
+                            GestureDetector(
+                              onTap: _pickImage,
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 500),
+                                    child: CircleAvatar(
+                                      key: ValueKey(_pickedImage?.path ?? _currentAvatarUrl ?? 'default'),
+                                      radius: 70,
+                                      backgroundColor: Theme.of(context).primaryColor.withOpacity(0.7),
+                                      backgroundImage: _pickedImage != null
+                                          ? FileImage(_pickedImage!)
+                                          : (_currentAvatarUrl != null && _currentAvatarUrl!.isNotEmpty
+                                              ? NetworkImage(_currentAvatarUrl!)
+                                              : null) as ImageProvider<Object>?,
+                                      child: _pickedImage == null && (_currentAvatarUrl == null || _currentAvatarUrl!.isEmpty)
+                                          ? const Icon(Icons.person, size: 70, color: Colors.white)
+                                          : null,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: _BouncyCameraIcon(),
+                                  ),
+                                ],
                               ),
                             ),
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: _BouncyCameraIcon(),
+                            const SizedBox(height: 30),
+                            _AnimatedFormField(
+                              controller: _firstNameController,
+                              label: 'First Name',
+                              icon: Icons.person_outline,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Please enter your first name';
+                                }
+                                return null;
+                              },
+                              isDark: isDark,
+                              borderColor: borderColor,
                             ),
+                            const SizedBox(height: 16),
+                            _AnimatedFormField(
+                              controller: _lastNameController,
+                              label: 'Last Name',
+                              icon: Icons.person_outline,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Please enter your last name';
+                                }
+                                return null;
+                              },
+                              isDark: isDark,
+                              borderColor: borderColor,
+                            ),
+                            const SizedBox(height: 16),
+                            _AnimatedFormField(
+                              controller: _emailController,
+                              label: 'Email',
+                              icon: Icons.email_outlined,
+                              keyboardType: TextInputType.emailAddress,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Please enter your email';
+                                }
+                                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                                  return 'Please enter a valid email address';
+                                }
+                                return null;
+                              },
+                              isDark: isDark,
+                              borderColor: borderColor,
+                            ),
+                            const SizedBox(height: 16),
+                            _AnimatedFormField(
+                              controller: _latitudeDisplayController,
+                              label: 'Latitude',
+                              icon: Icons.location_on_outlined,
+                              enabled: false,
+                              isDark: isDark,
+                              borderColor: borderColor,
+                            ),
+                            const SizedBox(height: 16),
+                            _AnimatedFormField(
+                              controller: _longitudeDisplayController,
+                              label: 'Longitude',
+                              icon: Icons.location_on_outlined,
+                              enabled: false,
+                              isDark: isDark,
+                              borderColor: borderColor,
+                            ),
+                            const SizedBox(height: 8),
+                            _AnimatedLocationPickerButton(
+                              onPick: () async {
+                                final LatLng? pickedLocation = await Navigator.push<LatLng>(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => LocationPickerWidget(
+                                      initialLocation: _selectedLocationFromMap ?? _originalLocation,
+                                    ),
+                                  ),
+                                );
+                                if (pickedLocation != null) {
+                                  setState(() {
+                                    _selectedLocationFromMap = pickedLocation;
+                                    _latitudeDisplayController.text = pickedLocation.latitude.toString();
+                                    _longitudeDisplayController.text = pickedLocation.longitude.toString();
+                                  });
+                                }
+                              },
+                              isDark: isDark,
+                            ),
+                            const SizedBox(height: 16),
+                            _AnimatedFormField(
+                              controller: _descriptionController,
+                              label: 'About Me',
+                              icon: Icons.info_outline,
+                              maxLines: 3,
+                              isDark: isDark,
+                              borderColor: borderColor,
+                            ),
+                            const SizedBox(height: 24),
+                            _AnimatedSaveButton(
+                              isLoading: _updateInProgress,
+                              onTap: _updateProfile,
+                              isDark: isDark,
+                            ),
+                            const SizedBox(height: 20),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 30),
-                      _AnimatedFormField(
-                        controller: _firstNameController,
-                        label: 'First Name',
-                        icon: Icons.person_outline,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Please enter your first name';
-                          }
-                          return null;
-                        },
-                        isDark: isDark,
-                        borderColor: borderColor,
-                      ),
-                      const SizedBox(height: 16),
-                      _AnimatedFormField(
-                        controller: _lastNameController,
-                        label: 'Last Name',
-                        icon: Icons.person_outline,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Please enter your last name';
-                          }
-                          return null;
-                        },
-                        isDark: isDark,
-                        borderColor: borderColor,
-                      ),
-                      const SizedBox(height: 16),
-                      _AnimatedFormField(
-                        controller: _emailController,
-                        label: 'Email',
-                        icon: Icons.email_outlined,
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Please enter your email';
-                          }
-                          if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                            return 'Please enter a valid email address';
-                          }
-                          return null;
-                        },
-                        isDark: isDark,
-                        borderColor: borderColor,
-                      ),
-                      const SizedBox(height: 16),
-                      _AnimatedFormField(
-                        controller: _latitudeDisplayController,
-                        label: 'Latitude',
-                        icon: Icons.location_on_outlined,
-                        enabled: false,
-                        isDark: isDark,
-                        borderColor: borderColor,
-                      ),
-                      const SizedBox(height: 16),
-                      _AnimatedFormField(
-                        controller: _longitudeDisplayController,
-                        label: 'Longitude',
-                        icon: Icons.location_on_outlined,
-                        enabled: false,
-                        isDark: isDark,
-                        borderColor: borderColor,
-                      ),
-                      const SizedBox(height: 8),
-                      _AnimatedLocationPickerButton(
-                        onPick: () async {
-                          final LatLng? pickedLocation = await Navigator.push<LatLng>(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => LocationPickerWidget(
-                                initialLocation: _selectedLocationFromMap ?? _originalLocation,
-                              ),
-                            ),
-                          );
-                          if (pickedLocation != null) {
-                            setState(() {
-                              _selectedLocationFromMap = pickedLocation;
-                              _latitudeDisplayController.text = pickedLocation.latitude.toString();
-                              _longitudeDisplayController.text = pickedLocation.longitude.toString();
-                            });
-                          }
-                        },
-                        isDark: isDark,
-                      ),
-                      const SizedBox(height: 16),
-                      _AnimatedFormField(
-                        controller: _descriptionController,
-                        label: 'About Me',
-                        icon: Icons.info_outline,
-                        maxLines: 3,
-                        isDark: isDark,
-                        borderColor: borderColor,
-                      ),
-                      const SizedBox(height: 24),
-                      _AnimatedSaveButton(
-                        isLoading: _updateInProgress,
-                        onTap: _updateProfile,
-                        isDark: isDark,
-                      ),
-                    ],
-                  ),
+                    ),
+                    GlobalFooter(
+                      currentIndex: _currentFooterIndex,
+                      onTap: _onFooterTap,
+                    ),
+                  ],
                 ),
               );
             },

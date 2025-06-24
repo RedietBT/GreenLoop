@@ -34,6 +34,7 @@ class WeastCubit  extends Cubit<WeastState>{
     required String type,
     required String quantity,
     required LatLng? location,
+    required String userType,
     Function()? onSuccess,
   }) async {
     emit(WeastLoading());
@@ -43,6 +44,7 @@ class WeastCubit  extends Cubit<WeastState>{
       type,
       quantity,
       location,
+      userType,
     );
     result.fold(
       (failure) => emit(WeastError(failure.errorMassage)),

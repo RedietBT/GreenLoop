@@ -1609,14 +1609,14 @@ class _AnimatedPickupButtonState extends State<_AnimatedPickupButton> with Singl
                       ),
                     ],
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 24),
+                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Icon(
                         Icons.recycling,
                         color: Colors.white,
-                        size: 24,
+                        size: 22,
                       ),
                       const SizedBox(width: 12),
                       Text(
@@ -1624,7 +1624,7 @@ class _AnimatedPickupButtonState extends State<_AnimatedPickupButton> with Singl
                         style: TextStyle(
                           fontFamily: Fonts.fontFamilyBold,
                           fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                          fontSize: 16,
                           color: Colors.white,
                         ),
                       ),

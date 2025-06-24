@@ -6,7 +6,7 @@ class IncrementUserWasteCount {
 
   IncrementUserWasteCount(this.repository);
 
-  ResultFuture<void> call(String userId) async {
-    return await repository.incrementUserWasteCount(userId);
+  ResultFuture<void> call(String userId, String userType) async {
+    return await repository.incrementUserWasteCount(userId, userType);
   }
 } 

@@ -14,6 +14,7 @@ class InsertWeastProfile {
      String type,
      String quantity,
      LatLng? location,
+     String userType,
   ) async {
     return await repository.insertWeastProfile(
       weastId,
@@ -21,6 +22,7 @@ class InsertWeastProfile {
       type,
       quantity,
       location,
+      userType,
     );
   }
 }
